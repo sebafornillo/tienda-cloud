@@ -2,11 +2,7 @@
 
 Una sola app React/Vite que sirve infinitas tiendas. Cada tienda vive en su subdominio y toda la data se aísla por `tenant_id` con Row Level Security de Supabase.
 
-## Paso 1 — Supabase
 
-1. Creá el proyecto en [supabase.com](https://supabase.com).
-2. Andá a **SQL Editor → New query**, pegá el contenido de `schema_multitenant.sql` y ejecutalo. Esto crea las tablas, la seguridad y dos tiendas de prueba (`mates` y `burger`).
-3. En **Project Settings → API**, copiá la `URL` y la `anon public key`.
 
 ## Paso 2 — El proyecto
 
