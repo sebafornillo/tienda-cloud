@@ -1,0 +1,35 @@
+import { Routes, Route } from 'react-router-dom'
+import { useTenant } from './lib/TenantContext'
+import Store from './pages/Store'
+import Checkout from './pages/Checkout'
+import OrderConfirmed from './pages/OrderConfirmed'
+import AdminLogin from './admin/AdminLogin'
+import AdminLayout from './admin/AdminLayout'
+import Orders from './admin/Orders'
+import Products from './admin/Products'
+
+export default function App() {
+  const { tenant, loading, error } = useTenant()
+
+  if (loading) return <div className="screen-msg">Cargando…</div>
+  if (error || !tenant)
+    return (
+      <div className="screen-msg">
+        <h1>Tienda no encontrada</h1>
+        <p>Verificá la dirección o probá con ?tienda=burger / ?tienda=mates</p>
+      </div>
+    )
+
+  return (
+    <Routes>
+      <Route path="/" element={<Store />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/pedido/:orderNumber" element={<OrderConfirmed />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Orders />} />
+        <Route path="productos" element={<Products />} />
+      </Route>
+    </Routes>
+  )
+}
