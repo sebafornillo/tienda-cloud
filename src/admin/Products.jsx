@@ -19,6 +19,27 @@ export default function Products() {
   const [editing, setEditing] = useState(null) // null | {id?, ...EMPTY}
   const [newCat, setNewCat] = useState('')
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState(null)
+
+  async function uploadImage(file) {
+    if (!file) return
+    setUploading(true)
+    setUploadError(null)
+    const ext = file.name.split('.').pop().toLowerCase()
+    const path = `${tenant.id}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('products').upload(path, file, {
+      cacheControl: '31536000',
+      upsert: false,
+    })
+    if (error) {
+      setUploadError('No se pudo subir la imagen. Probá de nuevo.')
+    } else {
+      const { data } = supabase.storage.from('products').getPublicUrl(path)
+      setEditing((e) => ({ ...e, image_url: data.publicUrl }))
+    }
+    setUploading(false)
+  }
 
   async function load() {
     const [prods, cats] = await Promise.all([
@@ -131,14 +152,37 @@ export default function Products() {
                   ))}
                 </select>
               </label>
-              <label>
-                URL de imagen
-                <input
-                  value={editing.image_url}
-                  onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
-                  placeholder="https://…"
-                />
-              </label>
+              <div className="photo-field">
+                <span className="field-label">Foto</span>
+                <div className="photo-row">
+                  {editing.image_url ? (
+                    <img className="photo-preview" src={editing.image_url} alt="" />
+                  ) : (
+                    <div className="photo-preview placeholder" />
+                  )}
+                  <div className="photo-actions">
+                    <label className="btn-upload">
+                      {uploading ? 'Subiendo…' : editing.image_url ? 'Cambiar foto' : 'Subir foto'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        hidden
+                        disabled={uploading}
+                        onChange={(e) => uploadImage(e.target.files?.[0])}
+                      />
+                    </label>
+                    {editing.image_url && (
+                      <button
+                        className="link danger"
+                        onClick={() => setEditing({ ...editing, image_url: '' })}
+                      >
+                        Quitar
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {uploadError && <p className="error">{uploadError}</p>}
+              </div>
               <label className="check-label">
                 <input
                   type="checkbox"
