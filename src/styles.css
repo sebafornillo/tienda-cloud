@@ -421,3 +421,77 @@ img { display: block; }
   font-size: 0.9rem;
   cursor: pointer;
 }
+
+/* ---------- Editor de opciones/adicionales (admin) ---------- */
+.editor-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  margin-top: 1rem;
+  background: var(--paper);
+}
+.editor-group-head {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.editor-group-head small { color: var(--ink-soft); flex: 1; }
+.editor-options { list-style: none; margin: 0; padding: 0; }
+.editor-options li {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.95rem;
+}
+.editor-options li span:first-child { flex: 1; }
+.editor-options .delta { color: var(--ink-soft); font-size: 0.88rem; }
+.editor-add-option {
+  display: flex; gap: 0.4rem; margin-top: 0.6rem;
+}
+.editor-add-option input {
+  border: 1px solid var(--line); border-radius: 8px; padding: 0.5rem;
+  background: var(--card); font-size: 0.9rem;
+}
+.editor-add-option input:first-child { flex: 1; }
+.editor-add-option input[type="number"] { width: 90px; }
+.btn-small {
+  border: 1px solid var(--brand); color: var(--brand);
+  background: none; border-radius: 8px; padding: 0 0.85rem; font-weight: 600;
+  font-size: 0.88rem;
+}
+.editor-new-group {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 0.7rem;
+}
+.editor-new-group h3 { font-size: 1rem; margin: 0; }
+.editor-new-group input {
+  border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem; background: var(--card);
+}
+.editor-new-group-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  font-size: 0.9rem;
+}
+.max-label { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.88rem; }
+.max-label input { width: 64px; padding: 0.45rem; }
+
+/* ---------- Historial y KPIs (admin) ---------- */
+.range-picker { max-width: 260px; }
+.range-picker button { padding: 0.5rem 0.9rem; font-size: 0.88rem; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  display: flex; flex-direction: column; gap: 0.2rem;
+}
+.kpi-value { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
+.kpi-label { color: var(--ink-soft); font-size: 0.8rem; }
+.badge.b-delivered { background: #d7ecd9; color: #1e5b2a; }
+.badge.b-cancelled { background: #f4d7d5; color: #8a1f18; }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { money } from '../lib/CartContext'
+import ModifierEditor from './ModifierEditor'
 
 const EMPTY = {
   name: '',
@@ -21,6 +22,7 @@ export default function Products() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState(null)
+  const [editingMods, setEditingMods] = useState(null)
 
   async function uploadImage(file) {
     if (!file) return
@@ -219,6 +221,9 @@ export default function Products() {
               <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '' })}>
                 Editar
               </button>
+              <button className="link" onClick={() => setEditingMods(p)}>
+                Opciones
+              </button>
               <button className="link" onClick={() => toggleActive(p)}>
                 {p.is_active ? 'Ocultar' : 'Mostrar'}
               </button>
@@ -230,6 +235,10 @@ export default function Products() {
         ))}
       </ul>
       {products.length === 0 && <p className="empty">Todavía no cargaste productos.</p>}
+
+      {editingMods && (
+        <ModifierEditor product={editingMods} onClose={() => setEditingMods(null)} />
+      )}
     </div>
   )
 }
