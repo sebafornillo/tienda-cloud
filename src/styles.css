@@ -544,3 +544,76 @@ img { display: block; }
   align-items: center;
 }
 .btn-wa:active { transform: scale(0.98); }
+
+/* ---------- Estadísticas ampliadas (admin) ---------- */
+.stats-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.stats-block h2 { font-size: 1rem; margin-bottom: 0.85rem; }
+.section-title { font-size: 1rem; margin: 1.25rem 0 0.75rem; }
+
+.delta-up { color: #1e5b2a; font-size: 0.75rem; font-weight: 600; }
+.delta-down { color: #8a1f18; font-size: 0.75rem; font-weight: 600; }
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 140px;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+}
+.bar {
+  width: 100%;
+  max-width: 34px;
+  background: var(--brand);
+  border-radius: 6px 6px 0 0;
+  opacity: 0.85;
+  transition: height 0.3s ease;
+}
+.bar-col:hover .bar { opacity: 1; }
+.bar-label {
+  font-size: 0.62rem;
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+}
+/* En 30 días, mostrar 1 de cada 3 etiquetas para que no se amontonen */
+.bar-chart .bar-col:nth-child(3n+2) .bar-label,
+.bar-chart .bar-col:nth-child(3n) .bar-label { visibility: hidden; }
+.bar-chart:has(.bar-col:nth-child(-n+10):last-child) .bar-col .bar-label { visibility: visible; }
+
+.top-products { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+.top-products li {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.95rem;
+}
+.top-products li:last-child { border-bottom: none; }
+.top-rank {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.top-name { flex: 1; font-weight: 600; }
+.top-qty { color: var(--ink-soft); font-size: 0.88rem; }
+.top-revenue { font-weight: 700; }
