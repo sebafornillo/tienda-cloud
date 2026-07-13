@@ -8,6 +8,7 @@ import AdminLayout from './admin/AdminLayout'
 import Orders from './admin/Orders'
 import Products from './admin/Products'
 import History from './admin/History'
+import Settings from './admin/Settings'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
@@ -31,6 +32,7 @@ export default function App() {
         <Route index element={<Orders />} />
         <Route path="productos" element={<Products />} />
         <Route path="historial" element={<History />} />
+        <Route path="config" element={<Settings />} />
       </Route>
     </Routes>
   )

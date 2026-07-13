@@ -495,3 +495,38 @@ img { display: block; }
 .kpi-label { color: var(--ink-soft); font-size: 0.8rem; }
 .badge.b-delivered { background: #d7ecd9; color: #1e5b2a; }
 .badge.b-cancelled { background: #f4d7d5; color: #8a1f18; }
+
+/* ---------- Configuración de tienda (admin) ---------- */
+.settings-page { max-width: 560px; }
+.settings-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 1rem;
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+.settings-input {
+  border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem; background: var(--paper);
+}
+.hint { color: var(--ink-soft); font-size: 0.8rem; }
+.banner-preview {
+  width: 100%; max-width: 360px; height: 110px;
+  border-radius: 12px; object-fit: cover; border: 1px solid var(--line);
+}
+.banner-preview.placeholder { background: var(--line); }
+.color-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.color-row input[type="color"] {
+  width: 52px; height: 40px; border: 1px solid var(--line); border-radius: 8px;
+  background: none; padding: 2px; cursor: pointer;
+}
+.color-hex {
+  width: 110px;
+  border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem;
+  background: var(--paper); font-family: monospace;
+}
+.color-sample {
+  color: #fff; font-size: 0.82rem; font-weight: 600;
+  padding: 0.5rem 0.9rem; border-radius: 999px;
+}
+.success { color: #1e5b2a; font-size: 0.9rem; }
