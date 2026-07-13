@@ -37,46 +37,37 @@ export default function Checkout() {
     setSending(true)
     setError(null)
 
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
+    // Crea pedido + items de forma atómica vía función de base de datos.
+    // Funciona para clientes anónimos (no requiere permiso de lectura).
+    const { data: result, error: orderError } = await supabase.rpc('place_order', {
+      order_data: {
         tenant_id: tenant.id,
         customer_name: form.customer_name.trim(),
         customer_phone: form.customer_phone.trim(),
         delivery_type: form.delivery_type,
-        address: form.delivery_type === 'delivery' ? form.address.trim() : null,
-        notes: form.notes.trim() || null,
+        address: form.delivery_type === 'delivery' ? form.address.trim() : '',
+        notes: form.notes.trim(),
         subtotal,
         delivery_fee: deliveryFee,
         total,
         payment_method: form.payment_method,
-      })
-      .select('id, order_number')
-      .single()
+      },
+      items_data: items.map((i) => ({
+        product_id: i.product.id,
+        product_name: i.product.name,
+        unit_price: i.unitPrice,
+        quantity: i.quantity,
+        modifiers: i.modifiers.map((m) => ({ name: m.name, price_delta: m.price_delta })),
+        line_total: i.unitPrice * i.quantity,
+      })),
+    })
 
-    if (orderError) {
+    if (orderError || !result?.length) {
       setError('No pudimos enviar el pedido. Probá de nuevo.')
       setSending(false)
       return
     }
-
-    const rows = items.map((i) => ({
-      tenant_id: tenant.id,
-      order_id: order.id,
-      product_id: i.product.id,
-      product_name: i.product.name,
-      unit_price: i.unitPrice,
-      quantity: i.quantity,
-      modifiers: i.modifiers.map((m) => ({ name: m.name, price_delta: m.price_delta })),
-      line_total: i.unitPrice * i.quantity,
-    }))
-    const { error: itemsError } = await supabase.from('order_items').insert(rows)
-
-    if (itemsError) {
-      setError('No pudimos enviar el pedido. Probá de nuevo.')
-      setSending(false)
-      return
-    }
+    const order = { id: result[0].order_id, order_number: result[0].new_order_number }
 
     if (form.payment_method === 'mercadopago') {
       const backUrl = `${window.location.origin}/pedido/${order.order_number}${window.location.search}`
