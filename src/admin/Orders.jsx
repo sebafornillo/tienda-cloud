@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { money } from '../lib/CartContext'
@@ -19,11 +19,100 @@ const NEXT_LABEL = {
   ready: 'Entregado',
 }
 
+// ---------- Sonido de pedido nuevo (sin archivos: sintetizado) ----------
+let audioCtx = null
+function ensureAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    if (audioCtx.state === 'suspended') audioCtx.resume()
+  } catch {}
+}
+function playDing() {
+  try {
+    ensureAudio()
+    if (!audioCtx) return
+    const note = (freq, t0, dur) => {
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      const t = audioCtx.currentTime + t0
+      gain.gain.setValueAtTime(0.0001, t)
+      gain.gain.exponentialRampToValueAtTime(0.35, t + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+      osc.start(t)
+      osc.stop(t + dur + 0.05)
+    }
+    note(880, 0, 0.4) // La5
+    note(1174.66, 0.18, 0.55) // Re6 — "ding-dong" ascendente
+  } catch {}
+}
+
+// ---------- WhatsApp al cliente ----------
+// Normaliza teléfonos argentinos al formato de wa.me (549 + número)
+function waNumber(phone) {
+  let d = (phone || '').replace(/\D/g, '')
+  if (d.startsWith('549')) return d
+  if (d.startsWith('54')) return '549' + d.slice(2)
+  if (d.startsWith('0')) d = d.slice(1)
+  return '549' + d
+}
+function waMessage(order, tenantName) {
+  const n = order.order_number
+  const name = order.customer_name.split(' ')[0]
+  const byStatus = {
+    pending: `recibimos tu pedido #${n} y lo estamos revisando.`,
+    confirmed: `tu pedido #${n} está confirmado y entra a cocina. 🙌`,
+    preparing: `tu pedido #${n} se está preparando. 👨‍🍳`,
+    ready:
+      order.delivery_type === 'delivery'
+        ? `tu pedido #${n} está listo y sale en camino. 🛵`
+        : `tu pedido #${n} está listo para retirar. ✅`,
+    delivered: `¡gracias por tu compra! Esperamos que disfrutes tu pedido #${n}. 😊`,
+    cancelled: `lamentablemente tuvimos que cancelar tu pedido #${n}. Escribinos y lo resolvemos.`,
+  }
+  return encodeURIComponent(
+    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}`
+  )
+}
+
 export default function Orders() {
   const { tenant } = useTenant()
   const [orders, setOrders] = useState([])
-  const [items, setItems] = useState({}) // orderId -> items
+  const [items, setItems] = useState({})
   const [open, setOpen] = useState(null)
+  const pendingAlerts = useRef(0)
+
+  // El navegador bloquea el audio hasta la primera interacción:
+  // con el primer click/tecla en el panel dejamos el audio listo.
+  useEffect(() => {
+    const unlock = () => ensureAudio()
+    window.addEventListener('pointerdown', unlock, { once: true })
+    window.addEventListener('keydown', unlock, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+  }, [])
+
+  // Al volver a la pestaña, se limpia el aviso del título
+  useEffect(() => {
+    const clearTitle = () => {
+      pendingAlerts.current = 0
+      document.title = tenant.name
+    }
+    const onVisible = () => {
+      if (!document.hidden) clearTitle()
+    }
+    window.addEventListener('focus', clearTitle)
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.removeEventListener('focus', clearTitle)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [tenant.name])
 
   useEffect(() => {
     async function load() {
@@ -50,17 +139,30 @@ export default function Orders() {
         },
         (payload) => {
           setOrders((prev) => [payload.new, ...prev])
-          try {
-            new Audio(
-              'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'
-            ).play()
-          } catch {}
+          playDing()
+          pendingAlerts.current += 1
+          document.title = `(🔔 ${pendingAlerts.current}) Pedido nuevo — ${tenant.name}`
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `tenant_id=eq.${tenant.id}`,
+        },
+        (payload) => {
+          // Refleja pagos confirmados por webhook (✓ PAGADO) sin refrescar
+          setOrders((prev) =>
+            prev.map((o) => (o.id === payload.new.id ? { ...o, ...payload.new } : o))
+          )
         }
       )
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [tenant.id])
+  }, [tenant.id, tenant.name])
 
   async function toggleDetail(order) {
     if (open === order.id) {
@@ -139,6 +241,14 @@ export default function Orders() {
                         {NEXT_LABEL[o.status]}
                       </button>
                     )}
+                    <a
+                      className="btn-wa"
+                      href={`https://wa.me/${waNumber(o.customer_phone)}?text=${waMessage(o, tenant.name)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      WhatsApp
+                    </a>
                     <button className="link danger" onClick={() => setStatus(o, 'cancelled')}>
                       Cancelar pedido
                     </button>

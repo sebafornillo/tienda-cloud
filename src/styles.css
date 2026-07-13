@@ -530,3 +530,17 @@ img { display: block; }
   padding: 0.5rem 0.9rem; border-radius: 999px;
 }
 .success { color: #1e5b2a; font-size: 0.9rem; }
+
+/* ---------- Botón WhatsApp (admin) ---------- */
+.btn-wa {
+  background: #25d366;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-wa:active { transform: scale(0.98); }
