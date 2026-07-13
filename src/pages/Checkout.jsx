@@ -18,6 +18,7 @@ export default function Checkout() {
   })
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
+  const mpEnabled = tenant.settings?.mp_enabled === true
 
   const deliveryFee = 0 // luego: calcular según settings.delivery_zones
   const total = subtotal + deliveryFee
@@ -74,6 +75,21 @@ export default function Checkout() {
     if (itemsError) {
       setError('No pudimos enviar el pedido. Probá de nuevo.')
       setSending(false)
+      return
+    }
+
+    if (form.payment_method === 'mercadopago') {
+      const backUrl = `${window.location.origin}/pedido/${order.order_number}${window.location.search}`
+      const { data, error: fnError } = await supabase.functions.invoke('create-payment', {
+        body: { order_id: order.id, back_url: backUrl },
+      })
+      if (fnError || !data?.init_point) {
+        setError('No pudimos iniciar el pago. Probá con otro medio.')
+        setSending(false)
+        return
+      }
+      clear()
+      window.location.href = data.init_point // redirige a Mercado Pago
       return
     }
 
@@ -185,6 +201,14 @@ export default function Checkout() {
           >
             Transferencia
           </button>
+          {mpEnabled && (
+            <button
+              className={form.payment_method === 'mercadopago' ? 'active' : ''}
+              onClick={() => set('payment_method', 'mercadopago')}
+            >
+              Mercado Pago
+            </button>
+          )}
         </div>
       </div>
 
@@ -197,7 +221,11 @@ export default function Checkout() {
       {error && <p className="error">{error}</p>}
 
       <button className="btn-primary full" disabled={!canSubmit || sending} onClick={submit}>
-        {sending ? 'Enviando…' : `Confirmar pedido · ${money(total)}`}
+        {sending
+          ? 'Enviando…'
+          : form.payment_method === 'mercadopago'
+          ? `Pagar con Mercado Pago · ${money(total)}`
+          : `Confirmar pedido · ${money(total)}`}
       </button>
     </div>
   )

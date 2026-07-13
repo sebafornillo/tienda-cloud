@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 
@@ -17,6 +17,20 @@ export default function Settings() {
   const [saved, setSaved] = useState(false)
   const [uploading, setUploading] = useState(null) // 'logo' | 'banner' | null
   const [error, setError] = useState(null)
+  const [mpToken, setMpToken] = useState('')
+  const [mpConfigured, setMpConfigured] = useState(false)
+
+  useEffect(() => {
+    async function loadSecret() {
+      const { data } = await supabase
+        .from('tenant_secrets')
+        .select('mp_access_token')
+        .eq('tenant_id', tenant.id)
+        .maybeSingle()
+      if (data?.mp_access_token) setMpConfigured(true)
+    }
+    loadSecret()
+  }, [tenant.id])
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -44,12 +58,28 @@ export default function Settings() {
   async function save() {
     setSaving(true)
     setError(null)
+
+    // Si cargó un token nuevo de MP, se guarda en la tabla segura
+    if (mpToken.trim()) {
+      const { error: secErr } = await supabase
+        .from('tenant_secrets')
+        .upsert({ tenant_id: tenant.id, mp_access_token: mpToken.trim() })
+      if (secErr) {
+        setError('No se pudo guardar el token de Mercado Pago.')
+        setSaving(false)
+        return
+      }
+      setMpConfigured(true)
+      setMpToken('')
+    }
+
     const newSettings = {
       ...tenant.settings,
       logo_url: form.logo_url || null,
       banner_url: form.banner_url || null,
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
+      mp_enabled: mpConfigured || !!mpToken.trim(),
     }
     const { error: dbErr } = await supabase
       .from('tenants')
@@ -160,6 +190,24 @@ export default function Settings() {
         />
         <small className="hint">
           Se usa en el botón "Avisar por WhatsApp" que ve el cliente al confirmar su pedido.
+        </small>
+      </div>
+
+      <div className="settings-block">
+        <span className="field-label">Mercado Pago</span>
+        {mpConfigured && (
+          <p className="success">✓ Configurado — tus clientes pueden pagar online.</p>
+        )}
+        <input
+          className="settings-input"
+          type="password"
+          value={mpToken}
+          onChange={(e) => { setMpToken(e.target.value); setSaved(false) }}
+          placeholder={mpConfigured ? 'Pegar un token nuevo para reemplazar' : 'Access Token de producción (APP_USR-…)'}
+        />
+        <small className="hint">
+          Se obtiene en Mercado Pago → Tus integraciones → Credenciales de producción.
+          Se guarda de forma segura y nunca es visible en la tienda.
         </small>
       </div>
 

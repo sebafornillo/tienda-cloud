@@ -128,6 +128,7 @@ export default function Orders() {
                   {o.notes && <p className="order-notes">Nota: {o.notes}</p>}
                   <p className="order-notes">
                     Tel: {o.customer_phone} · Pago: {o.payment_method}
+                    {o.payment_status === 'paid' ? ' ✓ PAGADO' : ''}
                   </p>
                   <div className="order-actions">
                     {nextStatus && (
