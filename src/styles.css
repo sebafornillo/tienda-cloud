@@ -617,3 +617,93 @@ img { display: block; }
 .top-name { flex: 1; font-weight: 600; }
 .top-qty { color: var(--ink-soft); font-size: 0.88rem; }
 .top-revenue { font-weight: 700; }
+
+/* ============================================================
+   PASADA RESPONSIVE DEL ADMIN (pantallas chicas)
+   ============================================================ */
+@media (max-width: 640px) {
+  /* Header: el nav scrollea horizontal en vez de desbordar */
+  .admin-header {
+    gap: 0.75rem;
+    padding: 0.75rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .admin-header > strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 34vw;
+    font-size: 0.95rem;
+  }
+  .admin-header nav {
+    gap: 0.85rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-header nav::-webkit-scrollbar { display: none; }
+  .admin-header a { font-size: 0.88rem; white-space: nowrap; }
+  .admin-header .link { padding: 0.35rem 0; font-size: 0.85rem; }
+
+  /* Título + selector de rango: apilados */
+  .page-title-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .range-picker { max-width: none; }
+
+  /* Fila de pedido: 2 líneas (nro + cliente arriba, estado + total abajo) */
+  .order-summary {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "num customer total"
+      "num badge badge";
+    row-gap: 0.35rem;
+    padding: 0.75rem;
+  }
+  .order-summary .order-number { grid-area: num; }
+  .order-summary .order-customer { grid-area: customer; min-width: 0; }
+  .order-summary .order-customer small {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: block; max-width: 100%;
+  }
+  .order-summary .badge { grid-area: badge; justify-self: start; }
+  .order-summary .order-total { grid-area: total; }
+
+  /* Acciones del pedido: que no desborden */
+  .order-actions { flex-wrap: wrap; gap: 0.5rem; }
+  .order-actions .btn-primary { flex: 1 1 100%; }
+
+  /* Lista de productos: acciones abajo del nombre */
+  .admin-product-list li { flex-wrap: wrap; }
+  .admin-product-list .info { flex: 1 1 calc(100% - 66px); }
+  .admin-product-list .row-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    border-top: 1px dashed var(--line);
+    padding-top: 0.4rem;
+    margin-top: 0.2rem;
+  }
+
+  /* KPIs: siempre 2 columnas parejas */
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 1.1rem; }
+
+  /* Gráfico: barras un poco más finas y menos etiquetas */
+  .bar-chart { height: 110px; gap: 2px; }
+
+  /* Crear categoría: apilado */
+  .cat-manager { flex-direction: column; }
+  .cat-manager button { padding: 0.6rem; }
+
+  /* Editor de opciones: inputs apilados */
+  .editor-add-option { flex-wrap: wrap; }
+  .editor-add-option input:first-child { flex: 1 1 100%; }
+  .editor-new-group-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+
+  /* Página de configuración */
+  .settings-page { max-width: none; }
+  .color-row { gap: 0.5rem; }
+}
