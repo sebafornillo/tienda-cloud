@@ -707,3 +707,37 @@ img { display: block; }
   .settings-page { max-width: none; }
   .color-row { gap: 0.5rem; }
 }
+
+/* ---------- Panel de la plataforma (súper admin) ---------- */
+.tenant-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.tenant-list li {
+  display: flex; align-items: center; gap: 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  flex-wrap: wrap;
+}
+.tenant-list li.inactive { opacity: 0.5; }
+.tenant-color {
+  width: 14px; height: 42px; border-radius: 6px; flex-shrink: 0;
+}
+.tenant-info { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 0.15rem; }
+.tenant-info small { color: var(--ink-soft); }
+.tenant-info a { color: var(--ink-soft); }
+.tenant-stats {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem;
+  font-size: 0.85rem; color: var(--ink-soft);
+  min-width: 110px;
+}
+.tenant-stats strong { color: var(--ink); font-size: 1rem; }
+.tenant-actions { display: flex; align-items: center; flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .tenant-stats { align-items: flex-start; }
+  .tenant-actions {
+    flex: 1 1 100%;
+    border-top: 1px dashed var(--line);
+    padding-top: 0.4rem; margin-top: 0.2rem;
+    justify-content: flex-end;
+  }
+}

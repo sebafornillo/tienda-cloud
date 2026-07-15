@@ -9,6 +9,7 @@ import Orders from './admin/Orders'
 import Products from './admin/Products'
 import History from './admin/History'
 import Settings from './admin/Settings'
+import PlatformPanel from './platform/PlatformPanel'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
@@ -16,11 +17,19 @@ export default function App() {
   if (loading) return <div className="screen-msg">Cargando…</div>
   if (error === 'landing')
     return (
-      <div className="screen-msg">
-        <h1>Fornistore</h1>
-        <p>Tiendas online para tu negocio: pedidos, pagos y panel de gestión.</p>
-        <p className="desc">Muy pronto podrás crear tu tienda acá. 🚀</p>
-      </div>
+      <Routes>
+        <Route path="/panel/*" element={<PlatformPanel />} />
+        <Route
+          path="*"
+          element={
+            <div className="screen-msg">
+              <h1>Fornistore</h1>
+              <p>Tiendas online para tu negocio: pedidos, pagos y panel de gestión.</p>
+              <p className="desc">Muy pronto podrás crear tu tienda acá. 🚀</p>
+            </div>
+          }
+        />
+      </Routes>
     )
   if (error || !tenant)
     return (
