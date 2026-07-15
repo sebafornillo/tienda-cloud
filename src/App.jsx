@@ -14,11 +14,19 @@ export default function App() {
   const { tenant, loading, error } = useTenant()
 
   if (loading) return <div className="screen-msg">Cargando…</div>
+  if (error === 'landing')
+    return (
+      <div className="screen-msg">
+        <h1>Fornistore</h1>
+        <p>Tiendas online para tu negocio: pedidos, pagos y panel de gestión.</p>
+        <p className="desc">Muy pronto podrás crear tu tienda acá. 🚀</p>
+      </div>
+    )
   if (error || !tenant)
     return (
       <div className="screen-msg">
         <h1>Tienda no encontrada</h1>
-        <p>Verificá la dirección o probá con ?tienda=burger / ?tienda=mates</p>
+        <p>Verificá la dirección de la tienda.</p>
       </div>
     )
 
