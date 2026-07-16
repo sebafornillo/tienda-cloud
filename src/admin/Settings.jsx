@@ -19,6 +19,21 @@ export default function Settings() {
   const [error, setError] = useState(null)
   const [mpToken, setMpToken] = useState('')
   const [mpConfigured, setMpConfigured] = useState(false)
+  const [zones, setZones] = useState(
+    Array.isArray(tenant.settings?.delivery_zones) ? tenant.settings.delivery_zones : []
+  )
+  const [newZone, setNewZone] = useState({ name: '', fee: '' })
+
+  function addZone() {
+    if (!newZone.name.trim()) return
+    setZones([...zones, { name: newZone.name.trim(), fee: Number(newZone.fee) || 0 }])
+    setNewZone({ name: '', fee: '' })
+    setSaved(false)
+  }
+  function removeZone(i) {
+    setZones(zones.filter((_, idx) => idx !== i))
+    setSaved(false)
+  }
 
   useEffect(() => {
     async function loadSecret() {
@@ -79,6 +94,7 @@ export default function Settings() {
       banner_url: form.banner_url || null,
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
+      delivery_zones: zones,
       mp_enabled: mpConfigured || !!mpToken.trim(),
     }
     const { error: dbErr } = await supabase
@@ -191,6 +207,42 @@ export default function Settings() {
         <small className="hint">
           Se usa en el botón "Avisar por WhatsApp" que ve el cliente al confirmar su pedido.
         </small>
+      </div>
+
+      <div className="settings-block">
+        <span className="field-label">Zonas de delivery</span>
+        <small className="hint">
+          Si cargás zonas, el cliente elige la suya en el checkout y el costo se suma al
+          total. Sin zonas, el delivery no cobra envío.
+        </small>
+        {zones.length > 0 && (
+          <ul className="zone-list">
+            {zones.map((z, i) => (
+              <li key={i}>
+                <span>{z.name}</span>
+                <span className="delta">
+                  {Number(z.fee) > 0 ? `$ ${Number(z.fee).toLocaleString('es-AR')}` : 'Sin costo'}
+                </span>
+                <button className="link danger" onClick={() => removeZone(i)}>✕</button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="editor-add-option">
+          <input
+            placeholder="Zona (ej: Centro)"
+            value={newZone.name}
+            onChange={(e) => setNewZone({ ...newZone, name: e.target.value })}
+          />
+          <input
+            placeholder="$ envío"
+            type="number"
+            inputMode="decimal"
+            value={newZone.fee}
+            onChange={(e) => setNewZone({ ...newZone, fee: e.target.value })}
+          />
+          <button className="btn-small" onClick={addZone}>Agregar</button>
+        </div>
       </div>
 
       <div className="settings-block">

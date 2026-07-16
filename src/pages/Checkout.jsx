@@ -18,9 +18,15 @@ export default function Checkout() {
   })
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
+  const [zoneIndex, setZoneIndex] = useState('')
   const mpEnabled = tenant.settings?.mp_enabled === true
 
-  const deliveryFee = 0 // luego: calcular según settings.delivery_zones
+  const zones = Array.isArray(tenant.settings?.delivery_zones)
+    ? tenant.settings.delivery_zones
+    : []
+  const selectedZone =
+    form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
+  const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
   const total = subtotal + deliveryFee
 
   function set(field, value) {
@@ -31,7 +37,8 @@ export default function Checkout() {
     items.length > 0 &&
     form.customer_name.trim() &&
     form.customer_phone.trim() &&
-    (form.delivery_type !== 'delivery' || form.address.trim())
+    (form.delivery_type !== 'delivery' ||
+      (form.address.trim() && (zones.length === 0 || selectedZone)))
 
   async function submit() {
     setSending(true)
@@ -46,6 +53,7 @@ export default function Checkout() {
         customer_phone: form.customer_phone.trim(),
         delivery_type: form.delivery_type,
         address: form.delivery_type === 'delivery' ? form.address.trim() : '',
+        delivery_zone: selectedZone ? selectedZone.name : '',
         notes: form.notes.trim(),
         subtotal,
         delivery_fee: deliveryFee,
@@ -160,14 +168,29 @@ export default function Checkout() {
         </div>
 
         {form.delivery_type === 'delivery' && (
-          <label>
-            Dirección
-            <input
-              value={form.address}
-              onChange={(e) => set('address', e.target.value)}
-              placeholder="Calle, número, referencia"
-            />
-          </label>
+          <>
+            {zones.length > 0 && (
+              <label>
+                Zona de entrega
+                <select value={zoneIndex} onChange={(e) => setZoneIndex(e.target.value)}>
+                  <option value="">Elegí tu zona…</option>
+                  {zones.map((z, i) => (
+                    <option key={i} value={i}>
+                      {z.name} · {Number(z.fee) > 0 ? money(Number(z.fee)) : 'Sin costo'}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <label>
+              Dirección
+              <input
+                value={form.address}
+                onChange={(e) => set('address', e.target.value)}
+                placeholder="Calle, número, referencia"
+              />
+            </label>
+          </>
         )}
 
         <label>

@@ -73,8 +73,9 @@ function waMessage(order, tenantName) {
     delivered: `¡gracias por tu compra! Esperamos que disfrutes tu pedido #${n}. 😊`,
     cancelled: `lamentablemente tuvimos que cancelar tu pedido #${n}. Escribinos y lo resolvemos.`,
   }
+  const tracking = `${window.location.origin}/pedido/${n}`
   return encodeURIComponent(
-    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}`
+    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}\n\nSeguí tu pedido en vivo acá: ${tracking}`
   )
 }
 
@@ -202,7 +203,9 @@ export default function Orders() {
                 <span className="order-customer">
                   {o.customer_name}
                   <small>
-                    {o.delivery_type === 'delivery' ? `Delivery · ${o.address || ''}` : 'Retiro'}
+                    {o.delivery_type === 'delivery'
+                      ? `Delivery${o.delivery_zone ? ` · ${o.delivery_zone}` : ''} · ${o.address || ''}`
+                      : 'Retiro'}
                     {' · '}
                     {new Date(o.created_at).toLocaleTimeString('es-AR', {
                       hour: '2-digit',

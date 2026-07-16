@@ -956,3 +956,95 @@ img { display: block; }
 .l-social a:hover { color: #fff; }
 .l-credit { margin-top: 3rem; font-size: 0.8rem; color: rgba(255,255,255,0.45); }
 .l-credit a { color: rgba(255,255,255,0.6); }
+
+/* ---------- Seguimiento de pedido (cliente) ---------- */
+.tracking { max-width: 480px; margin: 0 auto; padding: 1.25rem 1.25rem 3rem; }
+.tracking .page-header h1 { font-size: 1.5rem; }
+.pay-chip {
+  display: inline-block;
+  margin-top: 0.6rem;
+  background: var(--line);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+}
+.pay-chip.paid { background: #d7ecd9; color: #1e5b2a; }
+
+.timeline { list-style: none; margin: 1.75rem 0; padding: 0; position: relative; }
+.timeline li {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 0;
+  position: relative;
+  color: var(--ink-soft);
+}
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: -14px;
+  width: 2px;
+  height: 28px;
+  background: var(--line);
+}
+.timeline li:first-child::before { display: none; }
+.timeline li.done::before, .timeline li.current::before { background: var(--brand); }
+.t-dot {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--card);
+  border: 2px solid var(--line);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.timeline li.done .t-dot {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-size: 1.05rem;
+}
+.timeline li.current .t-dot {
+  border-color: var(--brand);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 35%, transparent); }
+  50% { box-shadow: 0 0 0 10px transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .timeline li.current .t-dot { animation: none; } }
+.timeline li.current { color: var(--ink); font-weight: 600; }
+.timeline li.done { color: var(--ink); }
+.t-now {
+  margin-left: auto;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+.tracking-hint { color: var(--ink-soft); font-size: 0.85rem; text-align: center; }
+.tracking-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+}
+
+/* ---------- Zonas de delivery (admin) ---------- */
+.zone-list { list-style: none; margin: 0; padding: 0; }
+.zone-list li {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.95rem;
+}
+.zone-list li span:first-child { flex: 1; }
