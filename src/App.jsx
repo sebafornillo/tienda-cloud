@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { useTenant } from './lib/TenantContext'
 import Store from './pages/Store'
+import Landing from './pages/Landing'
 import Checkout from './pages/Checkout'
 import OrderConfirmed from './pages/OrderConfirmed'
 import AdminLogin from './admin/AdminLogin'
@@ -39,9 +40,12 @@ export default function App() {
       </div>
     )
 
+  const landingOn = tenant.settings?.landing_enabled === true
+
   return (
     <Routes>
-      <Route path="/" element={<Store />} />
+      <Route path="/" element={landingOn ? <Landing /> : <Store />} />
+      {landingOn && <Route path="/tienda" element={<Store />} />}
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/pedido/:orderNumber" element={<OrderConfirmed />} />
       <Route path="/admin/login" element={<AdminLogin />} />
