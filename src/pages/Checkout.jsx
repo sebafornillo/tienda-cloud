@@ -19,6 +19,10 @@ export default function Checkout() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
   const [zoneIndex, setZoneIndex] = useState('')
+  const [couponInput, setCouponInput] = useState('')
+  const [coupon, setCoupon] = useState(null) // {code, discount, label}
+  const [couponError, setCouponError] = useState(null)
+  const [checkingCoupon, setCheckingCoupon] = useState(false)
   const mpEnabled = tenant.settings?.mp_enabled === true
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
@@ -27,7 +31,26 @@ export default function Checkout() {
   const selectedZone =
     form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
   const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
-  const total = subtotal + deliveryFee
+  const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
+  const total = Math.max(0, subtotal + deliveryFee - discount)
+
+  async function applyCoupon() {
+    if (!couponInput.trim()) return
+    setCheckingCoupon(true)
+    setCouponError(null)
+    const { data } = await supabase.rpc('validate_coupon', {
+      t_id: tenant.id,
+      p_code: couponInput.trim(),
+      p_subtotal: subtotal,
+    })
+    setCheckingCoupon(false)
+    if (data && data.length > 0) {
+      setCoupon(data[0])
+      setCouponInput('')
+    } else {
+      setCouponError('Cupón inválido, vencido o no aplica a esta compra.')
+    }
+  }
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -54,6 +77,7 @@ export default function Checkout() {
         delivery_type: form.delivery_type,
         address: form.delivery_type === 'delivery' ? form.address.trim() : '',
         delivery_zone: selectedZone ? selectedZone.name : '',
+        coupon_code: coupon ? coupon.code : '',
         notes: form.notes.trim(),
         subtotal,
         delivery_fee: deliveryFee,
@@ -71,7 +95,12 @@ export default function Checkout() {
     })
 
     if (orderError || !result?.length) {
-      setError('No pudimos enviar el pedido. Probá de nuevo.')
+      const raw = orderError?.message || ''
+      setError(
+        raw.includes('SIN_STOCK')
+          ? `Uy — "${raw.split('SIN_STOCK:')[1]?.split('"')[0] || 'un producto'}" se quedó sin stock. Ajustá tu pedido.`
+          : 'No pudimos enviar el pedido. Probá de nuevo.'
+      )
       setSending(false)
       return
     }
@@ -226,9 +255,44 @@ export default function Checkout() {
         </div>
       </div>
 
+      <div className="coupon-box">
+        {coupon ? (
+          <div className="coupon-applied">
+            <span className="coupon-tag">🎟 {coupon.code}</span>
+            <span>{coupon.label} · −{money(discount)}</span>
+            <button
+              className="link danger"
+              onClick={() => { setCoupon(null); setCouponError(null) }}
+            >
+              Quitar
+            </button>
+          </div>
+        ) : (
+          <div className="coupon-input-row">
+            <input
+              placeholder="¿Tenés un cupón?"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+            />
+            <button
+              className="btn-small"
+              disabled={!couponInput.trim() || checkingCoupon}
+              onClick={applyCoupon}
+            >
+              {checkingCoupon ? '…' : 'Aplicar'}
+            </button>
+          </div>
+        )}
+        {couponError && <p className="error">{couponError}</p>}
+      </div>
+
       <div className="totals">
         <div><span>Subtotal</span><span>{money(subtotal)}</span></div>
         {deliveryFee > 0 && <div><span>Envío</span><span>{money(deliveryFee)}</span></div>}
+        {discount > 0 && (
+          <div className="discount-row"><span>Cupón {coupon.code}</span><span>−{money(discount)}</span></div>
+        )}
         <div className="grand"><span>Total</span><span>{money(total)}</span></div>
       </div>
 

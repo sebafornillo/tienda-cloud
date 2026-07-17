@@ -88,25 +88,36 @@ export default function Store() {
           <section key={group.id}>
             <h2>{group.name}</h2>
             <div className="product-list">
-              {group.items.map((p) => (
-                <button
-                  key={p.id}
-                  className="product-card"
-                  onClick={() => setSelected(p)}
-                >
-                  <div className="product-info">
-                    <h3>{p.name}</h3>
-                    {p.description && <p>{p.description}</p>}
-                    <div className="price-row">
-                      <span className="price">{money(p.price)}</span>
-                      {p.compare_at_price && (
-                        <span className="compare">{money(p.compare_at_price)}</span>
-                      )}
+              {group.items.map((p) => {
+                const out = p.stock !== null && p.stock <= 0
+                const low = !out && p.stock !== null && p.stock <= 3
+                return (
+                  <button
+                    key={p.id}
+                    className={out ? 'product-card out-of-stock' : 'product-card'}
+                    disabled={out}
+                    onClick={() => setSelected(p)}
+                  >
+                    <div className="product-info">
+                      <h3>{p.name}</h3>
+                      {p.description && <p>{p.description}</p>}
+                      <div className="price-row">
+                        <span className="price">{money(p.price)}</span>
+                        {p.compare_at_price && (
+                          <span className="compare">{money(p.compare_at_price)}</span>
+                        )}
+                        {out && <span className="stock-chip out">Sin stock</span>}
+                        {low && (
+                          <span className="stock-chip low">
+                            ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  {p.image_url && <img src={p.image_url} alt={p.name} />}
-                </button>
-              ))}
+                    {p.image_url && <img src={p.image_url} alt={p.name} />}
+                  </button>
+                )
+              })}
             </div>
           </section>
         ))}

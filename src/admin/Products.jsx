@@ -10,6 +10,7 @@ const EMPTY = {
   price: '',
   category_id: '',
   image_url: '',
+  stock: '',
   is_active: true,
 }
 
@@ -65,6 +66,7 @@ export default function Products() {
       price: Number(editing.price),
       category_id: editing.category_id || null,
       image_url: editing.image_url.trim() || null,
+      stock: editing.stock === '' || editing.stock === null ? null : Number(editing.stock),
       is_active: editing.is_active,
     }
     if (editing.id) {
@@ -95,8 +97,18 @@ export default function Products() {
     load()
   }
 
+  const lowStock = products.filter((p) => p.stock !== null && p.stock <= 3 && p.is_active)
+
   return (
     <div className="admin-page">
+      {lowStock.length > 0 && (
+        <div className="stock-alert">
+          <strong>Stock bajo:</strong>{' '}
+          {lowStock
+            .map((p) => `${p.name} (${p.stock <= 0 ? 'agotado' : p.stock})`)
+            .join(' · ')}
+        </div>
+      )}
       <div className="page-title-row">
         <h1>Productos</h1>
         <button className="btn-primary" onClick={() => setEditing({ ...EMPTY })}>
@@ -185,6 +197,20 @@ export default function Products() {
                 </div>
                 {uploadError && <p className="error">{uploadError}</p>}
               </div>
+              <label>
+                Stock
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={editing.stock ?? ''}
+                  onChange={(e) => setEditing({ ...editing, stock: e.target.value })}
+                  placeholder="Vacío = sin control de stock"
+                />
+                <small className="hint">
+                  Con stock cargado, se descuenta con cada venta y se marca "Sin stock" al
+                  llegar a cero.
+                </small>
+              </label>
               <label className="check-label">
                 <input
                   type="checkbox"
@@ -215,6 +241,18 @@ export default function Products() {
               <small>
                 {categories.find((c) => c.id === p.category_id)?.name || 'Sin categoría'}
                 {' · '}{money(p.price)}
+                {p.stock !== null && (
+                  <>
+                    {' · '}
+                    <span
+                      className={
+                        p.stock <= 0 ? 'stock-tag out' : p.stock <= 3 ? 'stock-tag low' : 'stock-tag'
+                      }
+                    >
+                      {p.stock <= 0 ? 'Sin stock' : `${p.stock} en stock`}
+                    </span>
+                  </>
+                )}
               </small>
             </div>
             <div className="row-actions">

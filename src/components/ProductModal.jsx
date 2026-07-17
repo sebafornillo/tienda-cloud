@@ -60,6 +60,8 @@ export default function ProductModal({ product, onClose }) {
       chosenOptions.reduce((s, o) => s + Number(o.price_delta), 0)) *
     qty
 
+  const maxQty = product.stock !== null && product.stock !== undefined ? product.stock : Infinity
+
   function confirm() {
     addItem(product, chosenOptions, qty)
     onClose()
@@ -76,6 +78,10 @@ export default function ProductModal({ product, onClose }) {
           {product.description && <p className="desc">{product.description}</p>}
 
           {loading && <p className="desc">Cargando opciones…</p>}
+
+          {maxQty !== Infinity && maxQty <= 5 && (
+            <p className="stock-note">Quedan {maxQty} disponibles</p>
+          )}
 
           {groups.map((g) => (
             <fieldset key={g.id} className="mod-group">
@@ -116,7 +122,13 @@ export default function ProductModal({ product, onClose }) {
             <div className="qty">
               <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Restar">−</button>
               <span>{qty}</span>
-              <button onClick={() => setQty(qty + 1)} aria-label="Sumar">+</button>
+              <button
+                onClick={() => setQty(Math.min(maxQty, qty + 1))}
+                disabled={qty >= maxQty}
+                aria-label="Sumar"
+              >
+                +
+              </button>
             </div>
             <button
               className="btn-primary"

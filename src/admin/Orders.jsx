@@ -181,7 +181,12 @@ export default function Orders() {
   }
 
   async function setStatus(order, status) {
-    await supabase.from('orders').update({ status }).eq('id', order.id)
+    if (status === 'cancelled') {
+      // Cancela y devuelve el stock de los productos, todo junto
+      await supabase.rpc('cancel_order_restore', { o_id: order.id })
+    } else {
+      await supabase.from('orders').update({ status }).eq('id', order.id)
+    }
     setOrders((prev) =>
       status === 'delivered' || status === 'cancelled'
         ? prev.filter((o) => o.id !== order.id)
@@ -234,6 +239,7 @@ export default function Orders() {
                   <p className="order-notes">
                     Tel: {o.customer_phone} · Pago: {o.payment_method}
                     {o.payment_status === 'paid' ? ' ✓ PAGADO' : ''}
+                    {Number(o.discount) > 0 && ` · Cupón ${o.coupon_code}: −${money(o.discount)}`}
                   </p>
                   <div className="order-actions">
                     {nextStatus && (
