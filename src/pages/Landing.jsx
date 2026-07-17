@@ -30,11 +30,40 @@ function useReveal() {
   return ref
 }
 
+function useTilt() {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const zone = el.closest('.l-hero')
+    if (!zone) return
+    const move = (e) => {
+      const r = zone.getBoundingClientRect()
+      const x = (e.clientX - r.left) / r.width - 0.5
+      const y = (e.clientY - r.top) / r.height - 0.5
+      el.style.transform = `rotateY(${(x * 16).toFixed(2)}deg) rotateX(${(-y * 11).toFixed(2)}deg)`
+    }
+    const reset = () => {
+      el.style.transform = 'rotateY(0deg) rotateX(0deg)'
+    }
+    zone.addEventListener('mousemove', move)
+    zone.addEventListener('mouseleave', reset)
+    return () => {
+      zone.removeEventListener('mousemove', move)
+      zone.removeEventListener('mouseleave', reset)
+    }
+  }, [])
+  return ref
+}
+
 export default function Landing() {
   const { tenant } = useTenant()
   const s = tenant.settings || {}
   const L = s.landing || {}
   const rootRef = useReveal()
+  const tiltRef = useTilt()
+  const isDark = L.theme === 'dark'
 
   const hero = L.hero_image || s.banner_url
   const logo = s.logo_url
@@ -54,23 +83,46 @@ export default function Landing() {
   const whatsapp = s.whatsapp
 
   return (
-    <div className="landing" ref={rootRef}>
+    <div className={isDark ? 'landing theme-dark' : 'landing'} ref={rootRef}>
       {/* ---------- HERO ---------- */}
-      <section className="l-hero">
-        {hero && <div className="l-hero-bg" style={{ backgroundImage: `url(${hero})` }} />}
-        <div className="l-hero-overlay" />
-        <div className="l-hero-content">
-          {logo && <img className="l-hero-logo" src={logo} alt={tenant.name} />}
-          <h1>{tagline}</h1>
-          {sub && <p>{sub}</p>}
-          <Link to="/tienda" className="l-cta">
-            Ver la tienda
-          </Link>
-        </div>
-        <div className="l-scroll-hint" aria-hidden="true">
-          <span />
-        </div>
-      </section>
+      {isDark ? (
+        <section className="l-hero l-hero-dark">
+          <div className="l-hero-dark-grid">
+            <div className="l-hero-content">
+              {logo && <img className="l-hero-logo" src={logo} alt={tenant.name} />}
+              <h1>{tagline}</h1>
+              {sub && <p>{sub}</p>}
+              <Link to="/tienda" className="l-cta">
+                Pedir ahora
+              </Link>
+            </div>
+            {hero && (
+              <div className="l-tilt-stage" aria-hidden="true">
+                <div className="l-tilt-float">
+                  <img ref={tiltRef} className="l-tilt" src={hero} alt="" />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="checker-strip" aria-hidden="true" />
+        </section>
+      ) : (
+        <section className="l-hero">
+          {hero && <div className="l-hero-bg" style={{ backgroundImage: `url(${hero})` }} />}
+          <div className="l-hero-overlay" />
+          <div className="l-hero-content">
+            {logo && <img className="l-hero-logo" src={logo} alt={tenant.name} />}
+            <h1>{tagline}</h1>
+            {sub && <p>{sub}</p>}
+            <Link to="/tienda" className="l-cta">
+              Ver la tienda
+            </Link>
+          </div>
+          <div className="l-scroll-hint" aria-hidden="true">
+            <span />
+          </div>
+        </section>
+      )}
 
       {/* ---------- HISTORIA ---------- */}
       {story && (
@@ -156,6 +208,7 @@ export default function Landing() {
       )}
 
       {/* ---------- CIERRE ---------- */}
+      {isDark && <div className="checker-strip" aria-hidden="true" />}
       <section className="l-footer">
         <div className="reveal">
           {logo && <img className="l-footer-logo" src={logo} alt="" />}
