@@ -9,6 +9,7 @@ import AdminLayout from './admin/AdminLayout'
 import Orders from './admin/Orders'
 import Products from './admin/Products'
 import History from './admin/History'
+import Coupons from './admin/Coupons'
 import Settings from './admin/Settings'
 import PlatformPanel from './platform/PlatformPanel'
 
@@ -53,6 +54,7 @@ export default function App() {
         <Route index element={<Orders />} />
         <Route path="productos" element={<Products />} />
         <Route path="historial" element={<History />} />
+        <Route path="cupones" element={<Coupons />} />
         <Route path="config" element={<Settings />} />
       </Route>
     </Routes>

@@ -49,6 +49,7 @@ export default function AdminLayout() {
           <NavLink to="/admin" end>Pedidos</NavLink>
           <NavLink to="/admin/productos">Productos</NavLink>
           <NavLink to="/admin/historial">Historial</NavLink>
+          <NavLink to="/admin/cupones">Cupones</NavLink>
           <NavLink to="/admin/config">Mi tienda</NavLink>
         </nav>
         <button className="link" onClick={logout}>Salir</button>

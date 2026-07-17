@@ -1048,3 +1048,113 @@ img { display: block; }
   font-size: 0.95rem;
 }
 .zone-list li span:first-child { flex: 1; }
+
+/* ---------- Stock (tienda) ---------- */
+.stock-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+}
+.stock-chip.low { background: #fdf0d7; color: #8a5b00; }
+.stock-chip.out { background: var(--line); color: var(--ink-soft); }
+.product-card.out-of-stock {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.product-card.out-of-stock img { filter: grayscale(1); }
+.stock-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8a5b00;
+}
+.qty button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ---------- Stock (admin) ---------- */
+.stock-tag { font-weight: 600; color: #1e5b2a; }
+.stock-tag.low { color: #8a5b00; }
+.stock-tag.out { color: #b3261e; }
+.stock-alert {
+  background: #fdf0d7;
+  border: 1px solid #f0dcae;
+  color: #6d4a00;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Cupones (checkout) ---------- */
+.coupon-box { margin: 1rem 0 0.25rem; }
+.coupon-input-row { display: flex; gap: 0.5rem; }
+.coupon-input-row input {
+  flex: 1;
+  border: 1.5px dashed var(--line);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  background: var(--card);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.coupon-input-row input::placeholder { text-transform: none; font-weight: 400; letter-spacing: 0; }
+.coupon-input-row input:focus { outline: none; border-color: var(--brand); border-style: solid; }
+.coupon-applied {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: color-mix(in srgb, var(--brand) 8%, var(--card));
+  border: 1.5px dashed var(--brand);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+  flex-wrap: wrap;
+}
+.coupon-tag {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.coupon-applied .link { margin-left: auto; }
+.discount-row { color: #1e5b2a; font-weight: 600; }
+
+/* ---------- Cupones (admin) ---------- */
+.coupon-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.coupon {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  flex-wrap: wrap;
+}
+.coupon.expired, .coupon.paused { opacity: 0.55; }
+.coupon-code {
+  border: 1.5px dashed var(--brand);
+  color: var(--brand);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 0.92rem;
+  background: color-mix(in srgb, var(--brand) 6%, var(--card));
+  flex-shrink: 0;
+}
+.coupon-info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; min-width: 150px; }
+.coupon-info small { color: var(--ink-soft); }
+.badge.b-coupon-active { background: #d7ecd9; color: #1e5b2a; }
+.badge.b-coupon-expired { background: #f4d7d5; color: #8a1f18; }
+.badge.b-coupon-paused { background: var(--line); color: var(--ink-soft); }
+.field-row { display: flex; gap: 0.75rem; }
+.field-row label { flex: 1; }
+@media (max-width: 640px) {
+  .coupon .row-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    border-top: 1px dashed var(--line);
+    padding-top: 0.4rem;
+  }
+}

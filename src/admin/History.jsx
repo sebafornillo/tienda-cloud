@@ -295,6 +295,7 @@ export default function History() {
                 <p className="order-notes">
                   Tel: {o.customer_phone} · Pago: {o.payment_method}
                   {o.payment_status === 'paid' ? ' ✓ PAGADO' : ''}
+                  {Number(o.discount) > 0 && ` · Cupón ${o.coupon_code}: −${money(o.discount)}`}
                 </p>
               </div>
             )}
