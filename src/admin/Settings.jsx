@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
+import { DAY_NAMES } from '../lib/schedule'
 
 // Configuración de la tienda: logo, color de marca y WhatsApp.
 // Guarda en tenants.settings (jsonb). El permiso ya existe por RLS
@@ -19,6 +20,24 @@ export default function Settings() {
   const [error, setError] = useState(null)
   const [mpToken, setMpToken] = useState('')
   const [mpConfigured, setMpConfigured] = useState(false)
+  const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // lunes a domingo
+  const [schedule, setSchedule] = useState(() => {
+    const base = tenant.settings?.schedule || { enabled: false, days: {} }
+    const days = {}
+    for (const d of DAY_ORDER) {
+      days[d] = base.days?.[d] || { on: false, from: '20:00', to: '00:00' }
+    }
+    return { enabled: !!base.enabled, days }
+  })
+
+  function setDay(d, field, value) {
+    setSchedule((sc) => ({
+      ...sc,
+      days: { ...sc.days, [d]: { ...sc.days[d], [field]: value } },
+    }))
+    setSaved(false)
+  }
+
   const [zones, setZones] = useState(
     Array.isArray(tenant.settings?.delivery_zones) ? tenant.settings.delivery_zones : []
   )
@@ -95,6 +114,7 @@ export default function Settings() {
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
       delivery_zones: zones,
+      schedule,
       mp_enabled: mpConfigured || !!mpToken.trim(),
     }
     const { error: dbErr } = await supabase
@@ -207,6 +227,53 @@ export default function Settings() {
         <small className="hint">
           Se usa en el botón "Avisar por WhatsApp" que ve el cliente al confirmar su pedido.
         </small>
+      </div>
+
+      <div className="settings-block">
+        <span className="field-label">Horarios de atención</span>
+        <label className="check-label">
+          <input
+            type="checkbox"
+            checked={schedule.enabled}
+            onChange={(e) => { setSchedule({ ...schedule, enabled: e.target.checked }); setSaved(false) }}
+          />
+          Controlar horarios (fuera de horario la tienda se ve, pero no toma pedidos)
+        </label>
+        {schedule.enabled && (
+          <div className="schedule-grid">
+            {DAY_ORDER.map((d) => (
+              <div key={d} className={schedule.days[d].on ? 'schedule-row' : 'schedule-row off'}>
+                <label className="check-label day-check">
+                  <input
+                    type="checkbox"
+                    checked={schedule.days[d].on}
+                    onChange={(e) => setDay(d, 'on', e.target.checked)}
+                  />
+                  {DAY_NAMES[d].charAt(0).toUpperCase() + DAY_NAMES[d].slice(1)}
+                </label>
+                {schedule.days[d].on && (
+                  <div className="schedule-times">
+                    <input
+                      type="time"
+                      value={schedule.days[d].from}
+                      onChange={(e) => setDay(d, 'from', e.target.value)}
+                    />
+                    <span>a</span>
+                    <input
+                      type="time"
+                      value={schedule.days[d].to}
+                      onChange={(e) => setDay(d, 'to', e.target.value)}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+            <small className="hint">
+              Cierre "00:00" = hasta la medianoche. Un cierre menor que la apertura (ej:
+              20:00 a 02:00) cruza la medianoche.
+            </small>
+          </div>
+        )}
       </div>
 
       <div className="settings-block">

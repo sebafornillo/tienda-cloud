@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
+import { isStoreOpen, nextOpening } from '../lib/schedule'
 
 export default function Checkout() {
   const { tenant } = useTenant()
@@ -24,6 +25,8 @@ export default function Checkout() {
   const [couponError, setCouponError] = useState(null)
   const [checkingCoupon, setCheckingCoupon] = useState(false)
   const mpEnabled = tenant.settings?.mp_enabled === true
+  const storeOpen = isStoreOpen(tenant.settings?.schedule)
+  const opensAt = storeOpen ? null : nextOpening(tenant.settings?.schedule)
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
     ? tenant.settings.delivery_zones
@@ -57,6 +60,7 @@ export default function Checkout() {
   }
 
   const canSubmit =
+    storeOpen &&
     items.length > 0 &&
     form.customer_name.trim() &&
     form.customer_phone.trim() &&
@@ -295,6 +299,13 @@ export default function Checkout() {
         )}
         <div className="grand"><span>Total</span><span>{money(total)}</span></div>
       </div>
+
+      {!storeOpen && (
+        <p className="closed-note">
+          🌙 La tienda está cerrada ahora{opensAt ? ` — abrimos ${opensAt}` : ''}. Tu
+          carrito queda armado para cuando abramos.
+        </p>
+      )}
 
       {error && <p className="error">{error}</p>}
 

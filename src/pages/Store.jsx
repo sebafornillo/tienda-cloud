@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
 import ProductModal from '../components/ProductModal'
+import { isStoreOpen, nextOpening } from '../lib/schedule'
 
 export default function Store() {
   const { tenant } = useTenant()
@@ -46,8 +47,17 @@ export default function Store() {
 
   const visible = activeCat ? grouped.filter((g) => g.id === activeCat) : grouped
 
+  const open = isStoreOpen(tenant.settings?.schedule)
+  const opensAt = open ? null : nextOpening(tenant.settings?.schedule)
+
   return (
     <div className="store">
+      {!open && (
+        <div className="closed-banner">
+          🌙 Cerrado ahora{opensAt ? ` — abrimos ${opensAt}` : ''}. Podés mirar el menú
+          igual.
+        </div>
+      )}
       <header className="store-header">
         {tenant.settings?.banner_url && (
           <img className="store-banner" src={tenant.settings.banner_url} alt="" />
