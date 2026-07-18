@@ -40,18 +40,26 @@ export default function OrderConfirmed() {
   const steps = useMemo(() => {
     if (!order) return []
     const isDelivery = order.delivery_type === 'delivery'
+    // Rubro gastronómico: cocina y moto. E-commerce: paquete y envío.
+    const food = tenant.business_type === 'gastronomy'
     return [
       { key: 'pending', label: 'Pedido recibido', icon: '📝' },
       { key: 'confirmed', label: 'Confirmado', icon: '👍' },
-      { key: 'preparing', label: 'En preparación', icon: '👨‍🍳' },
+      {
+        key: 'preparing',
+        label: food ? 'En preparación' : 'Preparando tu paquete',
+        icon: food ? '👨‍🍳' : '📦',
+      },
       {
         key: 'ready',
-        label: isDelivery ? 'En camino' : 'Listo para retirar',
-        icon: isDelivery ? '🛵' : '🛍️',
+        label: isDelivery
+          ? food ? 'En camino' : 'Despachado'
+          : 'Listo para retirar',
+        icon: isDelivery ? (food ? '🛵' : '🚚') : '🛍️',
       },
       { key: 'delivered', label: 'Entregado', icon: '✅' },
     ]
-  }, [order])
+  }, [order, tenant.business_type])
 
   const currentIndex = order ? steps.findIndex((s) => s.key === order.status) : -1
 
