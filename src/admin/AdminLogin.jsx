@@ -8,31 +8,16 @@ export default function AdminLogin() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState(null)
   const [sending, setSending] = useState(false)
 
-  const logo = tenant.settings?.logo_url
-  const whatsapp = tenant.settings?.whatsapp
-
   async function login(e) {
     e?.preventDefault?.()
-    if (!email.trim() || !password) {
-      setError('Completá email y contraseña.')
-      return
-    }
     setSending(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError(
-        error.message?.includes('Invalid login')
-          ? 'Email o contraseña incorrectos.'
-          : 'No pudimos conectar. Revisá tu internet y probá de nuevo.'
-      )
+      setError('Email o contraseña incorrectos.')
       setSending(false)
       return
     }
@@ -40,69 +25,86 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="login-screen">
-      <form className="login-card" onSubmit={login}>
-        {logo ? (
-          <img className="login-logo" src={logo} alt={tenant.name} />
-        ) : (
-          <div className="login-logo-fallback">{tenant.name.charAt(0)}</div>
-        )}
-        <h1>{tenant.name}</h1>
-        <p className="desc">Panel de administración</p>
+    <div className="admin-login">
+      <style>{`
+        .admin-login label {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          margin-bottom: 16px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #4a4a40;
+          text-align: left;
+        }
+        .admin-login input {
+          width: 100%;
+          padding: 12px 14px;
+          border: 1.5px solid #e2ddd2;
+          border-radius: 10px;
+          font-size: 15px;
+          font-weight: 400;
+          font-family: inherit;
+          outline: none;
+          box-sizing: border-box;
+          background: #fff;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .admin-login input:focus {
+          border-color: var(--color-primary, #4a5d33);
+          box-shadow: 0 0 0 3px rgba(74, 93, 51, 0.12);
+        }
+        .admin-login input::placeholder {
+          color: #b5b0a4;
+        }
+      `}</style>
 
-        <label>
-          Email
-          <input
-            type="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu@email.com"
-          />
-        </label>
-        <label>
-          Contraseña
-          <div className="pass-field">
-            <input
-              type={showPass ? 'text' : 'password'}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-            <button
-              type="button"
-              className="pass-toggle"
-              onClick={() => setShowPass((v) => !v)}
-              aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            >
-              {showPass ? '🙈' : '👁️'}
-            </button>
-          </div>
-        </label>
+      {tenant?.logo_url && (
+        <img
+          src={tenant.logo_url}
+          alt={tenant.name}
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: '50%',
+            objectFit: 'cover',
+            margin: '0 auto 12px',
+            display: 'block',
+          }}
+        />
+      )}
 
-        {error && <p className="error">{error}</p>}
+      <h1>{tenant.name}</h1>
+      <p className="desc">Panel de administración</p>
 
-        <button className="btn-primary full" type="submit" disabled={sending}>
-          {sending ? 'Entrando…' : 'Entrar a mi tienda'}
-        </button>
+      <label>
+        Email
+        <input
+          type="email"
+          placeholder="tu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+        />
+      </label>
 
-        {whatsapp && (
-          <p className="login-help">
-            ¿Problemas para entrar?{' '}
-            <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer">
-              Escribinos
-            </a>
-          </p>
-        )}
-        <p className="login-powered">
-          ⚡ Tienda impulsada por{' '}
-          <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">
-            Fornistore
-          </a>
-        </p>
-      </form>
+      <label>
+        Contraseña
+        <input
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && login()}
+          autoComplete="current-password"
+        />
+      </label>
+
+      {error && <p className="error">{error}</p>}
+
+      <button className="btn-primary full" disabled={sending} onClick={login}>
+        {sending ? 'Entrando…' : 'Entrar a mi tienda'}
+      </button>
     </div>
   )
 }
