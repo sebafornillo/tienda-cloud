@@ -8,13 +8,32 @@ const money = (n) =>
 export default function StockPanel() {
   const { tenant } = useTenant()
   const [products, setProducts] = useState(null)
-
   useEffect(() => {
-    supabase
-      .from('products')
-      .select('id, name, price, stock, is_active')
-      .eq('tenant_id', tenant.id)
-      .then(({ data }) => setProducts(data || []))
+    function load() {
+      supabase
+        .from('products')
+        .select('id, name, price, stock, is_active')
+        .eq('tenant_id', tenant.id)
+        .then(({ data }) => setProducts(data || []))
+    }
+  
+    load()
+  
+    const channel = supabase
+      .channel('stock-panel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'products',
+          filter: `tenant_id=eq.${tenant.id}`,
+        },
+        load
+      )
+      .subscribe()
+  
+    return () => supabase.removeChannel(channel)
   }, [tenant.id])
 
   if (!products) return <div className="admin-page"><p>Cargando…</p></div>
