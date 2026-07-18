@@ -619,8 +619,8 @@ img { display: block; }
 .top-revenue { font-weight: 700; }
 
 /* ============================================================
-  PASADA RESPONSIVE DEL ADMIN (pantallas chicas)
-  ============================================================ */
+   PASADA RESPONSIVE DEL ADMIN (pantallas chicas)
+   ============================================================ */
 @media (max-width: 640px) {
   /* Header: el nav scrollea horizontal en vez de desbordar */
   .admin-header {
@@ -743,8 +743,8 @@ img { display: block; }
 }
 
 /* ============================================================
-  LANDING (template premium por tienda)
-  ============================================================ */
+   LANDING (template premium por tienda)
+   ============================================================ */
 .landing { --serif: 'Fraunces', Georgia, serif; overflow-x: hidden; }
 .landing .reveal {
   opacity: 0;
@@ -1198,8 +1198,8 @@ img { display: block; }
 .schedule-times span { color: var(--ink-soft); font-size: 0.85rem; }
 
 /* ============================================================
-  LANDING — TEMA OSCURO (food truck) + efecto 3D
-  ============================================================ */
+   LANDING — TEMA OSCURO (food truck) + efecto 3D
+   ============================================================ */
 .checker-strip {
   height: 24px;
   background: repeating-conic-gradient(#111009 0% 25%, #ece7db 0% 50%);
@@ -1310,3 +1310,27 @@ img { display: block; }
 .landing.theme-dark .l-badge small { color: rgba(245,241,230,0.6); }
 .landing.theme-dark .l-feature-overlay { background: rgba(10, 9, 7, 0.72); }
 .landing.theme-dark .l-footer { background: #0d0c0a; }
+
+/* ---------- Inventario (admin Productos) ---------- */
+.inv-grid { margin-bottom: 1.25rem; }
+.kpi-value.warn { color: #8a5b00; }
+.kpi-value.danger { color: #b3261e; }
+.product-toolbar {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.product-search {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  background: var(--card);
+}
+.product-toolbar select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem 0.7rem;
+  background: var(--card);
+  max-width: 45%;
+}

@@ -132,6 +132,7 @@ export default function History() {
 
   // ---------- Top productos (por items de pedidos entregados) ----------
   const [topProducts, setTopProducts] = useState([])
+  const [stockMap, setStockMap] = useState({})
   useEffect(() => {
     async function loadTop() {
       const { data } = await supabase
@@ -156,6 +157,15 @@ export default function History() {
       )
     }
     loadTop()
+    supabase
+      .from('products')
+      .select('name, stock')
+      .eq('tenant_id', tenant.id)
+      .then(({ data }) => {
+        const map = {}
+        for (const pr of data || []) map[pr.name] = pr.stock
+        setStockMap(map)
+      })
   }, [tenant.id, rangeStart])
 
   async function toggleDetail(order) {
@@ -239,7 +249,22 @@ export default function History() {
             {topProducts.map((p, i) => (
               <li key={p.name}>
                 <span className="top-rank">{i + 1}</span>
-                <span className="top-name">{p.name}</span>
+                <span className="top-name">
+                  {p.name}
+                  {stockMap[p.name] !== undefined && stockMap[p.name] !== null && (
+                    <small
+                      className={
+                        stockMap[p.name] <= 0
+                          ? 'stock-tag out'
+                          : stockMap[p.name] <= 3
+                          ? 'stock-tag low'
+                          : 'stock-tag'
+                      }
+                    >
+                      {' '}· quedan {stockMap[p.name]}
+                    </small>
+                  )}
+                </span>
                 <span className="top-qty">{p.qty} u.</span>
                 <span className="top-revenue">{money(p.revenue)}</span>
               </li>
