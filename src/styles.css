@@ -1334,3 +1334,72 @@ img { display: block; }
   background: var(--card);
   max-width: 45%;
 }
+
+/* ---------- Login del admin ---------- */
+.login-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, color-mix(in srgb, var(--brand) 14%, transparent), transparent 70%),
+    var(--paper);
+}
+.login-card {
+  width: min(400px, 100%);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 2.2rem 1.8rem 1.6rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+.login-logo {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+.login-logo-fallback {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  margin: 0 auto;
+}
+.login-card h1 { font-size: 1.4rem; margin: 0; }
+.login-card .desc { margin: -0.4rem 0 0.4rem; }
+.login-card label { text-align: left; }
+.pass-field { position: relative; }
+.pass-field input { width: 100%; padding-right: 3rem; }
+.pass-toggle {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+.login-help { font-size: 0.85rem; color: var(--ink-soft); margin: 0.4rem 0 0; }
+.login-help a { color: var(--brand); font-weight: 600; }
+.login-powered {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--line);
+}
+.login-powered a { color: var(--ink-soft); font-weight: 600; }
