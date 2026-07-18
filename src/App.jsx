@@ -12,6 +12,7 @@ import History from './admin/History'
 import Coupons from './admin/Coupons'
 import Settings from './admin/Settings'
 import PlatformPanel from './platform/PlatformPanel'
+import StockPanel from './admin/StockPanel'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="historial" element={<History />} />
         <Route path="cupones" element={<Coupons />} />
         <Route path="config" element={<Settings />} />
+        <Route path="stock" element={<StockPanel />} />
       </Route>
     </Routes>
   )
