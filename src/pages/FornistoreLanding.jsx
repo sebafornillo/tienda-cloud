@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
@@ -8,6 +8,76 @@ const WHATSAPP = '5493425255392'
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
   ecommerce: 'E-commerce',
+}
+
+const DEMO_NAMES = ['Sofi', 'Marcos', 'Caro', 'Leo', 'Vale', 'Nico']
+const DEMO_STAGES = ['📝 Recibido', '👨‍🍳 En preparación', '🛵 En camino', '✅ Entregado']
+
+function PanelDemo() {
+  const [orders, setOrders] = useState([])
+  const [stock, setStock] = useState(4)
+  const [count, setCount] = useState(7)
+  const timers = useRef([])
+
+  useEffect(() => {
+    return () => timers.current.forEach(clearTimeout)
+  }, [])
+
+  function simulate() {
+    if (stock <= 0) return
+    const id = Date.now()
+    const name = DEMO_NAMES[count % DEMO_NAMES.length]
+    setOrders((o) => [{ id, name, num: 53 + count - 6, stage: 0 }, ...o].slice(0, 4))
+    setStock((s) => s - 1)
+    setCount((c) => c + 1)
+    for (let s = 1; s < DEMO_STAGES.length; s++) {
+      timers.current.push(
+        setTimeout(() => {
+          setOrders((o) => o.map((x) => (x.id === id ? { ...x, stage: s } : x)))
+        }, s * 1700)
+      )
+    }
+  }
+
+  return (
+    <div className="fs-panel">
+      <div className="fs-panel-top">
+        <span className="fs-panel-badge">F</span>
+        <strong>Pizzería Don Beto — Panel</strong>
+        <span className="fs-panel-live">● en vivo</span>
+      </div>
+      <div className="fs-panel-kpis">
+        <div>
+          <small>Pedidos hoy</small>
+          <strong>{count}</strong>
+        </div>
+        <div>
+          <small>Stock muzzarella</small>
+          <strong className={stock <= 0 ? 'kpi-out' : stock <= 3 ? 'kpi-low' : ''}>
+            {stock} u.
+          </strong>
+        </div>
+        <div>
+          <small>Cupón activo</small>
+          <strong className="kpi-coupon">HOLA10 · 10%</strong>
+        </div>
+      </div>
+      <div className="fs-panel-orders">
+        {orders.map((o) => (
+          <div key={o.id} className="fs-panel-order">
+            <strong>#{o.num} {o.name}</strong>
+            <span>1× Pizza muzzarella</span>
+            <em className={o.stage === DEMO_STAGES.length - 1 ? 'done' : ''}>
+              {DEMO_STAGES[o.stage]}
+            </em>
+          </div>
+        ))}
+      </div>
+      <button className="fs-panel-btn" onClick={simulate} disabled={stock <= 0}>
+        {stock <= 0 ? 'Muzzarella agotada — así te avisa' : '▶ Simular un pedido'}
+      </button>
+    </div>
+  )
 }
 
 const COLORS = [
@@ -406,6 +476,148 @@ export default function FornistoreLanding() {
         @media (max-width: 700px) {
           .fs-stores-grid { grid-template-columns: 1fr; }
         }
+
+        /* ---- Panel en vivo ---- */
+        .fs-admin-demo {
+          background: #f7f3e8;
+          padding: 0 24px 88px;
+        }
+        .fs-admin-demo-inner {
+          max-width: 640px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .fs-admin-demo h2 {
+          font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+          letter-spacing: -0.01em;
+          margin: 0 0 8px;
+          color: #23211b;
+        }
+        .fs-admin-sub {
+          color: #8f8a7c;
+          margin: 0 0 28px;
+          line-height: 1.55;
+        }
+        .fs-panel {
+          background: #fff;
+          border: 1px solid #e8e2d2;
+          border-radius: 18px;
+          overflow: hidden;
+          text-align: left;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+        .fs-panel-top {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px;
+          border-bottom: 1px solid #efe9da;
+          font-size: 0.95rem;
+          color: #23211b;
+        }
+        .fs-panel-badge {
+          width: 22px;
+          height: 22px;
+          border-radius: 6px;
+          background: #1f1d18;
+          color: #fff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 800;
+        }
+        .fs-panel-live {
+          margin-left: auto;
+          font-size: 0.8rem;
+          color: #1d9e75;
+          font-weight: 700;
+        }
+        .fs-panel-kpis {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          padding: 14px 16px;
+        }
+        .fs-panel-kpis > div {
+          background: #f7f3e8;
+          border-radius: 10px;
+          padding: 10px 12px;
+        }
+        .fs-panel-kpis small {
+          display: block;
+          color: #8f8a7c;
+          font-size: 0.75rem;
+          margin-bottom: 2px;
+        }
+        .fs-panel-kpis strong {
+          font-size: 1.15rem;
+          color: #23211b;
+        }
+        .fs-panel-kpis .kpi-low { color: #b8860b; }
+        .fs-panel-kpis .kpi-out { color: #c0392b; }
+        .fs-panel-kpis .kpi-coupon {
+          font-size: 0.8rem;
+          background: #e1f5ee;
+          color: #0f6e56;
+          padding: 3px 8px;
+          border-radius: 99px;
+          display: inline-block;
+        }
+        .fs-panel-orders {
+          padding: 0 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          min-height: 8px;
+        }
+        .fs-panel-order {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid #efe9da;
+          border-radius: 10px;
+          padding: 9px 12px;
+          font-size: 0.9rem;
+          animation: fs-order-in 0.5s ease;
+          flex-wrap: wrap;
+        }
+        @keyframes fs-order-in {
+          from { background: #e7f6e2; transform: translateY(-6px); opacity: 0; }
+          to { background: #fff; transform: none; opacity: 1; }
+        }
+        .fs-panel-order strong { color: #23211b; }
+        .fs-panel-order span { color: #8f8a7c; }
+        .fs-panel-order em {
+          margin-left: auto;
+          font-style: normal;
+          font-size: 0.85rem;
+          color: #8f8a7c;
+        }
+        .fs-panel-order em.done { color: #0f6e56; font-weight: 700; }
+        .fs-panel-btn {
+          display: block;
+          width: calc(100% - 32px);
+          margin: 14px 16px 16px;
+          padding: 13px;
+          border: none;
+          border-radius: 12px;
+          background: #1f1d18;
+          color: #f5efdf;
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.12s;
+        }
+        .fs-panel-btn:hover:not(:disabled) { transform: translateY(-1px); }
+        .fs-panel-btn:disabled {
+          background: #f3d9d3;
+          color: #a32d2d;
+          cursor: default;
+        }
+        @media (max-width: 520px) {
+          .fs-panel-kpis { grid-template-columns: 1fr 1fr; }
+        }
       `}</style>
 
       <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
@@ -544,7 +756,20 @@ export default function FornistoreLanding() {
       </section>
       )}
 
-      {/* Parte 3 en adelante: panel en vivo → precios → CTA final */}
+      {/* ---------- TU PANEL EN VIVO ---------- */}
+      <section className="fs-admin-demo">
+        <div className="fs-admin-demo-inner">
+          <span className="fs-kicker">Del otro lado del mostrador</span>
+          <h2>Vos manejás todo desde acá</h2>
+          <p className="fs-admin-sub">
+            Pedidos que entran solos, stock que se descuenta con cada venta y el estado
+            de la entrega en vivo. Tocá el botón y miralo funcionar:
+          </p>
+          <PanelDemo />
+        </div>
+      </section>
+
+      {/* Parte 4 en adelante: precios → CTA final */}
     </div>
   )
 }
