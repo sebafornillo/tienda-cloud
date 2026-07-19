@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useCart, money } from '../lib/CartContext'
 
@@ -8,6 +8,32 @@ export default function ProductModal({ product, onClose }) {
   const [selected, setSelected] = useState({}) // groupId -> [optionIds]
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
+
+  // ---------- Galería ----------
+  const photos = useMemo(() => {
+    const extra = Array.isArray(product.images) ? product.images : []
+    return [product.image_url, ...extra].filter(Boolean)
+  }, [product])
+  const [photoIdx, setPhotoIdx] = useState(0)
+  const touchX = useRef(null)
+
+  function prevPhoto() {
+    setPhotoIdx((i) => (i - 1 + photos.length) % photos.length)
+  }
+  function nextPhoto() {
+    setPhotoIdx((i) => (i + 1) % photos.length)
+  }
+  function onTouchStart(e) {
+    touchX.current = e.touches[0].clientX
+  }
+  function onTouchEnd(e) {
+    if (touchX.current === null) return
+    const dx = e.changedTouches[0].clientX - touchX.current
+    touchX.current = null
+    if (Math.abs(dx) < 40) return
+    if (dx < 0) nextPhoto()
+    else prevPhoto()
+  }
 
   useEffect(() => {
     async function load() {
@@ -70,8 +96,53 @@ export default function ProductModal({ product, onClose }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        {product.image_url && (
-          <img className="modal-img" src={product.image_url} alt={product.name} />
+        {photos.length > 0 && (
+          <div className="modal-gallery">
+            <div
+              className="modal-gallery-main"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
+              <img src={photos[photoIdx]} alt={product.name} />
+              {photos.length > 1 && (
+                <>
+                  <button
+                    className="gal-arrow left"
+                    onClick={prevPhoto}
+                    aria-label="Foto anterior"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="gal-arrow right"
+                    onClick={nextPhoto}
+                    aria-label="Foto siguiente"
+                  >
+                    ›
+                  </button>
+                  <div className="gal-dots" aria-hidden="true">
+                    {photos.map((_, i) => (
+                      <span key={i} className={i === photoIdx ? 'on' : ''} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            {photos.length > 1 && (
+              <div className="modal-gallery-thumbs">
+                {photos.map((url, i) => (
+                  <button
+                    key={url}
+                    className={i === photoIdx ? 'on' : ''}
+                    onClick={() => setPhotoIdx(i)}
+                    aria-label={`Foto ${i + 1}`}
+                  >
+                    <img src={url} alt="" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
         <div className="modal-body">
           <h2>{product.name}</h2>
