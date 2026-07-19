@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '549XXXXXXXXXX'
+const WHATSAPP = '5493425255392'
 
 const COLORS = [
   { hex: '#e05a33', name: 'naranja' },
