@@ -13,6 +13,7 @@ import Coupons from './admin/Coupons'
 import Settings from './admin/Settings'
 import PlatformPanel from './platform/PlatformPanel'
 import StockPanel from './admin/StockPanel'
+import FornistoreLanding from './pages/FornistoreLanding'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
