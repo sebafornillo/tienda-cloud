@@ -23,16 +23,7 @@ export default function App() {
     return (
       <Routes>
         <Route path="/panel/*" element={<PlatformPanel />} />
-        <Route
-          path="*"
-          element={
-            <div className="screen-msg">
-              <h1>Fornistore</h1>
-              <p>Tiendas online para tu negocio: pedidos, pagos y panel de gestión.</p>
-              <p className="desc">Muy pronto podrás crear tu tienda acá. 🚀</p>
-            </div>
-          }
-        />
+        <Route path="*" element={<FornistoreLanding />} />
       </Routes>
     )
   if (error || !tenant)
