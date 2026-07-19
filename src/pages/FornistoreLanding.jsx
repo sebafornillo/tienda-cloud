@@ -251,6 +251,146 @@ export default function FornistoreLanding() {
           .fs-nav { margin-bottom: 40px; }
           .fs-hero { padding-bottom: 56px; }
         }
+
+        /* ---- Transición oscuro → claro ---- */
+        .fs-fade {
+          height: 120px;
+          background: linear-gradient(180deg, #14120e, #f7f3e8);
+        }
+
+        /* ---- Sección dolor ---- */
+        .fs-pain {
+          background: #f7f3e8;
+          color: #23211b;
+          padding: 40px 24px 72px;
+        }
+        .fs-pain-inner {
+          max-width: 720px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .fs-kicker {
+          display: inline-block;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #8f8a7c;
+          margin-bottom: 14px;
+        }
+        .fs-pain h2 {
+          font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+          letter-spacing: -0.01em;
+          margin: 0 0 32px;
+        }
+        .fs-pain-chats {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 420px;
+          margin: 0 auto 28px;
+          text-align: left;
+        }
+        .fs-chat {
+          background: #fff;
+          border: 1px solid #e8e2d2;
+          border-radius: 14px 14px 14px 4px;
+          padding: 10px 14px;
+          font-size: 0.95rem;
+          color: #555043;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          max-width: 85%;
+        }
+        .fs-chat.right {
+          align-self: flex-end;
+          border-radius: 14px 14px 4px 14px;
+          background: #e7f6e2;
+          border-color: #cfe8c6;
+        }
+        .fs-pain-punch {
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: #555043;
+          max-width: 46ch;
+          margin: 0 auto;
+        }
+        .fs-pain-punch strong { color: #23211b; }
+
+        /* ---- Tiendas reales ---- */
+        .fs-stores {
+          background: #f7f3e8;
+          padding: 0 24px 80px;
+        }
+        .fs-stores-inner {
+          max-width: 1080px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .fs-stores h2 {
+          font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+          letter-spacing: -0.01em;
+          margin: 0 0 8px;
+          color: #23211b;
+        }
+        .fs-stores > .fs-stores-inner > p {
+          color: #8f8a7c;
+          margin: 0 0 36px;
+        }
+        .fs-stores-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+        .fs-store-card {
+          display: block;
+          background: #fff;
+          border: 1px solid #e8e2d2;
+          border-radius: 18px;
+          padding: 28px 24px;
+          text-decoration: none;
+          color: #23211b;
+          text-align: left;
+          transition: transform 0.15s, box-shadow 0.15s;
+          position: relative;
+          overflow: hidden;
+        }
+        .fs-store-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 5px;
+          background: var(--card-accent);
+        }
+        .fs-store-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 14px 36px rgba(0,0,0,0.10);
+        }
+        .fs-store-card .tag {
+          display: inline-block;
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--card-accent);
+          margin-bottom: 8px;
+        }
+        .fs-store-card h3 {
+          font-size: 1.35rem;
+          margin: 0 0 6px;
+        }
+        .fs-store-card p {
+          color: #8f8a7c;
+          font-size: 0.95rem;
+          line-height: 1.55;
+          margin: 0 0 16px;
+        }
+        .fs-store-card .visit {
+          font-weight: 700;
+          color: var(--card-accent);
+        }
+        @media (max-width: 700px) {
+          .fs-stores-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
 
       <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
@@ -338,7 +478,71 @@ export default function FornistoreLanding() {
         </div>
       </div>
 
-      {/* Parte 2 en adelante: dolor → tiendas reales → panel en vivo → precios → CTA */}
+      {/* ---------- TRANSICIÓN ---------- */}
+      <div className="fs-fade" aria-hidden="true" />
+
+      {/* ---------- DOLOR ---------- */}
+      <section className="fs-pain">
+        <div className="fs-pain-inner">
+          <span className="fs-kicker">¿Te suena?</span>
+          <h2>Vender por WhatsApp era gratis.<br />Hasta que empezaste a vender.</h2>
+          <div className="fs-pain-chats" aria-hidden="true">
+            <div className="fs-chat">Hola! ¿Tenés stock del grande?</div>
+            <div className="fs-chat">¿Me pasás el CBU de nuevo?</div>
+            <div className="fs-chat">¿Viste mi pedido de ayer? Nadie me contestó 😕</div>
+            <div className="fs-chat right">Perdón!! Se me traspapeló 🙏</div>
+          </div>
+          <p className="fs-pain-punch">
+            Pedidos perdidos entre 40 chats, transferencias que hay que verificar a mano,
+            el "¿tenés stock?" repetido veinte veces por día. <strong>Tu negocio creció;
+            tu herramienta no.</strong> Fornistore ordena todo eso: catálogo, pago y
+            pedidos en un solo lugar, con tu marca.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- TIENDAS REALES ---------- */}
+      <section className="fs-stores">
+        <div className="fs-stores-inner">
+          <span className="fs-kicker">Sin humo</span>
+          <h2>Tiendas reales, vendiendo ahora</h2>
+          <p>No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
+          <div className="fs-stores-grid">
+            <a
+              className="fs-store-card"
+              style={{ '--card-accent': '#5a6b3a' }}
+              href="https://rinconmatero.fornistore.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="tag">E-commerce · Santa Fe</span>
+              <h3>Rincón Matero 🧉</h3>
+              <p>
+                Mates artesanales, termos y yerba con landing premium, stock por unidad y
+                sets de regalo. Pagos con Mercado Pago.
+              </p>
+              <span className="visit">Recorrer la tienda →</span>
+            </a>
+            <a
+              className="fs-store-card"
+              style={{ '--card-accent': '#c0392b' }}
+              href="https://burger.fornistore.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="tag">Gastronomía</span>
+              <h3>Burger & Pizza House 🍔</h3>
+              <p>
+                Menú con adicionales y combos, pedidos en tiempo real, zonas de envío con
+                costo propio y seguimiento del pedido en vivo.
+              </p>
+              <span className="visit">Recorrer la tienda →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Parte 3 en adelante: panel en vivo → precios → CTA final */}
     </div>
   )
 }
