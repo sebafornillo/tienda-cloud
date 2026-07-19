@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
 const WHATSAPP = '5493425255392'
+
+const TYPE_LABEL = {
+  gastronomy: 'Gastronomía',
+  ecommerce: 'E-commerce',
+}
 
 const COLORS = [
   { hex: '#e05a33', name: 'naranja' },
@@ -25,6 +31,15 @@ function initials(text) {
 export default function FornistoreLanding() {
   const [bizName, setBizName] = useState('')
   const [color, setColor] = useState(COLORS[1])
+  const [stores, setStores] = useState([])
+
+  useEffect(() => {
+    supabase
+      .from('tenants')
+      .select('subdomain, name, business_type, settings')
+      .eq('settings->>featured_on_fornistore', 'true')
+      .then(({ data }) => setStores(data || []))
+  }, [])
 
   const displayName = bizName.trim() || 'Tu Negocio'
 
@@ -502,45 +517,32 @@ export default function FornistoreLanding() {
       </section>
 
       {/* ---------- TIENDAS REALES ---------- */}
+      {stores.length > 0 && (
       <section className="fs-stores">
         <div className="fs-stores-inner">
           <span className="fs-kicker">Sin humo</span>
           <h2>Tiendas reales, vendiendo ahora</h2>
           <p>No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
           <div className="fs-stores-grid">
-            <a
-              className="fs-store-card"
-              style={{ '--card-accent': '#5a6b3a' }}
-              href="https://rinconmatero.fornistore.com"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="tag">E-commerce · Santa Fe</span>
-              <h3>Rincón Matero 🧉</h3>
-              <p>
-                Mates artesanales, termos y yerba con landing premium, stock por unidad y
-                sets de regalo. Pagos con Mercado Pago.
-              </p>
-              <span className="visit">Recorrer la tienda →</span>
-            </a>
-            <a
-              className="fs-store-card"
-              style={{ '--card-accent': '#c0392b' }}
-              href="https://burger.fornistore.com"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="tag">Gastronomía</span>
-              <h3>Burger & Pizza House 🍔</h3>
-              <p>
-                Menú con adicionales y combos, pedidos en tiempo real, zonas de envío con
-                costo propio y seguimiento del pedido en vivo.
-              </p>
-              <span className="visit">Recorrer la tienda →</span>
-            </a>
+            {stores.map((t) => (
+              <a
+                key={t.subdomain}
+                className="fs-store-card"
+                style={{ '--card-accent': t.settings?.primary_color || '#5a6b3a' }}
+                href={`https://${t.subdomain}.fornistore.com`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="tag">{TYPE_LABEL[t.business_type] || 'Tienda'}</span>
+                <h3>{t.name}</h3>
+                {t.settings?.fornistore_blurb && <p>{t.settings.fornistore_blurb}</p>}
+                <span className="visit">Recorrer la tienda →</span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* Parte 3 en adelante: panel en vivo → precios → CTA final */}
     </div>
