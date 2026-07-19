@@ -10,6 +10,7 @@ const EMPTY = {
   price: '',
   category_id: '',
   image_url: '',
+  images: [],
   stock: '',
   is_active: true,
 }
@@ -22,26 +23,63 @@ export default function Products() {
   const [newCat, setNewCat] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingGallery, setUploadingGallery] = useState(false)
   const [uploadError, setUploadError] = useState(null)
   const [editingMods, setEditingMods] = useState(null)
+
+  async function uploadToStorage(file) {
+    const ext = file.name.split('.').pop().toLowerCase()
+    const path = `${tenant.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const { error } = await supabase.storage.from('products').upload(path, file, {
+      cacheControl: '31536000',
+      upsert: false,
+    })
+    if (error) return null
+    const { data } = supabase.storage.from('products').getPublicUrl(path)
+    return data.publicUrl
+  }
 
   async function uploadImage(file) {
     if (!file) return
     setUploading(true)
     setUploadError(null)
-    const ext = file.name.split('.').pop().toLowerCase()
-    const path = `${tenant.id}/${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from('products').upload(path, file, {
-      cacheControl: '31536000',
-      upsert: false,
-    })
-    if (error) {
+    const url = await uploadToStorage(file)
+    if (!url) {
       setUploadError('No se pudo subir la imagen. Probá de nuevo.')
     } else {
-      const { data } = supabase.storage.from('products').getPublicUrl(path)
-      setEditing((e) => ({ ...e, image_url: data.publicUrl }))
+      setEditing((e) => ({ ...e, image_url: url }))
     }
     setUploading(false)
+  }
+
+  async function uploadGallery(files) {
+    if (!files || files.length === 0) return
+    setUploadingGallery(true)
+    setUploadError(null)
+    const urls = []
+    for (const file of Array.from(files)) {
+      const url = await uploadToStorage(file)
+      if (url) urls.push(url)
+    }
+    if (urls.length < files.length) {
+      setUploadError('Alguna foto no se pudo subir. Revisá y probá de nuevo.')
+    }
+    if (urls.length > 0) {
+      setEditing((e) => ({ ...e, images: [...(e.images || []), ...urls] }))
+    }
+    setUploadingGallery(false)
+  }
+
+  function removeGalleryImage(url) {
+    setEditing((e) => ({ ...e, images: (e.images || []).filter((u) => u !== url) }))
+  }
+
+  function makeCover(url) {
+    setEditing((e) => {
+      const rest = (e.images || []).filter((u) => u !== url)
+      const oldCover = e.image_url ? [e.image_url] : []
+      return { ...e, image_url: url, images: [...oldCover, ...rest] }
+    })
   }
 
   async function load() {
@@ -66,6 +104,7 @@ export default function Products() {
       price: Number(editing.price),
       category_id: editing.category_id || null,
       image_url: editing.image_url.trim() || null,
+      images: editing.images || [],
       stock: editing.stock === '' || editing.stock === null ? null : Number(editing.stock),
       is_active: editing.is_active,
     }
@@ -167,7 +206,7 @@ export default function Products() {
                 </select>
               </label>
               <div className="photo-field">
-                <span className="field-label">Foto</span>
+                <span className="field-label">Foto de portada</span>
                 <div className="photo-row">
                   {editing.image_url ? (
                     <img className="photo-preview" src={editing.image_url} alt="" />
@@ -195,8 +234,55 @@ export default function Products() {
                     )}
                   </div>
                 </div>
-                {uploadError && <p className="error">{uploadError}</p>}
               </div>
+
+              <div className="photo-field">
+                <span className="field-label">Más fotos (galería)</span>
+                <div className="gallery-grid">
+                  {(editing.images || []).map((url) => (
+                    <div className="gallery-thumb" key={url}>
+                      <img src={url} alt="" />
+                      <div className="gallery-thumb-actions">
+                        <button
+                          type="button"
+                          title="Usar como portada"
+                          onClick={() => makeCover(url)}
+                        >
+                          ★
+                        </button>
+                        <button
+                          type="button"
+                          title="Quitar"
+                          className="danger"
+                          onClick={() => removeGalleryImage(url)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <label className="gallery-add">
+                    {uploadingGallery ? '…' : '+'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      hidden
+                      disabled={uploadingGallery}
+                      onChange={(e) => {
+                        uploadGallery(e.target.files)
+                        e.target.value = ''
+                      }}
+                    />
+                  </label>
+                </div>
+                <small className="hint">
+                  Se muestran en la tienda al abrir el producto. Podés subir varias juntas.
+                  La ★ pasa esa foto a portada.
+                </small>
+              </div>
+              {uploadError && <p className="error">{uploadError}</p>}
+
               <label>
                 Stock
                 <input
@@ -241,6 +327,9 @@ export default function Products() {
               <small>
                 {categories.find((c) => c.id === p.category_id)?.name || 'Sin categoría'}
                 {' · '}{money(p.price)}
+                {Array.isArray(p.images) && p.images.length > 0 && (
+                  <>{' · '}📷 {p.images.length + 1}</>
+                )}
                 {p.stock !== null && (
                   <>
                     {' · '}
@@ -256,7 +345,7 @@ export default function Products() {
               </small>
             </div>
             <div className="row-actions">
-              <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '' })}>
+              <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [] })}>
                 Editar
               </button>
               <button className="link" onClick={() => setEditingMods(p)}>
