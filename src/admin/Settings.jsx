@@ -13,6 +13,7 @@ export default function Settings() {
     banner_url: tenant.settings?.banner_url || '',
     primary_color: tenant.settings?.primary_color || '#111111',
     whatsapp: tenant.settings?.whatsapp || '',
+    announcement: tenant.settings?.announcement || '',
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -113,6 +114,7 @@ export default function Settings() {
       banner_url: form.banner_url || null,
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
+      announcement: form.announcement.trim() || null,
       delivery_zones: zones,
       schedule,
       mp_enabled: mpConfigured || !!mpToken.trim(),
@@ -197,6 +199,21 @@ export default function Settings() {
       </div>
 
       <div className="settings-block">
+        <span className="field-label">Anuncio de la tienda</span>
+        <input
+          className="settings-input"
+          value={form.announcement}
+          onChange={(e) => set('announcement', e.target.value)}
+          maxLength={90}
+          placeholder='Ej: 🔥 10% OFF en toda la tienda con el cupón HOLA10'
+        />
+        <small className="hint">
+          Aparece como barra destacada arriba de tu tienda, con tu color de marca. Ideal
+          para promos y cupones. Dejalo vacío para ocultarla.
+        </small>
+      </div>
+
+      <div className="settings-block">
         <span className="field-label">Color de marca</span>
         <div className="color-row">
           <input
@@ -225,7 +242,8 @@ export default function Settings() {
           inputMode="tel"
         />
         <small className="hint">
-          Se usa en el botón "Avisar por WhatsApp" que ve el cliente al confirmar su pedido.
+          Se usa en el botón "Avisar por WhatsApp" del pedido y en el botón flotante de
+          consultas que ve el cliente en la tienda.
         </small>
       </div>
 
