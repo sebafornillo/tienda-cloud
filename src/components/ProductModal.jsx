@@ -2,7 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useCart, money } from '../lib/CartContext'
 
-export default function ProductModal({ product, onClose }) {
+export default function ProductModal({
+  product,
+  onClose,
+  allProducts = [],
+  onSelectProduct,
+}) {
   const { addItem } = useCart()
   const [groups, setGroups] = useState([])
   const [selected, setSelected] = useState({}) // groupId -> [optionIds]
@@ -34,6 +39,23 @@ export default function ProductModal({ product, onClose }) {
     if (dx < 0) nextPhoto()
     else prevPhoto()
   }
+
+  // ---------- Recomendados ----------
+  const related = useMemo(() => {
+    const avail = allProducts.filter(
+      (p) =>
+        p.id !== product.id &&
+        p.is_active !== false &&
+        !(p.stock !== null && p.stock !== undefined && p.stock <= 0)
+    )
+    const same = avail.filter(
+      (p) => product.category_id && p.category_id === product.category_id
+    )
+    const others = avail.filter(
+      (p) => !product.category_id || p.category_id !== product.category_id
+    )
+    return [...same, ...others].slice(0, 6)
+  }, [allProducts, product])
 
   useEffect(() => {
     async function load() {
@@ -209,6 +231,29 @@ export default function ProductModal({ product, onClose }) {
               Agregar {money(total)}
             </button>
           </div>
+
+          {onSelectProduct && related.length > 0 && (
+            <div className="related">
+              <h3>También te puede interesar</h3>
+              <div className="related-strip">
+                {related.map((r) => (
+                  <button
+                    key={r.id}
+                    className="related-card"
+                    onClick={() => onSelectProduct(r)}
+                  >
+                    {r.image_url ? (
+                      <img src={r.image_url} alt="" loading="lazy" />
+                    ) : (
+                      <div className="related-img placeholder" />
+                    )}
+                    <strong>{r.name}</strong>
+                    <span>{money(r.price)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <button className="modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
       </div>

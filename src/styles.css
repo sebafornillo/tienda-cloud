@@ -1629,3 +1629,60 @@ img { display: block; }
 }
 .wa-float:hover { transform: scale(1.06); }
 .wa-float.up { bottom: 84px; }
+
+/* ---------- Recomendados en el modal ---------- */
+.related {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.related h3 {
+  font-size: 0.95rem;
+  margin: 0 0 10px;
+}
+.related-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.related-card {
+  flex: 0 0 auto;
+  width: 110px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.related-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.related-card img,
+.related-card .related-img {
+  width: 100%;
+  height: 74px;
+  object-fit: contain;
+  background: #f1ede2;
+  border-radius: 8px;
+}
+.related-card strong {
+  font-size: 0.8rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.related-card span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brand, #4a5d33);
+}

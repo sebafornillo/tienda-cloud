@@ -138,7 +138,13 @@ export default function Store() {
       </main>
 
       {selected && (
-        <ProductModal product={selected} onClose={() => setSelected(null)} />
+        <ProductModal
+          key={selected.id}
+          product={selected}
+          allProducts={products}
+          onSelectProduct={setSelected}
+          onClose={() => setSelected(null)}
+        />
       )}
 
       {whatsapp && (
