@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '549XXXXXXXXXX'
+const WHATSAPP = '5493425255392'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
