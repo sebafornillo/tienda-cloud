@@ -739,6 +739,147 @@ export default function FornistoreLanding() {
         @media (max-width: 520px) {
           .fs-panel-kpis { grid-template-columns: 1fr 1fr; }
         }
+
+        /* ---- Precios ---- */
+        .fs-pricing {
+          background: #f7f3e8;
+          padding: 0 24px 88px;
+        }
+        .fs-pricing-inner {
+          max-width: 880px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .fs-pricing h2 {
+          font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+          letter-spacing: -0.01em;
+          margin: 0 0 32px;
+          color: #23211b;
+        }
+        .fs-plans {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 22px;
+          text-align: left;
+        }
+        .fs-plan {
+          background: #fff;
+          border: 1px solid #e8e2d2;
+          border-radius: 18px;
+          padding: 28px 26px;
+          display: flex;
+          flex-direction: column;
+        }
+        .fs-plan.featured {
+          border: 2px solid #1f1d18;
+          box-shadow: 0 16px 44px rgba(0,0,0,0.10);
+          position: relative;
+        }
+        .fs-plan-tag {
+          position: absolute;
+          top: -12px;
+          left: 24px;
+          background: #1f1d18;
+          color: #f5efdf;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          padding: 4px 12px;
+          border-radius: 99px;
+        }
+        .fs-plan h3 {
+          margin: 0 0 10px;
+          font-size: 1.15rem;
+          color: #23211b;
+        }
+        .fs-plan-price strong {
+          font-size: 2.1rem;
+          color: #23211b;
+          letter-spacing: -0.02em;
+        }
+        .fs-plan-price span { color: #8f8a7c; }
+        .fs-plan-setup {
+          margin: 4px 0 0;
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #8f8a7c;
+        }
+        .fs-plan ul {
+          list-style: none;
+          padding: 0;
+          margin: 18px 0 22px;
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+          flex: 1;
+        }
+        .fs-plan li {
+          font-size: 0.93rem;
+          color: #555043;
+          padding-left: 22px;
+          position: relative;
+        }
+        .fs-plan li::before {
+          content: '✓';
+          position: absolute;
+          left: 0;
+          color: #1d9e75;
+          font-weight: 800;
+        }
+        .fs-plan-cta {
+          display: block;
+          text-align: center;
+          padding: 13px;
+          border-radius: 99px;
+          background: #1f1d18;
+          color: #f5efdf;
+          font-weight: 700;
+          text-decoration: none;
+          transition: transform 0.12s;
+        }
+        .fs-plan-cta:hover { transform: translateY(-1px); }
+        .fs-plan-cta.outline {
+          background: transparent;
+          border: 2px solid #1f1d18;
+          color: #1f1d18;
+        }
+        .fs-pricing-fine {
+          margin-top: 22px;
+          font-size: 0.8rem;
+          color: #b5b0a4;
+        }
+        @media (max-width: 700px) {
+          .fs-plans { grid-template-columns: 1fr; }
+        }
+
+        /* ---- CTA final ---- */
+        .fs-final {
+          background: #14120e;
+          color: #f5efdf;
+          text-align: center;
+          padding: 88px 24px 48px;
+        }
+        .fs-badge.big {
+          width: 52px;
+          height: 52px;
+          border-radius: 13px;
+          font-size: 28px;
+          margin-bottom: 20px;
+        }
+        .fs-final h2 {
+          font-size: clamp(1.7rem, 4vw, 2.5rem);
+          letter-spacing: -0.02em;
+          margin: 0 0 10px;
+        }
+        .fs-final > p {
+          color: #b8b2a2;
+          margin: 0 0 30px;
+        }
+        .fs-final-foot {
+          margin-top: 52px !important;
+          font-size: 0.8rem;
+          color: #6b665a !important;
+        }
       `}</style>
 
       <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
@@ -890,7 +1031,85 @@ export default function FornistoreLanding() {
         </div>
       </section>
 
-      {/* Parte 4 en adelante: precios → CTA final */}
+      {/* ---------- PRECIOS ---------- */}
+      <section className="fs-pricing">
+        <div className="fs-pricing-inner">
+          <span className="fs-kicker">Simple y sin sorpresas</span>
+          <h2>Un precio que se paga solo</h2>
+          <div className="fs-plans">
+            <div className="fs-plan">
+              <h3>Tienda Online</h3>
+              <div className="fs-plan-price">
+                <strong>$35.000</strong>
+                <span>/mes</span>
+              </div>
+              <ul>
+                <li>Catálogo con fotos y categorías</li>
+                <li>Pedidos en tiempo real + WhatsApp</li>
+                <li>Cobros con Mercado Pago</li>
+                <li>Control de stock automático</li>
+                <li>Cupones de descuento</li>
+                <li>Panel de gestión completo</li>
+                <li>Tu subdominio: tunegocio.fornistore.com</li>
+              </ul>
+              <a
+                className="fs-plan-cta outline"
+                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero mi Tienda Online de Fornistore 🚀')}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Quiero mi tienda
+              </a>
+            </div>
+            <div className="fs-plan featured">
+              <span className="fs-plan-tag">Para marcas que quieren impactar</span>
+              <h3>Tienda + Landing Premium</h3>
+              <div className="fs-plan-price">
+                <strong>$35.000</strong>
+                <span>/mes</span>
+              </div>
+              <p className="fs-plan-setup">+ $90.000 por única vez</p>
+              <ul>
+                <li>Todo lo del plan Tienda Online</li>
+                <li>Landing de marca diseñada a medida</li>
+                <li>Animaciones y fotografía optimizada</li>
+                <li>Tu historia, tu colección, tus sets</li>
+                <li>Ideal para regalos empresariales</li>
+              </ul>
+              <a
+                className="fs-plan-cta"
+                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Me interesa la Tienda + Landing Premium de Fornistore ✨')}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Quiero el combo
+              </a>
+            </div>
+          </div>
+          <p className="fs-pricing-fine">
+            Precios en pesos argentinos, con actualización trimestral. Sin permanencia:
+            te vas cuando quieras.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- CTA FINAL ---------- */}
+      <section className="fs-final">
+        <span className="fs-badge big">F</span>
+        <h2>Tu tienda puede estar vendiendo esta semana.</h2>
+        <p>Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
+        <a
+          className="fs-cta"
+          href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero arrancar con Fornistore 🚀')}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Hablemos por WhatsApp →
+        </a>
+        <p className="fs-final-foot">
+          Fornistore · Tiendas online para emprendedores · Santa Fe, Argentina
+        </p>
+      </section>
     </div>
   )
 }
