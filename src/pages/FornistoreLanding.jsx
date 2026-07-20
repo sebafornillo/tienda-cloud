@@ -3,15 +3,15 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '5493425255392'
+const WHATSAPP = '549XXXXXXXXXX'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
   ecommerce: 'E-commerce',
 }
 
-const DEMO_NAMES = ['Sofi', 'Marcos', 'Caro', 'Leo', 'Vale', 'Nico']
-const DEMO_STAGES = ['📝 Recibido', '👨‍🍳 En preparación', '🛵 En camino', '✅ Entregado']
+const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
+const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
 
 function PanelDemo() {
   const [orders, setOrders] = useState([])
@@ -23,27 +23,40 @@ function PanelDemo() {
     return () => timers.current.forEach(clearTimeout)
   }, [])
 
+  function now() {
+    return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  }
+
   function simulate() {
     if (stock <= 0) return
     const id = Date.now()
-    const name = DEMO_NAMES[count % DEMO_NAMES.length]
-    setOrders((o) => [{ id, name, num: 53 + count - 6, stage: 0 }, ...o].slice(0, 4))
+    setOrders((o) =>
+      [{ id, name: DEMO_NAMES[count % DEMO_NAMES.length], num: 47 + count, time: now(), stage: 0 }, ...o].slice(0, 4)
+    )
     setStock((s) => s - 1)
     setCount((c) => c + 1)
-    for (let s = 1; s < DEMO_STAGES.length; s++) {
+  }
+
+  function confirmOrder(id) {
+    setOrders((o) => o.map((x) => (x.id === id ? { ...x, stage: 1 } : x)))
+    for (let s = 2; s < DEMO_STAGES.length; s++) {
       timers.current.push(
         setTimeout(() => {
           setOrders((o) => o.map((x) => (x.id === id ? { ...x, stage: s } : x)))
-        }, s * 1700)
+        }, (s - 1) * 1600)
       )
     }
   }
+
+  const pillClass = (stage) =>
+    stage === 0 ? 'pill new' : stage === DEMO_STAGES.length - 1 ? 'pill done' : 'pill'
 
   return (
     <div className="fs-panel">
       <div className="fs-panel-top">
         <span className="fs-panel-badge">F</span>
-        <strong>Pizzería Don Beto — Panel</strong>
+        <strong>Pizzería Don Beto</strong>
+        <span className="fs-panel-nav">Pedidos · Productos · Stock · Cupones</span>
         <span className="fs-panel-live">● en vivo</span>
       </div>
       <div className="fs-panel-kpis">
@@ -63,18 +76,45 @@ function PanelDemo() {
         </div>
       </div>
       <div className="fs-panel-orders">
-        {orders.map((o) => (
-          <div key={o.id} className="fs-panel-order">
-            <strong>#{o.num} {o.name}</strong>
-            <span>1× Pizza muzzarella</span>
-            <em className={o.stage === DEMO_STAGES.length - 1 ? 'done' : ''}>
-              {DEMO_STAGES[o.stage]}
-            </em>
-          </div>
-        ))}
+        {orders.map((o) =>
+          o.stage === 0 ? (
+            <div key={o.id} className="fs-order-card">
+              <div className="fs-order-head">
+                <span className="fs-order-num">#{o.num}</span>
+                <div className="fs-order-who">
+                  <strong>{o.name}</strong>
+                  <small>Retiro · {o.time}</small>
+                </div>
+                <span className="pill new">Nuevo</span>
+                <span className="fs-order-total">$ 8.500</span>
+              </div>
+              <div className="fs-order-detail">
+                <span>1× Pizza muzzarella</span>
+                <span>$ 8.500</span>
+              </div>
+              <small className="fs-order-meta">Pago: Mercado Pago ✓ acreditado</small>
+              <div className="fs-order-actions">
+                <button className="fs-demo-confirm" onClick={() => confirmOrder(o.id)}>
+                  Confirmar
+                </button>
+                <span className="fs-demo-wa">WhatsApp</span>
+              </div>
+            </div>
+          ) : (
+            <div key={o.id} className="fs-order-row">
+              <span className="fs-order-num">#{o.num}</span>
+              <div className="fs-order-who">
+                <strong>{o.name}</strong>
+                <small>Retiro · {o.time}</small>
+              </div>
+              <span className={pillClass(o.stage)}>{DEMO_STAGES[o.stage]}</span>
+              <span className="fs-order-total">$ 8.500</span>
+            </div>
+          )
+        )}
       </div>
       <button className="fs-panel-btn" onClick={simulate} disabled={stock <= 0}>
-        {stock <= 0 ? 'Muzzarella agotada — así te avisa' : '▶ Simular un pedido'}
+        {stock <= 0 ? 'Muzzarella agotada — así te avisa' : '▶ Simular un pedido entrante'}
       </button>
     </div>
   )
@@ -564,6 +604,14 @@ export default function FornistoreLanding() {
           border-radius: 99px;
           display: inline-block;
         }
+        .fs-panel-nav {
+          font-size: 0.75rem;
+          color: #b5b0a4;
+          display: none;
+        }
+        @media (min-width: 560px) {
+          .fs-panel-nav { display: inline; }
+        }
         .fs-panel-orders {
           padding: 0 16px;
           display: flex;
@@ -571,30 +619,103 @@ export default function FornistoreLanding() {
           gap: 8px;
           min-height: 8px;
         }
-        .fs-panel-order {
+        .fs-order-row, .fs-order-card {
+          border: 1px solid #efe9da;
+          border-radius: 12px;
+          animation: fs-order-in 0.5s ease;
+          background: #fff;
+        }
+        .fs-order-row {
           display: flex;
           align-items: center;
           gap: 10px;
-          border: 1px solid #efe9da;
-          border-radius: 10px;
-          padding: 9px 12px;
+          padding: 10px 14px;
           font-size: 0.9rem;
-          animation: fs-order-in 0.5s ease;
-          flex-wrap: wrap;
+        }
+        .fs-order-card {
+          padding: 12px 14px;
+          border-left: 4px solid #5a6b3a;
+        }
+        .fs-order-head {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+        }
+        .fs-order-num {
+          font-weight: 800;
+          color: #23211b;
+          font-size: 0.95rem;
+        }
+        .fs-order-who {
+          display: flex;
+          flex-direction: column;
+          line-height: 1.2;
+        }
+        .fs-order-who strong { color: #23211b; font-size: 0.92rem; }
+        .fs-order-who small { color: #b5b0a4; font-size: 0.75rem; }
+        .fs-order-total {
+          margin-left: auto;
+          font-weight: 800;
+          color: #23211b;
+          font-size: 0.95rem;
+        }
+        .fs-order-row .pill { margin-left: auto; }
+        .fs-order-row .fs-order-total { margin-left: 10px; }
+        .pill {
+          font-size: 0.75rem;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 99px;
+          background: #f1ede0;
+          color: #6b6555;
+          white-space: nowrap;
+        }
+        .pill.new { background: #4a5232; color: #f5efdf; }
+        .pill.done { background: #e1f5ee; color: #0f6e56; }
+        .fs-order-detail {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          color: #555043;
+          padding: 6px 0;
+          border-top: 1px dashed #efe9da;
+        }
+        .fs-order-meta {
+          display: block;
+          color: #8f8a7c;
+          font-size: 0.78rem;
+          margin-bottom: 10px;
+        }
+        .fs-order-actions {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .fs-demo-confirm {
+          border: none;
+          border-radius: 99px;
+          background: #4a5232;
+          color: #f5efdf;
+          font-weight: 700;
+          font-size: 0.9rem;
+          padding: 9px 22px;
+          cursor: pointer;
+          transition: transform 0.12s;
+        }
+        .fs-demo-confirm:hover { transform: translateY(-1px); }
+        .fs-demo-wa {
+          border-radius: 99px;
+          background: #25d366;
+          color: #0b2b16;
+          font-weight: 700;
+          font-size: 0.9rem;
+          padding: 9px 18px;
         }
         @keyframes fs-order-in {
           from { background: #e7f6e2; transform: translateY(-6px); opacity: 0; }
           to { background: #fff; transform: none; opacity: 1; }
         }
-        .fs-panel-order strong { color: #23211b; }
-        .fs-panel-order span { color: #8f8a7c; }
-        .fs-panel-order em {
-          margin-left: auto;
-          font-style: normal;
-          font-size: 0.85rem;
-          color: #8f8a7c;
-        }
-        .fs-panel-order em.done { color: #0f6e56; font-weight: 700; }
         .fs-panel-btn {
           display: block;
           width: calc(100% - 32px);
@@ -762,8 +883,8 @@ export default function FornistoreLanding() {
           <span className="fs-kicker">Del otro lado del mostrador</span>
           <h2>Vos manejás todo desde acá</h2>
           <p className="fs-admin-sub">
-            Pedidos que entran solos, stock que se descuenta con cada venta y el estado
-            de la entrega en vivo. Tocá el botón y miralo funcionar:
+            Pedidos que entran solos, stock que se descuenta con cada venta y estados en
+            un click. Simulá un pedido y confirmalo vos, como si fueras el dueño:
           </p>
           <PanelDemo />
         </div>
