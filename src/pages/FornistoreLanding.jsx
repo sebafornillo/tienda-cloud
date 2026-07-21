@@ -106,15 +106,50 @@ function IntroBoot({ onDone }) {
   )
 }
 
+const DEMO_MODES = {
+  food: {
+    label: '🍔 Gastronomía',
+    store: 'Pizzería Don Beto',
+    product: 'Pizza muzzarella',
+    price: '$ 8.500',
+    stockName: 'muzzarella',
+    outMsg: 'Muzzarella agotada — así te avisa',
+    stages: ['Nuevo', 'Confirmado', 'En preparación 👨\u200d🍳', 'En camino 🛵', 'Entregado ✅'],
+    thanks: '¡Muchas gracias por tu compra, ',
+  },
+  shop: {
+    label: '🧉 E-commerce',
+    store: 'Rincón del Mate',
+    product: 'Mate imperial + bombilla',
+    price: '$ 35.000',
+    stockName: 'mate imperial',
+    outMsg: 'Mate imperial agotado — así te avisa',
+    stages: ['Nuevo', 'Confirmado', 'Armando tu paquete 📦', 'Despachado 🚚', 'Entregado ✅'],
+    thanks: '¡Muchas gracias por tu compra, ',
+  },
+}
+
 function PanelDemo() {
+  const [mode, setMode] = useState('food')
   const [orders, setOrders] = useState([])
   const [stock, setStock] = useState(4)
   const [count, setCount] = useState(7)
   const timers = useRef([])
+  const M = DEMO_MODES[mode]
 
   useEffect(() => {
     return () => timers.current.forEach(clearTimeout)
   }, [])
+
+  function switchMode(m) {
+    if (m === mode) return
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+    setMode(m)
+    setOrders([])
+    setStock(4)
+    setCount(7)
+  }
 
   function now() {
     return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
@@ -124,7 +159,7 @@ function PanelDemo() {
     if (stock <= 0) return
     const id = Date.now()
     setOrders((o) =>
-      [{ id, name: DEMO_NAMES[count % DEMO_NAMES.length], num: 47 + count, time: now(), stage: 0 }, ...o].slice(0, 4)
+      [{ id, name: DEMO_NAMES[count % DEMO_NAMES.length], num: 47 + count, time: now(), stage: 0 }, ...o].slice(0, 3)
     )
     setStock((s) => s - 1)
     setCount((c) => c + 1)
@@ -132,23 +167,34 @@ function PanelDemo() {
 
   function confirmOrder(id) {
     setOrders((o) => o.map((x) => (x.id === id ? { ...x, stage: 1 } : x)))
-    for (let s = 2; s < DEMO_STAGES.length; s++) {
+    for (let s = 2; s < M.stages.length; s++) {
       timers.current.push(
         setTimeout(() => {
           setOrders((o) => o.map((x) => (x.id === id ? { ...x, stage: s } : x)))
-        }, (s - 1) * 1600)
+        }, (s - 1) * 1500)
       )
     }
   }
 
   const pillClass = (stage) =>
-    stage === 0 ? 'pill new' : stage === DEMO_STAGES.length - 1 ? 'pill done' : 'pill'
+    stage === 0 ? 'pill new' : stage === M.stages.length - 1 ? 'pill done' : 'pill'
 
   return (
     <div className="fs-panel">
+      <div className="fs-panel-modes">
+        {Object.entries(DEMO_MODES).map(([key, m]) => (
+          <button
+            key={key}
+            className={mode === key ? 'on' : ''}
+            onClick={() => switchMode(key)}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
       <div className="fs-panel-top">
         <span className="fs-panel-badge">F</span>
-        <strong>Pizzería Don Beto</strong>
+        <strong>{M.store}</strong>
         <span className="fs-panel-nav">Pedidos · Productos · Stock · Cupones</span>
         <span className="fs-panel-live">● en vivo</span>
       </div>
@@ -158,7 +204,7 @@ function PanelDemo() {
           <strong>{count}</strong>
         </div>
         <div>
-          <small>Stock muzzarella</small>
+          <small>Stock {M.stockName}</small>
           <strong className={stock <= 0 ? 'kpi-out' : stock <= 3 ? 'kpi-low' : ''}>
             {stock} u.
           </strong>
@@ -176,14 +222,14 @@ function PanelDemo() {
                 <span className="fs-order-num">#{o.num}</span>
                 <div className="fs-order-who">
                   <strong>{o.name}</strong>
-                  <small>Retiro · {o.time}</small>
+                  <small>{mode === 'food' ? 'Delivery' : 'Envío'} · {o.time}</small>
                 </div>
                 <span className="pill new">Nuevo</span>
-                <span className="fs-order-total">$ 8.500</span>
+                <span className="fs-order-total">{M.price}</span>
               </div>
               <div className="fs-order-detail">
-                <span>1× Pizza muzzarella</span>
-                <span>$ 8.500</span>
+                <span>1× {M.product}</span>
+                <span>{M.price}</span>
               </div>
               <small className="fs-order-meta">Pago: Mercado Pago ✓ acreditado</small>
               <div className="fs-order-actions">
@@ -194,20 +240,30 @@ function PanelDemo() {
               </div>
             </div>
           ) : (
-            <div key={o.id} className="fs-order-row">
-              <span className="fs-order-num">#{o.num}</span>
-              <div className="fs-order-who">
-                <strong>{o.name}</strong>
-                <small>Retiro · {o.time}</small>
+            <div key={o.id} className="fs-order-block">
+              <div className="fs-order-row">
+                <span className="fs-order-num">#{o.num}</span>
+                <div className="fs-order-who">
+                  <strong>{o.name}</strong>
+                  <small>{mode === 'food' ? 'Delivery' : 'Envío'} · {o.time}</small>
+                </div>
+                <span className={pillClass(o.stage)}>{M.stages[o.stage]}</span>
+                <span className="fs-order-total">{M.price}</span>
               </div>
-              <span className={pillClass(o.stage)}>{DEMO_STAGES[o.stage]}</span>
-              <span className="fs-order-total">$ 8.500</span>
+              {o.stage === M.stages.length - 1 && (
+                <div className="fs-thanks-bubble">
+                  <span className="fs-thanks-tail" aria-hidden="true" />
+                  {M.thanks}
+                  {o.name}! 🧡 Cualquier duda escribinos por acá.
+                  <em>enviado por WhatsApp ✓✓</em>
+                </div>
+              )}
             </div>
           )
         )}
       </div>
       <button className="fs-panel-btn" onClick={simulate} disabled={stock <= 0}>
-        {stock <= 0 ? 'Muzzarella agotada — así te avisa' : '▶ Simular un pedido entrante'}
+        {stock <= 0 ? M.outMsg : '▶ Simular un pedido entrante'}
       </button>
     </div>
   )
@@ -809,6 +865,62 @@ export default function FornistoreLanding() {
         }
 
         /* ---- Panel en vivo ---- */
+        .fs-panel-modes {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          padding: 14px 16px 0;
+        }
+        .fs-panel-modes button {
+          border: 1.5px solid #e8e2d2;
+          background: #fff;
+          border-radius: 99px;
+          padding: 8px 18px;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #8f8a7c;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .fs-panel-modes button.on {
+          background: #1f1d18;
+          border-color: #1f1d18;
+          color: #f5efdf;
+        }
+        .fs-order-block {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .fs-thanks-bubble {
+          position: relative;
+          align-self: flex-start;
+          margin-left: 26px;
+          background: #e7f6e2;
+          border: 1px solid #cfe8c6;
+          border-radius: 4px 14px 14px 14px;
+          padding: 9px 12px;
+          font-size: 0.85rem;
+          color: #2c4a24;
+          max-width: 88%;
+          animation: fs-order-in 0.5s ease;
+        }
+        .fs-thanks-bubble em {
+          display: block;
+          margin-top: 4px;
+          font-style: normal;
+          font-size: 0.7rem;
+          color: #7ba36f;
+        }
+        .fs-thanks-tail {
+          position: absolute;
+          left: -7px;
+          top: 0;
+          width: 0;
+          height: 0;
+          border-top: 8px solid #cfe8c6;
+          border-left: 8px solid transparent;
+        }
         .fs-admin-demo {
           background: #f7f3e8;
           padding: 0 24px 88px;
