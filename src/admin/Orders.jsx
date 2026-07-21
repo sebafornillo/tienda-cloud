@@ -86,18 +86,26 @@ function waNumber(phone) {
   if (d.startsWith('0')) d = d.slice(1)
   return '549' + d
 }
-function waMessage(order, tenantName) {
+
+function waMessage(order, tenantName, businessType) {
   const n = order.order_number
   const name = order.customer_name.split(' ')[0]
+  const food = businessType === 'gastronomy'
   const byStatus = {
     pending: `recibimos tu pedido #${n} y lo estamos revisando.`,
-    confirmed: `tu pedido #${n} está confirmado y entra a cocina. 🙌`,
-    preparing: `tu pedido #${n} se está preparando. 👨‍🍳`,
+    confirmed: food
+      ? `tu pedido #${n} está confirmado y ya entra a cocina. 🙌`
+      : `tu pedido #${n} está confirmado y ya lo estamos preparando. 🙌`,
+    preparing: food
+      ? `tu pedido #${n} se está preparando. 👨‍🍳`
+      : `estamos armando tu pedido #${n} con mucho cuidado. 📦`,
     ready:
       order.delivery_type === 'delivery'
-        ? `tu pedido #${n} está listo y sale en camino. 🛵`
+        ? food
+          ? `tu pedido #${n} está listo y sale en camino. 🛵`
+          : `tu pedido #${n} fue despachado y va en camino. 🚚`
         : `tu pedido #${n} está listo para retirar. ✅`,
-    delivered: `¡gracias por tu compra! Esperamos que disfrutes tu pedido #${n}. 😊`,
+    delivered: `¡Gracias por tu compra! Esperamos que disfrutes tu pedido #${n}. 😊`,
     cancelled: `lamentablemente tuvimos que cancelar tu pedido #${n}. Escribinos y lo resolvemos.`,
   }
   const place =
@@ -290,7 +298,7 @@ export default function Orders() {
                     )}
                     <a
                       className="btn-wa"
-                      href={`https://wa.me/${waNumber(o.customer_phone)}?text=${waMessage(o, tenant.name)}`}
+                      href={`https://wa.me/${waNumber(o.customer_phone)}?text=${waMessage(o, tenant.name, tenant.business_type)}`}
                       target="_blank"
                       rel="noreferrer"
                     >
