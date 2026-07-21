@@ -6,6 +6,13 @@ import { useCart, money } from '../lib/CartContext'
 import ProductModal from '../components/ProductModal'
 import { isStoreOpen, nextOpening } from '../lib/schedule'
 
+// Normaliza texto para buscar sin acentos ni mayúsculas
+const norm = (t) =>
+  (t || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+
 export default function Store() {
   const { tenant } = useTenant()
   const { count, subtotal } = useCart()
@@ -13,6 +20,9 @@ export default function Store() {
   const [products, setProducts] = useState([])
   const [selected, setSelected] = useState(null)
   const [activeCat, setActiveCat] = useState(null)
+  const [query, setQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -36,6 +46,14 @@ export default function Store() {
     load()
   }, [tenant.id])
 
+  // Bloquea el scroll del fondo cuando el menú está abierto
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
+
   const grouped = useMemo(() => {
     const withCat = categories
       .map((c) => ({ ...c, items: products.filter((p) => p.category_id === c.id) }))
@@ -45,6 +63,15 @@ export default function Store() {
     return withCat
   }, [categories, products])
 
+  const searching = query.trim().length > 0
+  const results = useMemo(() => {
+    if (!searching) return []
+    const q = norm(query)
+    return products.filter(
+      (p) => norm(p.name).includes(q) || norm(p.description).includes(q)
+    )
+  }, [products, query, searching])
+
   const visible = activeCat ? grouped.filter((g) => g.id === activeCat) : grouped
 
   const open = isStoreOpen(tenant.settings?.schedule)
@@ -52,6 +79,44 @@ export default function Store() {
 
   const announcement = tenant.settings?.announcement?.trim()
   const whatsapp = tenant.settings?.whatsapp
+
+  function goCategory(id) {
+    setActiveCat(id)
+    setQuery('')
+    setMenuOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function renderCard(p) {
+    const out = p.stock !== null && p.stock <= 0
+    const low = !out && p.stock !== null && p.stock <= 3
+    return (
+      <button
+        key={p.id}
+        className={out ? 'product-card out-of-stock' : 'product-card'}
+        disabled={out}
+        onClick={() => setSelected(p)}
+      >
+        <div className="product-info">
+          <h3>{p.name}</h3>
+          {p.description && <p>{p.description}</p>}
+          <div className="price-row">
+            <span className="price">{money(p.price)}</span>
+            {p.compare_at_price && (
+              <span className="compare">{money(p.compare_at_price)}</span>
+            )}
+            {out && <span className="stock-chip out">Sin stock</span>}
+            {low && (
+              <span className="stock-chip low">
+                ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
+              </span>
+            )}
+          </div>
+        </div>
+        {p.image_url && <img src={p.image_url} alt={p.name} />}
+      </button>
+    )
+  }
 
   return (
     <div className="store">
@@ -62,6 +127,100 @@ export default function Store() {
           igual.
         </div>
       )}
+
+      {/* ---------- Barra superior: menú + búsqueda ---------- */}
+      <div className="store-topbar">
+        <button
+          className="topbar-btn"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Abrir menú"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+        </button>
+        <div className={searchOpen || searching ? 'topbar-search open' : 'topbar-search'}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+          </svg>
+          <input
+            placeholder="Buscar productos…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setSearchOpen(true)}
+            onBlur={() => setSearchOpen(false)}
+          />
+          {query && (
+            <button className="search-clear" onClick={() => setQuery('')} aria-label="Limpiar búsqueda">
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ---------- Drawer lateral ---------- */}
+      {menuOpen && (
+        <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
+          <nav className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-head">
+              {tenant.settings?.logo_url && (
+                <img src={tenant.settings.logo_url} alt="" />
+              )}
+              <strong>{tenant.name}</strong>
+              <button
+                className="drawer-close"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Cerrar menú"
+              >
+                ✕
+              </button>
+            </div>
+            <ul className="drawer-list">
+              <li>
+                <button
+                  className={!activeCat ? 'on' : ''}
+                  onClick={() => goCategory(null)}
+                >
+                  Inicio
+                </button>
+              </li>
+              {grouped.length > 0 && <li className="drawer-label">Categorías</li>}
+              {grouped.map((g) => (
+                <li key={g.id}>
+                  <button
+                    className={activeCat === g.id ? 'on' : ''}
+                    onClick={() => goCategory(g.id)}
+                  >
+                    {g.name}
+                    <span className="drawer-count">{g.items.length}</span>
+                  </button>
+                </li>
+              ))}
+              {whatsapp && (
+                <li className="drawer-contact">
+                  <a
+                    href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola ${tenant.name}! Tengo una consulta 🙂`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    💬 Consultanos por WhatsApp
+                  </a>
+                </li>
+              )}
+            </ul>
+            <p className="drawer-foot">
+              Tienda creada con{' '}
+              <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">
+                Fornistore
+              </a>
+            </p>
+          </nav>
+        </div>
+      )}
+
       <header className="store-header">
         {tenant.settings?.banner_url && (
           <img className="store-banner" src={tenant.settings.banner_url} alt="" />
@@ -74,7 +233,7 @@ export default function Store() {
         </div>
       </header>
 
-      {grouped.length > 1 && (
+      {!searching && grouped.length > 1 && (
         <nav className="cat-nav">
           <button
             className={!activeCat ? 'active' : ''}
@@ -95,46 +254,33 @@ export default function Store() {
       )}
 
       <main className="catalog">
-        {visible.length === 0 && (
-          <p className="empty">Todavía no hay productos cargados.</p>
-        )}
-        {visible.map((group) => (
-          <section key={group.id}>
-            <h2>{group.name}</h2>
-            <div className="product-list">
-              {group.items.map((p) => {
-                const out = p.stock !== null && p.stock <= 0
-                const low = !out && p.stock !== null && p.stock <= 3
-                return (
-                  <button
-                    key={p.id}
-                    className={out ? 'product-card out-of-stock' : 'product-card'}
-                    disabled={out}
-                    onClick={() => setSelected(p)}
-                  >
-                    <div className="product-info">
-                      <h3>{p.name}</h3>
-                      {p.description && <p>{p.description}</p>}
-                      <div className="price-row">
-                        <span className="price">{money(p.price)}</span>
-                        {p.compare_at_price && (
-                          <span className="compare">{money(p.compare_at_price)}</span>
-                        )}
-                        {out && <span className="stock-chip out">Sin stock</span>}
-                        {low && (
-                          <span className="stock-chip low">
-                            ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    {p.image_url && <img src={p.image_url} alt={p.name} />}
-                  </button>
-                )
-              })}
-            </div>
+        {searching ? (
+          <section>
+            <h2>
+              {results.length > 0
+                ? `Resultados para "${query.trim()}"`
+                : `Nada para "${query.trim()}"`}
+            </h2>
+            {results.length === 0 && (
+              <p className="empty">
+                Probá con otra palabra, o consultanos por WhatsApp 👉
+              </p>
+            )}
+            <div className="product-list">{results.map(renderCard)}</div>
           </section>
-        ))}
+        ) : (
+          <>
+            {visible.length === 0 && (
+              <p className="empty">Todavía no hay productos cargados.</p>
+            )}
+            {visible.map((group) => (
+              <section key={group.id}>
+                <h2>{group.name}</h2>
+                <div className="product-list">{group.items.map(renderCard)}</div>
+              </section>
+            ))}
+          </>
+        )}
       </main>
 
       {selected && (
