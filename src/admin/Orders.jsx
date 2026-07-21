@@ -114,10 +114,14 @@ function waMessage(order, tenantName, businessType) {
       : order.delivery_type === 'pickup'
       ? `🏪 Retiro por el local\n`
       : ''
-  const tracking = `${window.location.origin}/pedido/${n}`
-  return encodeURIComponent(
-    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}\n\n${place}💰 Total: ${money(order.total)}\n\nSeguí tu pedido en vivo acá: ${tracking}`
-  )
+      const greeting =
+      order.status === 'cancelled'
+        ? `Hola ${name}, te escribimos de ${tenantName}.`
+        : `¡Muchas gracias por tu compra, ${name}! 🧡 Te escribimos de ${tenantName}.`
+    const tracking = `${window.location.origin}/pedido/${n}`
+    return encodeURIComponent(
+      `${greeting}\n${byStatus[order.status] || `Novedades de tu pedido #${n}.`}\n\n${place}💰 Total: ${money(order.total)}\n\n👉 Seguí tu pedido en vivo: ${tracking}\n\nCualquier duda escribinos por acá, ¡estamos para ayudarte!`
+    )
 }
 
 export default function Orders() {
