@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useTenant } from './lib/TenantContext'
 import Store from './pages/Store'
@@ -14,11 +15,28 @@ import Settings from './admin/Settings'
 import PlatformPanel from './platform/PlatformPanel'
 import StockPanel from './admin/StockPanel'
 import FornistoreLanding from './pages/FornistoreLanding'
+import LoadingScreen from './components/LoadingScreen'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
 
-  if (loading) return <div className="screen-msg">Cargando…</div>
+  // Guarda logo, color y nombre de la tienda para que la próxima carga
+  // muestre su marca al instante (antes de saber qué tienda es).
+  useEffect(() => {
+    if (!tenant) return
+    try {
+      localStorage.setItem(
+        `fs_brand_${window.location.hostname}`,
+        JSON.stringify({
+          logo: tenant.settings?.logo_url || null,
+          color: tenant.settings?.primary_color || null,
+          name: tenant.name,
+        })
+      )
+    } catch {}
+  }, [tenant])
+
+  if (loading) return <LoadingScreen />
   if (error === 'landing')
     return (
       <Routes>

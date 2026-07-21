@@ -1664,7 +1664,9 @@ export default function FornistoreLanding() {
 
       {/* ---------- CTA FINAL ---------- */}
       <section className="fs-final">
-        <span className="fs-badge big fs-reveal">F</span>
+        <span className="fs-reveal" style={{ display: 'inline-block' }}>
+          <LogoF size={54} />
+        </span>
         <h2 className="fs-reveal">Tu tienda puede estar vendiendo esta semana.</h2>
         <p className="fs-reveal">Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
         <a
