@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '5493425255392'
+const WHATSAPP = '549XXXXXXXXXX'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
@@ -14,8 +14,7 @@ const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
 
 // ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
-// ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
-function useReveal(deps = []) {
+function useReveal() {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
@@ -35,12 +34,12 @@ function useReveal(deps = []) {
       },
       { threshold: 0.18 }
     )
-    el.querySelectorAll('.fs-reveal:not(.visible)').forEach((n) => obs.observe(n))
+    el.querySelectorAll('.fs-reveal').forEach((n) => obs.observe(n))
     return () => obs.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+  }, [])
   return ref
 }
+
 // ---------- Intro: editor que "programa" tu tienda ----------
 const BOOT_LINES = [
   'crear_tienda({',
@@ -291,6 +290,7 @@ function initials(text) {
 export default function FornistoreLanding() {
   const [bizName, setBizName] = useState('')
   const [color, setColor] = useState(COLORS[1])
+  const [autoColor, setAutoColor] = useState(true)
   const [stores, setStores] = useState([])
   const [intro, setIntro] = useState(() => {
     try {
@@ -300,6 +300,21 @@ export default function FornistoreLanding() {
       return false
     }
   })
+
+  // El celular va rotando colores solo, hasta que el visitante toma el control
+  useEffect(() => {
+    if (!autoColor || intro) return
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    } catch {}
+    const iv = setInterval(() => {
+      setColor((c) => {
+        const i = COLORS.findIndex((x) => x.hex === c.hex)
+        return COLORS[(i + 1) % COLORS.length]
+      })
+    }, 1600)
+    return () => clearInterval(iv)
+  }, [autoColor, intro])
 
   function finishIntro() {
     try {
@@ -323,7 +338,7 @@ export default function FornistoreLanding() {
     return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
   }, [displayName, color])
 
-  const rootRef = useReveal([stores, intro])
+  const rootRef = useReveal()
 
   return (
     <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'} ref={rootRef}>
@@ -1230,6 +1245,12 @@ export default function FornistoreLanding() {
           color: #1d9e75;
           font-weight: 800;
         }
+        .fs-plan-proof {
+          color: #23211b;
+          font-weight: 700;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
         .fs-plan-cta {
           display: block;
           text-align: center;
@@ -1314,7 +1335,10 @@ export default function FornistoreLanding() {
                 maxLength={26}
                 placeholder="Pizzería Don Beto"
                 value={bizName}
-                onChange={(e) => setBizName(e.target.value)}
+                onChange={(e) => {
+                  setBizName(e.target.value)
+                  setAutoColor(false)
+                }}
               />
             </div>
 
@@ -1328,7 +1352,10 @@ export default function FornistoreLanding() {
                     aria-label={c.name}
                     className={`fs-swatch ${c.hex === color.hex ? 'on' : ''}`}
                     style={{ background: c.hex }}
-                    onClick={() => setColor(c)}
+                    onClick={() => {
+                      setAutoColor(false)
+                      setColor(c)
+                    }}
                   />
                 ))}
               </div>
@@ -1479,8 +1506,18 @@ export default function FornistoreLanding() {
                 <li>Todo lo del plan Tienda Online</li>
                 <li>Landing de marca diseñada a medida</li>
                 <li>Animaciones y fotografía optimizada</li>
-                <li>Tu historia, tu colección, tus sets</li>
-                <li>Ideal para regalos empresariales</li>
+                <li>Tu historia, tu colección, tus productos</li>
+                <li>
+                  Mirá un ejemplo real:{' '}
+                  <a
+                    href="https://rinconmatero.fornistore.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="fs-plan-proof"
+                  >
+                    la landing de Rincón Matero →
+                  </a>
+                </li>
               </ul>
               <a
                 className="fs-plan-cta"
