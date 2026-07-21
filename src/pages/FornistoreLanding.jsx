@@ -14,7 +14,8 @@ const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
 
 // ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
-function useReveal() {
+// ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
+function useReveal(deps = []) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
@@ -34,12 +35,12 @@ function useReveal() {
       },
       { threshold: 0.18 }
     )
-    el.querySelectorAll('.fs-reveal').forEach((n) => obs.observe(n))
+    el.querySelectorAll('.fs-reveal:not(.visible)').forEach((n) => obs.observe(n))
     return () => obs.disconnect()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps)
   return ref
 }
-
 // ---------- Intro: editor que "programa" tu tienda ----------
 const BOOT_LINES = [
   'crear_tienda({',
@@ -322,7 +323,7 @@ export default function FornistoreLanding() {
     return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
   }, [displayName, color])
 
-  const rootRef = useReveal()
+  const rootRef = useReveal([stores, intro])
 
   return (
     <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'} ref={rootRef}>
