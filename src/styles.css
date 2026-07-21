@@ -1686,3 +1686,14 @@ img { display: block; }
   font-weight: 700;
   color: var(--brand, #4a5d33);
 }
+
+/* Categorías: en escritorio se acomodan en varias líneas */
+@media (min-width: 700px) {
+  .cat-nav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .cat-nav button {
+    flex: 0 0 auto;
+  }
+}
