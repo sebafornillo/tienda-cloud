@@ -50,6 +50,33 @@ function playDing() {
   } catch {}
 }
 
+// ---------- Notificación del sistema (aunque el panel esté en otra pestaña) ----------
+function askNotifPermission() {
+  try {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  } catch {}
+}
+function notifyNewOrder(order, tenant) {
+  try {
+    if (!('Notification' in window)) return
+    if (Notification.permission !== 'granted') return
+    const body = `${order.customer_name} · ${money(order.total)} · ${
+      order.delivery_type === 'delivery' ? 'Delivery' : 'Retiro'
+    }`
+    const n = new Notification(`🔔 Pedido nuevo #${order.order_number}`, {
+      body,
+      icon: tenant.settings?.logo_url || undefined,
+      tag: `order-${order.id}`,
+    })
+    n.onclick = () => {
+      window.focus()
+      n.close()
+    }
+  } catch {}
+}
+
 // ---------- WhatsApp al cliente ----------
 // Normaliza teléfonos argentinos al formato de wa.me (549 + número)
 function waNumber(phone) {
@@ -73,9 +100,15 @@ function waMessage(order, tenantName) {
     delivered: `¡gracias por tu compra! Esperamos que disfrutes tu pedido #${n}. 😊`,
     cancelled: `lamentablemente tuvimos que cancelar tu pedido #${n}. Escribinos y lo resolvemos.`,
   }
+  const place =
+    order.delivery_type === 'delivery' && order.address
+      ? `📍 Envío a: ${order.address}${order.delivery_zone ? ` (${order.delivery_zone})` : ''}\n`
+      : order.delivery_type === 'pickup'
+      ? `🏪 Retiro por el local\n`
+      : ''
   const tracking = `${window.location.origin}/pedido/${n}`
   return encodeURIComponent(
-    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}\n\nSeguí tu pedido en vivo acá: ${tracking}`
+    `Hola ${name}! Te escribimos de ${tenantName}: ${byStatus[order.status] || `novedades de tu pedido #${n}.`}\n\n${place}💰 Total: ${money(order.total)}\n\nSeguí tu pedido en vivo acá: ${tracking}`
   )
 }
 
@@ -87,9 +120,13 @@ export default function Orders() {
   const pendingAlerts = useRef(0)
 
   // El navegador bloquea el audio hasta la primera interacción:
-  // con el primer click/tecla en el panel dejamos el audio listo.
+  // con el primer click/tecla en el panel dejamos el audio listo
+  // y aprovechamos para pedir permiso de notificaciones.
   useEffect(() => {
-    const unlock = () => ensureAudio()
+    const unlock = () => {
+      ensureAudio()
+      askNotifPermission()
+    }
     window.addEventListener('pointerdown', unlock, { once: true })
     window.addEventListener('keydown', unlock, { once: true })
     return () => {
@@ -141,6 +178,7 @@ export default function Orders() {
         (payload) => {
           setOrders((prev) => [payload.new, ...prev])
           playDing()
+          notifyNewOrder(payload.new, tenant)
           pendingAlerts.current += 1
           document.title = `(🔔 ${pendingAlerts.current}) Pedido nuevo — ${tenant.name}`
         }
