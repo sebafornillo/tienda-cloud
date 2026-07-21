@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '5493425255392'
+const WHATSAPP = '549XXXXXXXXXX'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
@@ -1276,6 +1276,35 @@ export default function FornistoreLanding() {
         }
         @media (max-width: 520px) {
           .fs-panel-kpis { grid-template-columns: 1fr 1fr; }
+          /* La píldora de estado es larga en e-commerce: va a su propia línea
+             para que el precio no se salga de la pantalla */
+          .fs-order-row,
+          .fs-order-head {
+            flex-wrap: wrap;
+            row-gap: 8px;
+          }
+          .fs-order-row .fs-order-who,
+          .fs-order-head .fs-order-who {
+            flex: 1 1 auto;
+            min-width: 0;
+          }
+          .fs-order-row .fs-order-who strong,
+          .fs-order-head .fs-order-who strong {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .fs-order-row .fs-order-total,
+          .fs-order-head .fs-order-total {
+            order: 2;
+            margin-left: auto;
+          }
+          .fs-order-row .pill,
+          .fs-order-head .pill {
+            order: 3;
+            margin-left: 0;
+            flex: 0 0 auto;
+          }
         }
 
         /* ---- Precios ---- */
