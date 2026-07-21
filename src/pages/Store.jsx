@@ -23,6 +23,14 @@ export default function Store() {
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showTop, setShowTop] = useState(false)
+
+  // Botón "volver arriba": aparece pasados los 400px de scroll
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 400)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -291,6 +299,18 @@ export default function Store() {
           onSelectProduct={setSelected}
           onClose={() => setSelected(null)}
         />
+      )}
+
+      {showTop && (
+        <button
+          className={`scroll-top ${whatsapp ? 'with-wa' : ''} ${count > 0 ? 'with-cart' : ''}`}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Volver arriba"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="6 14 12 8 18 14" />
+          </svg>
+        </button>
       )}
 
       {whatsapp && (

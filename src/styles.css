@@ -1918,3 +1918,32 @@ img { display: block; }
   margin-top: 4px;
   text-align: center;
 }
+
+/* ---------- Botón volver arriba ---------- */
+.scroll-top {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ink, #23211b);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  z-index: 49;
+  animation: top-in 0.25s ease;
+  transition: bottom 0.2s, transform 0.12s;
+}
+.scroll-top:hover { transform: translateY(-2px); }
+.scroll-top.with-wa { bottom: 84px; }
+.scroll-top.with-cart { bottom: 84px; }
+.scroll-top.with-wa.with-cart { bottom: 152px; }
+@keyframes top-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
