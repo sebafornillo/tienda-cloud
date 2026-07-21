@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '5493425255392'
+const WHATSAPP = '549XXXXXXXXXX'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
@@ -12,6 +12,72 @@ const TYPE_LABEL = {
 
 const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
+
+// ---------- Intro: editor que "programa" tu tienda ----------
+const BOOT_LINES = [
+  'crear_tienda({',
+  '  negocio: "el tuyo",',
+  '  color: "tu marca",',
+  '  pagos: "Mercado Pago",',
+  '  online_en: "48 horas"',
+  '})',
+]
+
+function IntroBoot({ onDone }) {
+  const [text, setText] = useState('')
+  const [stage, setStage] = useState('typing') // typing | deploy | ready | out
+
+  useEffect(() => {
+    const full = BOOT_LINES.join('\n')
+    let i = 0
+    const iv = setInterval(() => {
+      i += 2
+      setText(full.slice(0, i))
+      if (i >= full.length) {
+        clearInterval(iv)
+        setStage('deploy')
+      }
+    }, 16)
+    return () => clearInterval(iv)
+  }, [])
+
+  useEffect(() => {
+    if (stage === 'deploy') {
+      const t = setTimeout(() => setStage('ready'), 850)
+      return () => clearTimeout(t)
+    }
+    if (stage === 'ready') {
+      const t = setTimeout(() => setStage('out'), 650)
+      return () => clearTimeout(t)
+    }
+    if (stage === 'out') {
+      const t = setTimeout(onDone, 600)
+      return () => clearTimeout(t)
+    }
+  }, [stage, onDone])
+
+  return (
+    <div className={stage === 'out' ? 'fs-boot fs-boot-out' : 'fs-boot'}>
+      <div className="fs-boot-editor">
+        <div className="fs-boot-bar">
+          <span /><span /><span />
+          <em>fornistore.dev</em>
+        </div>
+        <pre>
+          {text}
+          <span className="fs-caret" />
+        </pre>
+        <p className="fs-boot-status">
+          {stage === 'deploy' && '▶ Deployando tu tienda…'}
+          {(stage === 'ready' || stage === 'out') && '✓ Tienda lista'}
+        </p>
+      </div>
+      <button className="fs-boot-skip" onClick={onDone}>
+        Saltar →
+      </button>
+    </div>
+  )
+}
 
 function PanelDemo() {
   const [orders, setOrders] = useState([])
@@ -142,6 +208,21 @@ export default function FornistoreLanding() {
   const [bizName, setBizName] = useState('')
   const [color, setColor] = useState(COLORS[1])
   const [stores, setStores] = useState([])
+  const [intro, setIntro] = useState(() => {
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+      return !sessionStorage.getItem('fs_intro_seen')
+    } catch {
+      return false
+    }
+  })
+
+  function finishIntro() {
+    try {
+      sessionStorage.setItem('fs_intro_seen', '1')
+    } catch {}
+    setIntro(false)
+  }
 
   useEffect(() => {
     supabase
@@ -159,13 +240,123 @@ export default function FornistoreLanding() {
   }, [displayName, color])
 
   return (
-    <div className="fs-landing">
+    <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'}>
+      {intro && <IntroBoot onDone={finishIntro} />}
       <style>{`
         .fs-landing {
           min-height: 100vh;
           background: #14120e;
           color: #f5efdf;
           font-family: inherit;
+        }
+
+        /* ---- Intro: editor de código ---- */
+        .fs-boot {
+          position: fixed;
+          inset: 0;
+          background: #14120e;
+          z-index: 200;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .fs-boot-out {
+          opacity: 0;
+          transform: scale(1.04);
+          pointer-events: none;
+        }
+        .fs-boot-editor {
+          width: min(440px, 88vw);
+          background: #1e1b15;
+          border: 1px solid #3a362c;
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+        }
+        .fs-boot-bar {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 11px 14px;
+          border-bottom: 1px solid #3a362c;
+        }
+        .fs-boot-bar span {
+          width: 11px;
+          height: 11px;
+          border-radius: 50%;
+          background: #3a362c;
+        }
+        .fs-boot-bar span:nth-child(1) { background: #e05a33; }
+        .fs-boot-bar span:nth-child(2) { background: #e6a817; }
+        .fs-boot-bar span:nth-child(3) { background: #1d9e75; }
+        .fs-boot-bar em {
+          margin-left: auto;
+          font-style: normal;
+          font-size: 0.75rem;
+          color: #6b665a;
+        }
+        .fs-boot-editor pre {
+          margin: 0;
+          padding: 18px 18px 6px;
+          font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+          font-size: 0.92rem;
+          line-height: 1.65;
+          color: #1d9e75;
+          min-height: 176px;
+          white-space: pre-wrap;
+        }
+        .fs-caret {
+          display: inline-block;
+          width: 8px;
+          height: 1.05em;
+          background: #f5efdf;
+          vertical-align: text-bottom;
+          margin-left: 2px;
+          animation: fs-blink 0.85s steps(1) infinite;
+        }
+        @keyframes fs-blink { 50% { opacity: 0; } }
+        .fs-boot-status {
+          margin: 0;
+          padding: 0 18px 18px;
+          font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+          font-size: 0.88rem;
+          color: #e6a817;
+          min-height: 1.4em;
+        }
+        .fs-boot-skip {
+          position: absolute;
+          bottom: 26px;
+          right: 28px;
+          border: none;
+          background: none;
+          color: #6b665a;
+          font-size: 0.85rem;
+          cursor: pointer;
+        }
+        .fs-boot-skip:hover { color: #f5efdf; }
+
+        /* ---- Entrada escalonada del hero tras la intro ---- */
+        .fs-hero-grid > div {
+          opacity: 0;
+        }
+        .fs-ready .fs-hero-grid > div {
+          animation: fs-rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        }
+        .fs-ready .fs-hero-grid > div:nth-child(2) {
+          animation-delay: 0.25s;
+        }
+        .fs-ready .fs-nav {
+          animation: fs-rise 0.6s ease both;
+        }
+        @keyframes fs-rise {
+          from { opacity: 0; transform: translateY(22px); }
+          to { opacity: 1; transform: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fs-hero-grid > div { opacity: 1; }
+          .fs-ready .fs-hero-grid > div,
+          .fs-ready .fs-nav { animation: none; }
         }
         .fs-hero {
           max-width: 1080px;
