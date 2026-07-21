@@ -13,6 +13,20 @@ const norm = (t) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
 
+// Resalta la parte del texto que coincide con lo buscado
+function highlight(text, q) {
+  if (!q) return text
+  const i = norm(text).indexOf(norm(q))
+  if (i === -1) return text
+  return (
+    <>
+      {text.slice(0, i)}
+      <mark>{text.slice(i, i + q.length)}</mark>
+      {text.slice(i + q.length)}
+    </>
+  )
+}
+
 export default function Store() {
   const { tenant } = useTenant()
   const { count, subtotal } = useCart()
@@ -95,7 +109,7 @@ export default function Store() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  function renderCard(p) {
+  function renderCard(p, q) {
     const out = p.stock !== null && p.stock <= 0
     const low = !out && p.stock !== null && p.stock <= 3
     return (
@@ -106,8 +120,8 @@ export default function Store() {
         onClick={() => setSelected(p)}
       >
         <div className="product-info">
-          <h3>{p.name}</h3>
-          {p.description && <p>{p.description}</p>}
+          <h3>{highlight(p.name, q)}</h3>
+          {p.description && <p>{highlight(p.description, q)}</p>}
           <div className="price-row">
             <span className="price">{money(p.price)}</span>
             {p.compare_at_price && (
@@ -160,6 +174,12 @@ export default function Store() {
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setSearchOpen(true)}
             onBlur={() => setSearchOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setQuery('')
+                e.currentTarget.blur()
+              }
+            }}
           />
           {query && (
             <button className="search-clear" onClick={() => setQuery('')} aria-label="Limpiar búsqueda">
@@ -266,7 +286,7 @@ export default function Store() {
           <section>
             <h2>
               {results.length > 0
-                ? `Resultados para "${query.trim()}"`
+                ? `${results.length} ${results.length === 1 ? 'resultado' : 'resultados'} para "${query.trim()}"`
                 : `Nada para "${query.trim()}"`}
             </h2>
             {results.length === 0 && (
@@ -274,7 +294,7 @@ export default function Store() {
                 Probá con otra palabra, o consultanos por WhatsApp 👉
               </p>
             )}
-            <div className="product-list">{results.map(renderCard)}</div>
+            <div className="product-list">{results.map((p) => renderCard(p, query.trim()))}</div>
           </section>
         ) : (
           <>
@@ -284,7 +304,7 @@ export default function Store() {
             {visible.map((group) => (
               <section key={group.id}>
                 <h2>{group.name}</h2>
-                <div className="product-list">{group.items.map(renderCard)}</div>
+                <div className="product-list">{group.items.map((p) => renderCard(p))}</div>
               </section>
             ))}
           </>
