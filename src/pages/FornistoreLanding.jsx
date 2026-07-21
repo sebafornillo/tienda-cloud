@@ -288,6 +288,24 @@ function initials(text) {
     .join('')
 }
 
+// ---------- Tilt 3D de tarjetas (herencia del "3d card" 2023 de Sebastián) ----------
+// La idea original: remap(posición del mouse → ángulo). Acá el suavizado
+// lo hace la transición CSS en vez de un lerp a 60fps: mismo efecto, menos CPU.
+const TILT_MAX = 7 // grados
+function tiltMove(e) {
+  const el = e.currentTarget
+  const r = el.getBoundingClientRect()
+  const x = ((e.clientX - r.left) / r.width - 0.5) * 2 // -1 … 1
+  const y = ((e.clientY - r.top) / r.height - 0.5) * 2
+  el.style.setProperty('--tx', `${(x * TILT_MAX).toFixed(2)}deg`)
+  el.style.setProperty('--ty', `${(-y * TILT_MAX).toFixed(2)}deg`)
+}
+function tiltLeave(e) {
+  const el = e.currentTarget
+  el.style.setProperty('--tx', '0deg')
+  el.style.setProperty('--ty', '0deg')
+}
+
 export default function FornistoreLanding() {
   const [bizName, setBizName] = useState('')
   const [color, setColor] = useState(COLORS[1])
@@ -350,6 +368,7 @@ export default function FornistoreLanding() {
           background: #14120e;
           color: #f5efdf;
           font-family: inherit;
+          overflow-x: clip;
         }
 
         /* ---- Intro: editor de código ---- */
@@ -467,6 +486,8 @@ export default function FornistoreLanding() {
           transform: translateY(22px);
           transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
         }
+        .fs-reveal.from-left { transform: translateX(-44px); }
+        .fs-reveal.from-right { transform: translateX(44px); }
         .fs-reveal.visible {
           opacity: 1;
           transform: none;
@@ -853,6 +874,23 @@ export default function FornistoreLanding() {
         .fs-store-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 14px 36px rgba(0,0,0,0.10);
+        }
+        /* Tilt 3D: se activa recién cuando la tarjeta ya se reveló */
+        .fs-store-card.visible {
+          transform: perspective(900px) rotateY(var(--tx, 0deg)) rotateX(var(--ty, 0deg));
+          transition: transform 0.18s ease-out, box-shadow 0.25s ease;
+          will-change: transform;
+        }
+        .fs-store-card.visible:hover {
+          transform: perspective(900px) rotateY(var(--tx, 0deg)) rotateX(var(--ty, 0deg))
+            translateY(-4px);
+          box-shadow: 0 18px 44px rgba(0, 0, 0, 0.13);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fs-store-card.visible,
+          .fs-store-card.visible:hover {
+            transform: none;
+          }
         }
         .fs-store-card .tag {
           display: inline-block;
@@ -1433,7 +1471,9 @@ export default function FornistoreLanding() {
             {stores.map((t, i) => (
               <a
                 key={t.subdomain}
-                className="fs-store-card fs-reveal"
+                className={`fs-store-card fs-reveal ${i % 2 === 0 ? 'from-left' : 'from-right'}`}
+                onMouseMove={tiltMove}
+                onMouseLeave={tiltLeave}
                 style={{ '--card-accent': t.settings?.primary_color || '#5a6b3a', transitionDelay: `${i * 0.12}s` }}
                 href={`https://${t.subdomain}.fornistore.com`}
                 target="_blank"
@@ -1459,7 +1499,7 @@ export default function FornistoreLanding() {
             Pedidos que entran solos, stock que se descuenta con cada venta y estados en
             un click. Simulá un pedido y confirmalo vos, como si fueras el dueño:
           </p>
-          <div className="fs-reveal" style={{ transitionDelay: '0.15s' }}>
+          <div className="fs-reveal from-right" style={{ transitionDelay: '0.15s' }}>
             <PanelDemo />
           </div>
         </div>
@@ -1471,7 +1511,7 @@ export default function FornistoreLanding() {
           <span className="fs-kicker fs-reveal">Simple y sin sorpresas</span>
           <h2 className="fs-reveal">Un precio que se paga solo</h2>
           <div className="fs-plans">
-            <div className="fs-plan fs-reveal">
+            <div className="fs-plan fs-reveal from-left">
               <h3>Tienda Online</h3>
               <div className="fs-plan-price">
                 <strong>$35.000</strong>
@@ -1495,7 +1535,7 @@ export default function FornistoreLanding() {
                 Quiero mi tienda
               </a>
             </div>
-            <div className="fs-plan featured fs-reveal" style={{ transitionDelay: '0.12s' }}>
+            <div className="fs-plan featured fs-reveal from-right" style={{ transitionDelay: '0.12s' }}>
               <span className="fs-plan-tag">Para marcas que quieren impactar</span>
               <h3>Tienda + Landing Premium</h3>
               <div className="fs-plan-price">
@@ -1509,14 +1549,14 @@ export default function FornistoreLanding() {
                 <li>Animaciones y fotografía optimizada</li>
                 <li>Tu historia, tu colección, tus productos</li>
                 <li>
-                  Mirá un ejemplo real:{' '}
+                  Mirá{' '}
                   <a
                     href="https://rinconmatero.fornistore.com"
                     target="_blank"
                     rel="noreferrer"
                     className="fs-plan-proof"
                   >
-                    la landing de Rincón Matero →
+                    la página web y la tienda de Rincón Matero →
                   </a>
                 </li>
               </ul>
