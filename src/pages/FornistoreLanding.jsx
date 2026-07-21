@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '549XXXXXXXXXX'
+const WHATSAPP = '5493425255392'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
@@ -12,6 +12,33 @@ const TYPE_LABEL = {
 
 const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
+
+// ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
+function useReveal() {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.querySelectorAll('.fs-reveal').forEach((n) => n.classList.add('visible'))
+      return
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible')
+            obs.unobserve(e.target)
+          }
+        }
+      },
+      { threshold: 0.18 }
+    )
+    el.querySelectorAll('.fs-reveal').forEach((n) => obs.observe(n))
+    return () => obs.disconnect()
+  }, [])
+  return ref
+}
 
 // ---------- Intro: editor que "programa" tu tienda ----------
 const BOOT_LINES = [
@@ -239,8 +266,10 @@ export default function FornistoreLanding() {
     return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
   }, [displayName, color])
 
+  const rootRef = useReveal()
+
   return (
-    <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'}>
+    <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'} ref={rootRef}>
       {intro && <IntroBoot onDone={finishIntro} />}
       <style>{`
         .fs-landing {
@@ -357,6 +386,77 @@ export default function FornistoreLanding() {
           .fs-hero-grid > div { opacity: 1; }
           .fs-ready .fs-hero-grid > div,
           .fs-ready .fs-nav { animation: none; }
+        }
+
+        /* ---- Scroll reveal: la historia se cuenta al scrollear ---- */
+        .fs-reveal {
+          opacity: 0;
+          transform: translateY(22px);
+          transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+        }
+        .fs-reveal.visible {
+          opacity: 1;
+          transform: none;
+        }
+        .fs-chat.fs-reveal { transform: translateY(14px) scale(0.96); }
+        .fs-chat.fs-reveal.visible { transform: none; }
+
+        /* ---- El celular cae y se arma por partes ---- */
+        .fs-phone-wrap.fs-reveal {
+          transform: none;
+          transition: opacity 0.3s ease;
+        }
+        .fs-phone-wrap.fs-reveal .fs-phone {
+          opacity: 0;
+        }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone {
+          animation: fs-phone-drop 0.75s cubic-bezier(0.2, 0.85, 0.3, 1.15) both;
+        }
+        @keyframes fs-phone-drop {
+          from { opacity: 0; transform: translateY(-56px) rotateY(-6deg) rotateX(2deg); }
+          to { opacity: 1; transform: rotateY(-6deg) rotateX(2deg); }
+        }
+        .fs-phone-wrap.fs-reveal .fs-phone-topbar,
+        .fs-phone-wrap.fs-reveal .fs-phone-logo,
+        .fs-phone-wrap.fs-reveal .fs-phone-name,
+        .fs-phone-wrap.fs-reveal .fs-phone-tag,
+        .fs-phone-wrap.fs-reveal .fs-phone-products,
+        .fs-phone-wrap.fs-reveal .fs-phone-btn {
+          opacity: 0;
+        }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-topbar { animation: fs-build 0.45s 0.35s ease both; }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-logo { animation: fs-build 0.45s 0.5s ease both; }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-name { animation: fs-build 0.45s 0.62s ease both; }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-tag { animation: fs-build 0.45s 0.72s ease both; }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-products { animation: fs-build 0.45s 0.84s ease both; }
+        .fs-phone-wrap.fs-reveal.visible .fs-phone-btn { animation: fs-build 0.45s 0.98s ease both; }
+        @keyframes fs-build {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: none; }
+        }
+        @media (max-width: 800px) {
+          .fs-phone-wrap.fs-reveal.visible .fs-phone {
+            animation-name: fs-phone-drop-flat;
+          }
+          @keyframes fs-phone-drop-flat {
+            from { opacity: 0; transform: translateY(-56px); }
+            to { opacity: 1; transform: none; }
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fs-reveal,
+          .fs-phone-wrap.fs-reveal .fs-phone,
+          .fs-phone-wrap.fs-reveal .fs-phone-topbar,
+          .fs-phone-wrap.fs-reveal .fs-phone-logo,
+          .fs-phone-wrap.fs-reveal .fs-phone-name,
+          .fs-phone-wrap.fs-reveal .fs-phone-tag,
+          .fs-phone-wrap.fs-reveal .fs-phone-products,
+          .fs-phone-wrap.fs-reveal .fs-phone-btn {
+            opacity: 1;
+            transform: none;
+            transition: none;
+            animation: none;
+          }
         }
         .fs-hero {
           max-width: 1080px;
@@ -1129,7 +1229,7 @@ export default function FornistoreLanding() {
             </p>
           </div>
 
-          <div className="fs-phone-wrap">
+          <div className="fs-phone-wrap fs-reveal">
             <div className="fs-phone">
               <div className="fs-phone-topbar" />
               <div className="fs-phone-body">
@@ -1164,15 +1264,15 @@ export default function FornistoreLanding() {
       {/* ---------- DOLOR ---------- */}
       <section className="fs-pain">
         <div className="fs-pain-inner">
-          <span className="fs-kicker">¿Te suena?</span>
-          <h2>Vender por WhatsApp era gratis.<br />Hasta que empezaste a vender.</h2>
+          <span className="fs-kicker fs-reveal">¿Te suena?</span>
+          <h2 className="fs-reveal">Vender por WhatsApp era gratis.<br />Hasta que empezaste a vender.</h2>
           <div className="fs-pain-chats" aria-hidden="true">
-            <div className="fs-chat">Hola! ¿Tenés stock del grande?</div>
-            <div className="fs-chat">¿Me pasás el CBU de nuevo?</div>
-            <div className="fs-chat">¿Viste mi pedido de ayer? Nadie me contestó 😕</div>
-            <div className="fs-chat right">Perdón!! Se me traspapeló 🙏</div>
+            <div className="fs-chat fs-reveal">Hola! ¿Tenés stock del grande?</div>
+            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.15s' }}>¿Me pasás el CBU de nuevo?</div>
+            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.3s' }}>¿Viste mi pedido de ayer? Nadie me contestó 😕</div>
+            <div className="fs-chat right fs-reveal" style={{ transitionDelay: '0.5s' }}>Perdón!! Se me traspapeló 🙏</div>
           </div>
-          <p className="fs-pain-punch">
+          <p className="fs-pain-punch fs-reveal">
             Pedidos perdidos entre 40 chats, transferencias que hay que verificar a mano,
             el "¿tenés stock?" repetido veinte veces por día. <strong>Tu negocio creció;
             tu herramienta no.</strong> Fornistore ordena todo eso: catálogo, pago y
@@ -1185,15 +1285,15 @@ export default function FornistoreLanding() {
       {stores.length > 0 && (
       <section className="fs-stores">
         <div className="fs-stores-inner">
-          <span className="fs-kicker">Sin humo</span>
-          <h2>Tiendas reales, vendiendo ahora</h2>
-          <p>No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
+          <span className="fs-kicker fs-reveal">Sin humo</span>
+          <h2 className="fs-reveal">Tiendas reales, vendiendo ahora</h2>
+          <p className="fs-reveal">No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
           <div className="fs-stores-grid">
-            {stores.map((t) => (
+            {stores.map((t, i) => (
               <a
                 key={t.subdomain}
-                className="fs-store-card"
-                style={{ '--card-accent': t.settings?.primary_color || '#5a6b3a' }}
+                className="fs-store-card fs-reveal"
+                style={{ '--card-accent': t.settings?.primary_color || '#5a6b3a', transitionDelay: `${i * 0.12}s` }}
                 href={`https://${t.subdomain}.fornistore.com`}
                 target="_blank"
                 rel="noreferrer"
@@ -1212,23 +1312,25 @@ export default function FornistoreLanding() {
       {/* ---------- TU PANEL EN VIVO ---------- */}
       <section className="fs-admin-demo">
         <div className="fs-admin-demo-inner">
-          <span className="fs-kicker">Del otro lado del mostrador</span>
-          <h2>Vos manejás todo desde acá</h2>
-          <p className="fs-admin-sub">
+          <span className="fs-kicker fs-reveal">Del otro lado del mostrador</span>
+          <h2 className="fs-reveal">Vos manejás todo desde acá</h2>
+          <p className="fs-admin-sub fs-reveal">
             Pedidos que entran solos, stock que se descuenta con cada venta y estados en
             un click. Simulá un pedido y confirmalo vos, como si fueras el dueño:
           </p>
-          <PanelDemo />
+          <div className="fs-reveal" style={{ transitionDelay: '0.15s' }}>
+            <PanelDemo />
+          </div>
         </div>
       </section>
 
       {/* ---------- PRECIOS ---------- */}
       <section className="fs-pricing">
         <div className="fs-pricing-inner">
-          <span className="fs-kicker">Simple y sin sorpresas</span>
-          <h2>Un precio que se paga solo</h2>
+          <span className="fs-kicker fs-reveal">Simple y sin sorpresas</span>
+          <h2 className="fs-reveal">Un precio que se paga solo</h2>
           <div className="fs-plans">
-            <div className="fs-plan">
+            <div className="fs-plan fs-reveal">
               <h3>Tienda Online</h3>
               <div className="fs-plan-price">
                 <strong>$35.000</strong>
@@ -1252,7 +1354,7 @@ export default function FornistoreLanding() {
                 Quiero mi tienda
               </a>
             </div>
-            <div className="fs-plan featured">
+            <div className="fs-plan featured fs-reveal" style={{ transitionDelay: '0.12s' }}>
               <span className="fs-plan-tag">Para marcas que quieren impactar</span>
               <h3>Tienda + Landing Premium</h3>
               <div className="fs-plan-price">
@@ -1286,11 +1388,12 @@ export default function FornistoreLanding() {
 
       {/* ---------- CTA FINAL ---------- */}
       <section className="fs-final">
-        <span className="fs-badge big">F</span>
-        <h2>Tu tienda puede estar vendiendo esta semana.</h2>
-        <p>Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
+        <span className="fs-badge big fs-reveal">F</span>
+        <h2 className="fs-reveal">Tu tienda puede estar vendiendo esta semana.</h2>
+        <p className="fs-reveal">Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
         <a
-          className="fs-cta"
+          className="fs-cta fs-reveal"
+          style={{ transitionDelay: '0.15s' }}
           href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero arrancar con Fornistore 🚀')}`}
           target="_blank"
           rel="noreferrer"
