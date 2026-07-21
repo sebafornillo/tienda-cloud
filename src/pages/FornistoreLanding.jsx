@@ -42,6 +42,47 @@ function useReveal(deps = []) {
 }
 
 // ---------- Intro: editor que "programa" tu tienda ----------
+// ---------- Logo F3: los módulos caen y arman la F, el cursor rebota último ----------
+function LogoF({ size = 34 }) {
+  // misma grilla que el SVG del monograma (celda 74, gap 14)
+  const c = 74
+  const g = 14
+  const o = { x: 138, y: 108 }
+  const B = (cx, cy, green, i) => (
+    <rect
+      key={`${cx}-${cy}`}
+      className={green ? 'lb lb-cursor' : 'lb'}
+      style={{ animationDelay: `${0.08 * i}s` }}
+      x={o.x + cx * (c + g)}
+      y={o.y + cy * (c + g)}
+      width={c}
+      height={c}
+      rx="16"
+      fill={green ? '#1d9e75' : '#f5efdf'}
+    />
+  )
+  return (
+    <svg
+      className="fs-logo"
+      width={size}
+      height={size}
+      viewBox="0 0 512 512"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Fornistore"
+    >
+      <rect width="512" height="512" rx="112" fill="#1f1d18" />
+      {B(0, 0, false, 0)}
+      {B(1, 0, false, 1)}
+      {B(2, 0, false, 2)}
+      {B(0, 1, false, 3)}
+      {B(0, 2, false, 4)}
+      {B(1, 2, false, 5)}
+      {B(0, 3, false, 6)}
+      {B(2, 3, true, 8)}
+    </svg>
+  )
+}
+
 const BOOT_LINES = [
   'crear_tienda({',
   '  negocio: "el tuyo",',
@@ -627,9 +668,20 @@ export default function FornistoreLanding() {
         .fs-field input::placeholder { color: #6b665a; }
         .fs-field { margin-bottom: 22px; }
         .fs-swatches {
+          position: relative;
           display: flex;
           gap: 10px;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+        }
+        .fs-swatch-ring {
+          position: absolute;
+          top: -3px;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          border: 3px solid #f5efdf;
+          pointer-events: none;
+          transition: left 0.45s cubic-bezier(0.3, 1.35, 0.4, 1);
         }
         .fs-swatch {
           width: 38px;
@@ -638,12 +690,40 @@ export default function FornistoreLanding() {
           border: 3px solid transparent;
           cursor: pointer;
           padding: 0;
-          transition: transform 0.12s, border-color 0.12s;
+          transition: transform 0.12s;
         }
         .fs-swatch:hover { transform: scale(1.1); }
         .fs-swatch.on {
-          border-color: #f5efdf;
-          transform: scale(1.12);
+          transform: scale(1.08);
+        }
+
+        /* ---- Logo F3: caída y rebote de módulos ---- */
+        .fs-logo .lb {
+          opacity: 0;
+          transform: translateY(-140px);
+        }
+        .fs-ready .fs-logo .lb {
+          animation: lb-fall 0.7s cubic-bezier(0.25, 0.9, 0.3, 1.3) both;
+        }
+        .fs-ready .fs-logo .lb-cursor {
+          animation: lb-fall-cursor 0.85s cubic-bezier(0.25, 0.9, 0.25, 1.45) both;
+        }
+        @keyframes lb-fall {
+          from { opacity: 0; transform: translateY(-140px); }
+          65% { opacity: 1; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes lb-fall-cursor {
+          from { opacity: 0; transform: translateY(-180px); }
+          55% { opacity: 1; transform: translateY(16px); }
+          78% { transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fs-logo .lb { opacity: 1; transform: none; }
+          .fs-ready .fs-logo .lb,
+          .fs-ready .fs-logo .lb-cursor { animation: none; }
+          .fs-swatch-ring { transition: none; }
         }
         .fs-cta {
           display: inline-flex;
@@ -1348,7 +1428,7 @@ export default function FornistoreLanding() {
 
       <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
         <nav className="fs-nav">
-          <span className="fs-badge">F</span>
+          <LogoF size={36} />
           <strong>Fornistore</strong>
         </nav>
 
@@ -1384,6 +1464,11 @@ export default function FornistoreLanding() {
             <div className="fs-field">
               <label>Tu color</label>
               <div className="fs-swatches">
+                <span
+                  className="fs-swatch-ring"
+                  style={{ left: `${COLORS.findIndex((x) => x.hex === color.hex) * 48 - 3}px` }}
+                  aria-hidden="true"
+                />
                 {COLORS.map((c) => (
                   <button
                     key={c.hex}
