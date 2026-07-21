@@ -14,6 +14,8 @@ export default function Settings() {
     primary_color: tenant.settings?.primary_color || '#111111',
     whatsapp: tenant.settings?.whatsapp || '',
     announcement: tenant.settings?.announcement || '',
+    transfer_alias: tenant.settings?.transfer_alias || '',
+    transfer_holder: tenant.settings?.transfer_holder || '',
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -115,6 +117,8 @@ export default function Settings() {
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
       announcement: form.announcement.trim() || null,
+      transfer_alias: form.transfer_alias.trim() || null,
+      transfer_holder: form.transfer_holder.trim() || null,
       delivery_zones: zones,
       schedule,
       mp_enabled: mpConfigured || !!mpToken.trim(),
@@ -244,6 +248,27 @@ export default function Settings() {
         <small className="hint">
           Se usa en el botón "Avisar por WhatsApp" del pedido y en el botón flotante de
           consultas que ve el cliente en la tienda.
+        </small>
+      </div>
+
+      <div className="settings-block">
+        <span className="field-label">Transferencia bancaria</span>
+        <input
+          className="settings-input"
+          value={form.transfer_alias}
+          onChange={(e) => set('transfer_alias', e.target.value)}
+          placeholder="Alias o CBU/CVU (ej: rincon.matero.mp)"
+        />
+        <input
+          className="settings-input"
+          style={{ marginTop: 8 }}
+          value={form.transfer_holder}
+          onChange={(e) => set('transfer_holder', e.target.value)}
+          placeholder="Titular de la cuenta (opcional)"
+        />
+        <small className="hint">
+          Si cargás un alias, el cliente puede elegir "Transferencia" al pagar y lo ve
+          con un botón para copiarlo. Dejalo vacío para no ofrecer transferencia.
         </small>
       </div>
 

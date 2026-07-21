@@ -14,6 +14,7 @@ export default function OrderConfirmed() {
   const { tenant } = useTenant()
   const [order, setOrder] = useState(null)
   const [notFound, setNotFound] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -36,6 +37,18 @@ export default function OrderConfirmed() {
 
   const storeHome = tenant.settings?.landing_enabled ? '/tienda' : '/'
   const whatsapp = tenant.settings?.whatsapp
+  const transferAlias = tenant.settings?.transfer_alias
+  const transferHolder = tenant.settings?.transfer_holder
+
+  async function copyAlias() {
+    try {
+      await navigator.clipboard.writeText(transferAlias)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // clipboard puede fallar en contextos sin permisos; el alias queda visible igual
+    }
+  }
 
   const steps = useMemo(() => {
     if (!order) return []
@@ -105,6 +118,37 @@ export default function OrderConfirmed() {
           <span className="pay-chip">Esperando confirmación del pago…</span>
         ) : null}
       </header>
+
+      {order.payment_method === 'transfer' &&
+        order.payment_status !== 'paid' &&
+        transferAlias && (
+          <div className="transfer-box tracking-transfer">
+            <span className="transfer-label">
+              Para confirmar tu pedido, transferí {money(order.total)} a:
+            </span>
+            <div className="transfer-alias-row">
+              <code>{transferAlias}</code>
+              <button className="btn-small" onClick={copyAlias}>
+                {copied ? '✓ Copiado' : 'Copiar'}
+              </button>
+            </div>
+            {transferHolder && <small>Titular: {transferHolder}</small>}
+            {whatsapp ? (
+              <a
+                className="btn-wa"
+                href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(
+                  `Hola! Te envío el comprobante de mi pedido #${order.order_number} 🧾`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Enviar comprobante por WhatsApp
+              </a>
+            ) : (
+              <small>Envianos el comprobante para confirmar tu pedido.</small>
+            )}
+          </div>
+        )}
 
       <ol className="timeline">
         {steps.map((s, i) => {

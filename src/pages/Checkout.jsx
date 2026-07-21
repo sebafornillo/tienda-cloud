@@ -24,7 +24,10 @@ export default function Checkout() {
   const [coupon, setCoupon] = useState(null) // {code, discount, label}
   const [couponError, setCouponError] = useState(null)
   const [checkingCoupon, setCheckingCoupon] = useState(false)
+  const [copied, setCopied] = useState(false)
   const mpEnabled = tenant.settings?.mp_enabled === true
+  const transferAlias = tenant.settings?.transfer_alias
+  const transferHolder = tenant.settings?.transfer_holder
   const storeOpen = isStoreOpen(tenant.settings?.schedule)
   const opensAt = storeOpen ? null : nextOpening(tenant.settings?.schedule)
 
@@ -36,6 +39,16 @@ export default function Checkout() {
   const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
   const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
   const total = Math.max(0, subtotal + deliveryFee - discount)
+
+  async function copyAlias() {
+    try {
+      await navigator.clipboard.writeText(transferAlias)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // clipboard puede fallar en contextos sin permisos; el alias queda visible igual
+    }
+  }
 
   async function applyCoupon() {
     if (!couponInput.trim()) return
@@ -127,7 +140,14 @@ export default function Checkout() {
 
     clear()
     navigate(`/pedido/${order.order_number}`, {
-      state: { name: form.customer_name, whatsapp: tenant.settings?.whatsapp },
+      state: {
+        name: form.customer_name,
+        whatsapp: tenant.settings?.whatsapp,
+        payment_method: form.payment_method,
+        transfer_alias: transferAlias,
+        transfer_holder: transferHolder,
+        total,
+      },
     })
   }
 
@@ -242,12 +262,14 @@ export default function Checkout() {
           >
             Efectivo
           </button>
-          <button
-            className={form.payment_method === 'transfer' ? 'active' : ''}
-            onClick={() => set('payment_method', 'transfer')}
-          >
-            Transferencia
-          </button>
+          {transferAlias && (
+            <button
+              className={form.payment_method === 'transfer' ? 'active' : ''}
+              onClick={() => set('payment_method', 'transfer')}
+            >
+              Transferencia
+            </button>
+          )}
           {mpEnabled && (
             <button
               className={form.payment_method === 'mercadopago' ? 'active' : ''}
@@ -257,6 +279,23 @@ export default function Checkout() {
             </button>
           )}
         </div>
+
+        {form.payment_method === 'transfer' && transferAlias && (
+          <div className="transfer-box">
+            <span className="transfer-label">Transferí a este alias</span>
+            <div className="transfer-alias-row">
+              <code>{transferAlias}</code>
+              <button className="btn-small" onClick={copyAlias}>
+                {copied ? '✓ Copiado' : 'Copiar'}
+              </button>
+            </div>
+            {transferHolder && <small>Titular: {transferHolder}</small>}
+            <small>
+              Después de transferir, envianos el comprobante por WhatsApp para confirmar
+              tu pedido.
+            </small>
+          </div>
+        )}
       </div>
 
       <div className="coupon-box">
