@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 // ⚠️ COMPLETAR: tu número de WhatsApp con código de país, sin + ni espacios
 // Ejemplo Argentina: 5493425551234
-const WHATSAPP = '549XXXXXXXXXX'
+const WHATSAPP = '5493425255392'
 
 const TYPE_LABEL = {
   gastronomy: 'Gastronomía',
@@ -14,7 +14,7 @@ const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
 
 // ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
-function useReveal() {
+function useReveal(deps = []) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
@@ -34,9 +34,10 @@ function useReveal() {
       },
       { threshold: 0.18 }
     )
-    el.querySelectorAll('.fs-reveal').forEach((n) => obs.observe(n))
+    el.querySelectorAll('.fs-reveal:not(.visible)').forEach((n) => obs.observe(n))
     return () => obs.disconnect()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps)
   return ref
 }
 
@@ -338,7 +339,7 @@ export default function FornistoreLanding() {
     return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
   }, [displayName, color])
 
-  const rootRef = useReveal()
+  const rootRef = useReveal([stores, intro])
 
   return (
     <div className={intro ? 'fs-landing' : 'fs-landing fs-ready'} ref={rootRef}>
