@@ -17,6 +17,10 @@ export default function Settings() {
     transfer_alias: tenant.settings?.transfer_alias || '',
     transfer_holder: tenant.settings?.transfer_holder || '',
   })
+  const [banners, setBanners] = useState(
+    Array.isArray(tenant.settings?.banners) ? tenant.settings.banners : []
+  )
+  const [uploadingBanners, setUploadingBanners] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [uploading, setUploading] = useState(null) // 'logo' | 'banner' | null
@@ -92,6 +96,35 @@ export default function Settings() {
     setUploading(null)
   }
 
+  async function uploadBanners(files) {
+    if (!files || files.length === 0) return
+    setUploadingBanners(true)
+    setError(null)
+    const urls = []
+    for (const file of Array.from(files)) {
+      const ext = file.name.split('.').pop().toLowerCase()
+      const path = `${tenant.id}/branding/slide-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 7)}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('products')
+        .upload(path, file, { cacheControl: '31536000' })
+      if (!upErr) {
+        const { data } = supabase.storage.from('products').getPublicUrl(path)
+        urls.push(data.publicUrl)
+      }
+    }
+    if (urls.length === 0) setError('No se pudieron subir las imágenes.')
+    setBanners((b) => [...b, ...urls].slice(0, 3))
+    setUploadingBanners(false)
+    setSaved(false)
+  }
+
+  function removeBanner(url) {
+    setBanners((b) => b.filter((u) => u !== url))
+    setSaved(false)
+  }
+
   async function save() {
     setSaving(true)
     setError(null)
@@ -114,6 +147,7 @@ export default function Settings() {
       ...tenant.settings,
       logo_url: form.logo_url || null,
       banner_url: form.banner_url || null,
+      banners,
       primary_color: form.primary_color,
       whatsapp: form.whatsapp.trim() || null,
       announcement: form.announcement.trim() || null,
@@ -200,6 +234,48 @@ export default function Settings() {
           )}
         </div>
         <small className="hint">Ideal: imagen apaisada, 1200×400px aprox.</small>
+
+        <div style={{ marginTop: '1rem' }}>
+          <span className="field-label">Portada tipo carrusel (opcional)</span>
+          <div className="gallery-grid">
+            {banners.map((url) => (
+              <div className="gallery-thumb wide" key={url}>
+                <img src={url} alt="" />
+                <div className="gallery-thumb-actions">
+                  <button
+                    type="button"
+                    title="Quitar"
+                    className="danger"
+                    onClick={() => removeBanner(url)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+            {banners.length < 3 && (
+              <label className="gallery-add wide">
+                {uploadingBanners ? '…' : '+'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  hidden
+                  disabled={uploadingBanners || uploading !== null}
+                  onChange={(e) => {
+                    uploadBanners(e.target.files)
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+            )}
+          </div>
+          <small className="hint">
+            Sumá hasta 3 imágenes más y tu portada pasa a ser un carrusel que rota
+            solo (tus clientes también pueden deslizarlo). Sin imágenes acá, la
+            portada queda simple.
+          </small>
+        </div>
       </div>
 
       <div className="settings-block">
