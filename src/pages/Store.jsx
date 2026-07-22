@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
@@ -38,6 +38,9 @@ export default function Store() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showTop, setShowTop] = useState(false)
+  const [slide, setSlide] = useState(0)
+  const [autoSlide, setAutoSlide] = useState(true)
+  const slideTouchX = useRef(null)
 
   // Botón "volver arriba": aparece pasados los 400px de scroll
   useEffect(() => {
@@ -101,6 +104,30 @@ export default function Store() {
 
   const announcement = tenant.settings?.announcement?.trim()
   const whatsapp = tenant.settings?.whatsapp
+
+  // Portada: si hay imágenes extra, la portada es un carrusel
+  const slides = useMemo(() => {
+    const extra = Array.isArray(tenant.settings?.banners) ? tenant.settings.banners : []
+    return [tenant.settings?.banner_url, ...extra].filter(Boolean)
+  }, [tenant.settings])
+
+  useEffect(() => {
+    if (!autoSlide || slides.length < 2) return
+    const iv = setInterval(() => setSlide((i) => (i + 1) % slides.length), 5000)
+    return () => clearInterval(iv)
+  }, [autoSlide, slides.length])
+
+  function slideTouchStart(e) {
+    slideTouchX.current = e.touches[0].clientX
+  }
+  function slideTouchEnd(e) {
+    if (slideTouchX.current === null) return
+    const dx = e.changedTouches[0].clientX - slideTouchX.current
+    slideTouchX.current = null
+    if (Math.abs(dx) < 40) return
+    setAutoSlide(false)
+    setSlide((i) => (dx < 0 ? (i + 1) % slides.length : (i - 1 + slides.length) % slides.length))
+  }
 
   function goCategory(id) {
     setActiveCat(id)
@@ -250,8 +277,34 @@ export default function Store() {
       )}
 
       <header className="store-header">
-        {tenant.settings?.banner_url && (
-          <img className="store-banner" src={tenant.settings.banner_url} alt="" />
+        {slides.length === 1 && (
+          <img className="store-banner" src={slides[0]} alt="" />
+        )}
+        {slides.length > 1 && (
+          <div
+            className="banner-carousel"
+            onTouchStart={slideTouchStart}
+            onTouchEnd={slideTouchEnd}
+          >
+            <div className="banner-track" style={{ transform: `translateX(-${slide * 100}%)` }}>
+              {slides.map((url, i) => (
+                <img key={url} src={url} alt="" loading={i === 0 ? 'eager' : 'lazy'} />
+              ))}
+            </div>
+            <div className="banner-dots">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  className={i === slide ? 'on' : ''}
+                  onClick={() => {
+                    setAutoSlide(false)
+                    setSlide(i)
+                  }}
+                  aria-label={`Imagen ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
         )}
         <div className="store-identity">
           {tenant.settings?.logo_url && (

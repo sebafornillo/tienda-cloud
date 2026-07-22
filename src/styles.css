@@ -1985,3 +1985,44 @@ img { display: block; }
   width: 128px;
   height: 62px;
 }
+
+/* ---------- Carrusel de portada ---------- */
+.banner-carousel {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.banner-track {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+.banner-track img {
+  flex: 0 0 100%;
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+.banner-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+.banner-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: width 0.3s, background 0.3s;
+}
+.banner-dots button.on {
+  width: 22px;
+  border-radius: 99px;
+  background: #fff;
+}
