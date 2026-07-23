@@ -2083,7 +2083,7 @@ img { display: block; }
 }
 
 /* ---------- Cupones en el menú lateral ---------- */
-.drawer-coupon {
+.drawer-list .drawer-coupon {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2093,23 +2093,29 @@ img { display: block; }
   border-radius: 10px;
   background: color-mix(in srgb, var(--brand, #4a5d33) 6%, transparent);
 }
-.drawer-coupon div {
+.drawer-list .drawer-coupon > div {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
-.drawer-coupon strong {
+.drawer-list .drawer-coupon strong {
   font-size: 0.95rem;
   letter-spacing: 0.05em;
   color: var(--brand, #4a5d33);
+  line-height: 1.2;
 }
-.drawer-coupon small {
-  font-size: 0.78rem;
+.drawer-list .drawer-coupon small {
+  font-size: 0.75rem;
   color: var(--ink-soft);
+  line-height: 1.3;
 }
-.drawer-coupon button {
-  flex-shrink: 0;
+/* pisa la regla de los ítems del menú (width: 100%) */
+.drawer-list .drawer-coupon button {
+  width: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
   border: none;
   background: var(--brand, #4a5d33);
   color: #fff;
@@ -2117,7 +2123,12 @@ img { display: block; }
   padding: 7px 14px;
   font-size: 0.8rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
+}
+.drawer-list .drawer-coupon button:hover {
+  background: var(--brand, #4a5d33);
+  opacity: 0.9;
 }
 
 .public-chip {
