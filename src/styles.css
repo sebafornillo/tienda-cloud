@@ -2119,3 +2119,13 @@ img { display: block; }
   font-weight: 700;
   cursor: pointer;
 }
+
+.public-chip {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--brand, #4a5d33);
+  background: color-mix(in srgb, var(--brand, #4a5d33) 12%, transparent);
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin-left: 8px;
+}

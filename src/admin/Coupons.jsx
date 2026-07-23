@@ -10,6 +10,7 @@ const EMPTY = {
   min_subtotal: '',
   max_uses: '',
   expires_at: '',
+  is_public: false,
 }
 
 function couponStatus(c) {
@@ -54,6 +55,7 @@ export default function Coupons() {
       expires_at: creating.expires_at
         ? new Date(creating.expires_at + 'T23:59:59').toISOString()
         : null,
+      is_public: creating.is_public,
     })
     setBusy(false)
     if (err) {
@@ -68,6 +70,11 @@ export default function Coupons() {
 
   async function toggleActive(c) {
     await supabase.from('coupons').update({ is_active: !c.is_active }).eq('id', c.id)
+    load()
+  }
+
+  async function togglePublic(c) {
+    await supabase.from('coupons').update({ is_public: !c.is_public }).eq('id', c.id)
     load()
   }
 
@@ -110,6 +117,7 @@ export default function Coupons() {
               <div className="coupon-info">
                 <strong>
                   {c.discount_type === 'percent' ? `${Number(c.value)}% OFF` : `${money(c.value)} OFF`}
+                  {c.is_public && <span className="public-chip">👁 En la tienda</span>}
                 </strong>
                 <small>
                   {c.min_subtotal > 0 && <>mínimo {money(c.min_subtotal)} · </>}
@@ -125,6 +133,9 @@ export default function Coupons() {
               </div>
               <span className={`badge b-coupon-${st.key}`}>{st.label}</span>
               <div className="row-actions">
+                <button className="link" onClick={() => togglePublic(c)}>
+                  {c.is_public ? 'Ocultar de la tienda' : 'Mostrar en la tienda'}
+                </button>
                 <button className="link" onClick={() => toggleActive(c)}>
                   {c.is_active ? 'Pausar' : 'Activar'}
                 </button>
@@ -207,6 +218,19 @@ export default function Coupons() {
                   />
                 </label>
               </div>
+              <label className="check-label">
+                <input
+                  type="checkbox"
+                  checked={creating.is_public}
+                  onChange={(e) => setCreating({ ...creating, is_public: e.target.checked })}
+                />
+                Mostrar en la tienda
+              </label>
+              <small className="hint">
+                Si lo activás, el cupón aparece en el menú de tu tienda con un botón para
+                copiarlo. Dejalo sin marcar para cupones privados (los que mandás a un
+                cliente puntual).
+              </small>
               {error && <p className="error">{error}</p>}
               <button
                 className="btn-primary full"
