@@ -38,6 +38,8 @@ export default function Store() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showTop, setShowTop] = useState(false)
+  const [coupons, setCoupons] = useState([])
+  const [copiedCode, setCopiedCode] = useState(null)
   const [slide, setSlide] = useState(0)
   const [autoSlide, setAutoSlide] = useState(true)
   const slideTouchX = useRef(null)
@@ -70,6 +72,21 @@ export default function Store() {
     }
     load()
   }, [tenant.id])
+
+  // Cupones públicos: los muestra el menú lateral
+  useEffect(() => {
+    supabase
+      .rpc('get_public_coupons', { t_id: tenant.id })
+      .then(({ data }) => setCoupons(data || []))
+  }, [tenant.id])
+
+  async function copyCoupon(code) {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopiedCode(code)
+      setTimeout(() => setCopiedCode(null), 2000)
+    } catch {}
+  }
 
   // Bloquea el scroll del fondo cuando el menú está abierto
   useEffect(() => {
@@ -254,6 +271,29 @@ export default function Store() {
                   </button>
                 </li>
               ))}
+              {coupons.length > 0 && (
+                <>
+                  <li className="drawer-label">Cupones activos</li>
+                  {coupons.map((c) => (
+                    <li key={c.code} className="drawer-coupon">
+                      <div>
+                        <strong>{c.code}</strong>
+                        <small>
+                          {c.discount_type === 'percent'
+                            ? `${Number(c.value)}% de descuento`
+                            : `${money(Number(c.value))} de descuento`}
+                          {Number(c.min_subtotal) > 0
+                            ? ` · desde ${money(Number(c.min_subtotal))}`
+                            : ''}
+                        </small>
+                      </div>
+                      <button onClick={() => copyCoupon(c.code)}>
+                        {copiedCode === c.code ? '✓' : 'Copiar'}
+                      </button>
+                    </li>
+                  ))}
+                </>
+              )}
               {whatsapp && (
                 <li className="drawer-contact">
                   <a

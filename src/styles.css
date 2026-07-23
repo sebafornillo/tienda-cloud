@@ -2081,3 +2081,41 @@ img { display: block; }
   padding: 8px 14px;
   font-size: 0.85rem;
 }
+
+/* ---------- Cupones en el menú lateral ---------- */
+.drawer-coupon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 2px 8px;
+  padding: 10px 12px;
+  border: 1.5px dashed var(--brand, #4a5d33);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--brand, #4a5d33) 6%, transparent);
+}
+.drawer-coupon div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.drawer-coupon strong {
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: var(--brand, #4a5d33);
+}
+.drawer-coupon small {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.drawer-coupon button {
+  flex-shrink: 0;
+  border: none;
+  background: var(--brand, #4a5d33);
+  color: #fff;
+  border-radius: 99px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
