@@ -8,6 +8,7 @@
   --radius: 14px;
   --font-display: 'Sora', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-accent: 'Fraunces', Georgia, serif;
 }
 
 * { box-sizing: border-box; }
@@ -86,7 +87,19 @@ img { display: block; }
   padding: 1.25rem 1rem 0.5rem;
 }
 .store-logo { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
-.store-identity h1 { font-size: 1.5rem; letter-spacing: -0.02em; }
+.store-identity h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;  /* antes -0.02em, ahora más apretado */
+}
+.store-tagline {
+  margin: 2px 0 0;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
 
 .cat-nav {
   display: flex; gap: 0.5rem;
