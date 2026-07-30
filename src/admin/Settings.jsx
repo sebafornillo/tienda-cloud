@@ -16,6 +16,7 @@ export default function Settings() {
     announcement: tenant.settings?.announcement || '',
     transfer_alias: tenant.settings?.transfer_alias || '',
     transfer_holder: tenant.settings?.transfer_holder || '',
+    tagline: tenant.settings?.tagline || '',
   })
   const [banners, setBanners] = useState(
     Array.isArray(tenant.settings?.banners) ? tenant.settings.banners : []
@@ -153,6 +154,7 @@ export default function Settings() {
       announcement: form.announcement.trim() || null,
       transfer_alias: form.transfer_alias.trim() || null,
       transfer_holder: form.transfer_holder.trim() || null,
+      tagline: form.tagline.trim() || null,
       delivery_zones: zones,
       schedule,
       mp_enabled: mpConfigured || !!mpToken.trim(),
@@ -205,6 +207,20 @@ export default function Settings() {
           </div>
         </div>
         <small className="hint">Ideal: imagen cuadrada, mínimo 200×200px.</small>
+      </div>
+
+      <div className="settings-block">
+        <span className="field-label">Frase debajo del nombre (opcional)</span>
+        <input
+          className="settings-input"
+          value={form.tagline}
+          onChange={(e) => set('tagline', e.target.value)}
+          maxLength={60}
+          placeholder="Ej: papelería creativa"
+        />
+        <small className="hint">
+          Aparece chiquita debajo del nombre de tu tienda, como un lema.
+        </small>
       </div>
 
       <div className="settings-block">

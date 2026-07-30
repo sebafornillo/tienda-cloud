@@ -350,7 +350,12 @@ export default function Store() {
           {tenant.settings?.logo_url && (
             <img className="store-logo" src={tenant.settings.logo_url} alt="" />
           )}
-          <h1>{tenant.name}</h1>
+          <div>
+            <h1>{tenant.name}</h1>
+            {tenant.settings?.tagline && (
+              <p className="store-tagline">{tenant.settings.tagline}</p>
+            )}
+          </div>
         </div>
       </header>
 
