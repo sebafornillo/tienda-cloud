@@ -1415,6 +1415,19 @@ img { display: block; }
 .landing.theme-craft .l-hero-overlay {
   background: linear-gradient(180deg, rgba(35,24,40,0.55) 0%, rgba(35,24,40,0.72) 60%, rgba(35,24,40,0.88) 100%);
 }
+.landing.theme-craft .l-hero-logo,
+.landing.theme-craft .l-footer-logo {
+  filter:
+    drop-shadow(3px 0 0 #fff)
+    drop-shadow(-3px 0 0 #fff)
+    drop-shadow(0 3px 0 #fff)
+    drop-shadow(0 -3px 0 #fff)
+    drop-shadow(2.2px 2.2px 0 #fff)
+    drop-shadow(-2.2px -2.2px 0 #fff)
+    drop-shadow(2.2px -2.2px 0 #fff)
+    drop-shadow(-2.2px 2.2px 0 #fff)
+    drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+}
 
 /* ---------- Inventario (admin Productos) ---------- */
 .inv-grid { margin-bottom: 1.25rem; }
