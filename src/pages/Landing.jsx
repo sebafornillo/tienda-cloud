@@ -65,6 +65,23 @@ export default function Landing() {
   const tiltRef = useTilt()
   const isDark = L.theme === 'dark'
 
+  // Temas disponibles: 'dark' (food-truck / 3D), 'craft' (papelería / hecho a mano,
+  // claro con acento coral) o default (claro genérico). 'craft' es reusable por
+  // cualquier tenant futuro con estética similar, no es exclusivo de HITA.
+  const themeClass =
+    L.theme === 'dark' ? 'theme-dark' : L.theme === 'craft' ? 'theme-craft' : ''
+
+  // Colores extra opcionales para el tema craft. Si el tenant no los define,
+  // el CSS cae de nuevo en var(--brand) — no rompe nada para tenants existentes.
+  const accentVars = {}
+  if (L.accent2) accentVars['--accent2'] = L.accent2
+  if (L.accent3) accentVars['--accent3'] = L.accent3
+  if (L.accent4) accentVars['--accent4'] = L.accent4
+
+  // Entrada animada del logo del hero: opt-in por tenant (settings.landing.logo_bounce),
+  // así cada landing puede elegir su propio tratamiento sin afectar a los demás.
+  const logoClass = ['l-hero-logo', L.logo_bounce ? 'bounce-in' : ''].filter(Boolean).join(' ')
+
   const hero = L.hero_image || s.banner_url
   const logo = s.logo_url
   const tagline = L.tagline || `Bienvenido a ${tenant.name}`
@@ -83,13 +100,17 @@ export default function Landing() {
   const whatsapp = s.whatsapp
 
   return (
-    <div className={isDark ? 'landing theme-dark' : 'landing'} ref={rootRef}>
+    <div
+      className={['landing', themeClass].filter(Boolean).join(' ')}
+      style={accentVars}
+      ref={rootRef}
+    >
       {/* ---------- HERO ---------- */}
       {isDark ? (
         <section className="l-hero l-hero-dark">
           <div className="l-hero-dark-grid">
             <div className="l-hero-content">
-              {logo && <img className="l-hero-logo" src={logo} alt={tenant.name} />}
+              {logo && <img className={logoClass} src={logo} alt={tenant.name} />}
               <h1>{tagline}</h1>
               {sub && <p>{sub}</p>}
               <Link to="/tienda" className="l-cta">
@@ -111,7 +132,7 @@ export default function Landing() {
           {hero && <div className="l-hero-bg" style={{ backgroundImage: `url(${hero})` }} />}
           <div className="l-hero-overlay" />
           <div className="l-hero-content">
-            {logo && <img className="l-hero-logo" src={logo} alt={tenant.name} />}
+            {logo && <img className={logoClass} src={logo} alt={tenant.name} />}
             <h1>{tagline}</h1>
             {sub && <p>{sub}</p>}
             <Link to="/tienda" className="l-cta">

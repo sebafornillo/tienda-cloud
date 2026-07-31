@@ -86,7 +86,15 @@ img { display: block; }
   display: flex; align-items: center; gap: 0.85rem;
   padding: 1.25rem 1rem 0.5rem;
 }
-.store-logo { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
+.store-logo {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 4px;
+  box-sizing: border-box;
+}
 .store-identity h1 {
   font-size: 1.5rem;
   font-weight: 700;
@@ -768,6 +776,7 @@ img { display: block; }
 @media (prefers-reduced-motion: reduce) {
   .landing .reveal { opacity: 1; transform: none; transition: none; }
   .l-hero-bg { animation: none !important; }
+  .l-hero-logo.bounce-in { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 .l-kicker {
@@ -828,7 +837,22 @@ img { display: block; }
 }
 .l-hero-content { padding: 2rem; max-width: 720px; animation: fadeUp 1s ease 0.2s both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-.l-hero-logo { width: min(230px, 55vw); margin: 0 auto 1.5rem; filter: drop-shadow(0 8px 30px rgba(0,0,0,0.45)); }
+.l-hero-logo {
+  width: min(230px, 55vw);
+  margin: 0 auto 1.5rem;
+  filter: drop-shadow(0 8px 30px rgba(0,0,0,0.45));
+}
+/* Entrada opcional (opt-in por tenant vía settings.landing.logo_bounce) */
+.l-hero-logo.bounce-in {
+  opacity: 0;
+  transform: translateY(-140px);
+  animation: l-logo-fall 0.7s cubic-bezier(0.25, 0.9, 0.3, 1.3) 0.1s both;
+}
+@keyframes l-logo-fall {
+  from { opacity: 0; transform: translateY(-140px); }
+  65% { opacity: 1; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .l-hero h1 {
   font-family: var(--serif);
   font-weight: 500;
@@ -1323,6 +1347,52 @@ img { display: block; }
 .landing.theme-dark .l-badge small { color: rgba(245,241,230,0.6); }
 .landing.theme-dark .l-feature-overlay { background: rgba(10, 9, 7, 0.72); }
 .landing.theme-dark .l-footer { background: #0d0c0a; }
+
+/* ============================================================
+   LANDING — TEMA CLARO "CRAFT" (papelería / productos hechos a mano)
+   Colores extra opcionales via tenant.settings.landing.accent2/3/4
+   (con fallback a --brand si el tenant no los define)
+   ============================================================ */
+.landing.theme-craft .l-kicker {
+  position: relative;
+  display: inline-block;
+  padding: 0.15rem 0.3rem;
+}
+.landing.theme-craft .l-kicker::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem; right: -0.5rem;
+  top: 0.1rem; bottom: 0.05rem;
+  background: var(--accent2, var(--brand));
+  opacity: 0.22;
+  transform: rotate(-1.4deg);
+  border-radius: 3px;
+  z-index: -1;
+}
+.landing.theme-craft .l-cta {
+  background: var(--accent2, var(--brand));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent2, var(--brand)) 35%, transparent);
+}
+.landing.theme-craft .l-cta-outline {
+  color: var(--accent2, var(--brand));
+  border-color: var(--accent2, var(--brand));
+  background: transparent;
+}
+.landing.theme-craft .l-story-text { position: relative; }
+.landing.theme-craft .l-story-text::before,
+.landing.theme-craft .l-story-text::after {
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent3, var(--brand));
+  opacity: 0.85;
+}
+.landing.theme-craft .l-story-text::before { content: '“'; margin-right: 0.15rem; }
+.landing.theme-craft .l-story-text::after { content: '”'; margin-left: 0.15rem; }
+.landing.theme-craft .l-product-img { transition: box-shadow 0.25s ease; }
+.landing.theme-craft .l-product:hover .l-product-img {
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--accent4, var(--brand)) 35%, transparent);
+}
 
 /* ---------- Inventario (admin Productos) ---------- */
 .inv-grid { margin-bottom: 1.25rem; }
