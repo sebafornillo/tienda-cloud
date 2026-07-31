@@ -1353,6 +1353,17 @@ img { display: block; }
    Colores extra opcionales via tenant.settings.landing.accent2/3/4
    (con fallback a --brand si el tenant no los define)
    ============================================================ */
+.landing.theme-craft {
+  --font-craft-display: 'Baloo 2', var(--font-display);
+  --font-craft-script: 'Caveat', var(--serif);
+}
+.landing.theme-craft .l-hero h1,
+.landing.theme-craft .l-footer h2 {
+  font-family: var(--font-craft-display);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: -0.005em;
+}
 .landing.theme-craft .l-kicker {
   position: relative;
   display: inline-block;
@@ -1378,17 +1389,21 @@ img { display: block; }
   border-color: var(--accent2, var(--brand));
   background: transparent;
 }
-.landing.theme-craft .l-story-text { position: relative; }
-.landing.theme-craft .l-story-text::before,
-.landing.theme-craft .l-story-text::after {
-  font-family: var(--serif);
+.landing.theme-craft .l-story-text {
+  position: relative;
+  font-family: var(--font-craft-script);
   font-style: normal;
   font-weight: 600;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  line-height: 1.35;
+}
+.landing.theme-craft .l-story-text::before,
+.landing.theme-craft .l-story-text::after {
   color: var(--accent3, var(--brand));
   opacity: 0.85;
 }
-.landing.theme-craft .l-story-text::before { content: '“'; margin-right: 0.15rem; }
-.landing.theme-craft .l-story-text::after { content: '”'; margin-left: 0.15rem; }
+.landing.theme-craft .l-story-text::before { content: '“'; margin-right: 0.1rem; }
+.landing.theme-craft .l-story-text::after { content: '”'; margin-left: 0.1rem; }
 .landing.theme-craft .l-product-img { transition: box-shadow 0.25s ease; }
 .landing.theme-craft .l-product:hover .l-product-img {
   box-shadow: 0 14px 30px color-mix(in srgb, var(--accent4, var(--brand)) 35%, transparent);
