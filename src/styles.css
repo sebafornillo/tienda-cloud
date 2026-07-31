@@ -1409,6 +1409,13 @@ img { display: block; }
   box-shadow: 0 14px 30px color-mix(in srgb, var(--accent4, var(--brand)) 35%, transparent);
 }
 
+.landing.theme-craft .l-hero-bg {
+  filter: blur(7px) saturate(1.05) brightness(0.9);
+}
+.landing.theme-craft .l-hero-overlay {
+  background: linear-gradient(180deg, rgba(35,24,40,0.55) 0%, rgba(35,24,40,0.72) 60%, rgba(35,24,40,0.88) 100%);
+}
+
 /* ---------- Inventario (admin Productos) ---------- */
 .inv-grid { margin-bottom: 1.25rem; }
 .kpi-value.warn { color: #8a5b00; }
