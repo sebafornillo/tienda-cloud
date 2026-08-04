@@ -107,11 +107,10 @@ export default function Landing() {
   const tiltRef = useTilt()
   const isDark = L.theme === 'dark'
 
-  // Temas disponibles: 'dark' (food-truck / 3D), 'craft' (papelería / hecho a mano,
-  // claro con acento coral) o default (claro genérico). 'craft' es reusable por
-  // cualquier tenant futuro con estética similar, no es exclusivo de HITA.
+  // Temas disponibles: 'dark' (food-truck / 3D), 'craft' (papelería / hecho a mano),
+  // 'epic' (streetwear cristiano / cinematográfico) o default (claro genérico).
   const themeClass =
-    L.theme === 'dark' ? 'theme-dark' : L.theme === 'craft' ? 'theme-craft' : ''
+    L.theme === 'dark' ? 'theme-dark' : L.theme === 'craft' ? 'theme-craft' : L.theme === 'epic' ? 'theme-epic' : ''
 
   // Colores extra opcionales para el tema craft. Si el tenant no los define,
   // el CSS cae de nuevo en var(--brand) — no rompe nada para tenants existentes.
@@ -120,9 +119,15 @@ export default function Landing() {
   if (L.accent3) accentVars['--accent3'] = L.accent3
   if (L.accent4) accentVars['--accent4'] = L.accent4
 
-  // Entrada animada del logo del hero: opt-in por tenant (settings.landing.logo_bounce),
-  // así cada landing puede elegir su propio tratamiento sin afectar a los demás.
-  const logoClass = ['l-hero-logo', L.logo_bounce ? 'bounce-in' : ''].filter(Boolean).join(' ')
+  // Entrada animada del logo del hero: opt-in por tenant.
+  // logo_entrance acepta 'bounce' (caida con rebote, HITA) o 'reveal' (aparicion
+  // pesada tipo cine, sin rebote). logo_bounce=true se mantiene por compatibilidad.
+  const logoEntrance = L.logo_entrance || (L.logo_bounce ? 'bounce' : null)
+  const logoClass = [
+    'l-hero-logo',
+    logoEntrance === 'bounce' ? 'bounce-in' : '',
+    logoEntrance === 'reveal' ? 'reveal-in' : '',
+  ].filter(Boolean).join(' ')
 
   const hero = L.hero_image || s.banner_url
   const logo = s.logo_url
@@ -140,6 +145,9 @@ export default function Landing() {
   const badges = Array.isArray(L.badges) ? L.badges : []
   const instagram = L.instagram
   const whatsapp = s.whatsapp
+  const verseRef = L.verse_ref || ''
+  const verseText = L.verse_text || ''
+  const verseLines = verseText ? verseText.split('\n').filter(Boolean) : []
 
   return (
     <div
@@ -193,6 +201,24 @@ export default function Landing() {
           <div className="reveal">
             <span className="l-kicker">{storyTitle}</span>
             <p className="l-story-text">{story}</p>
+          </div>
+        </section>
+      )}
+
+      {/* ---------- MOMENTO DE VERSICULO (opt-in: verse_ref + verse_text) ---------- */}
+      {verseRef && verseLines.length > 0 && (
+        <section className="l-verse">
+          <div className="l-verse-inner">
+            <span className="l-verse-ref">{verseRef}</span>
+            {verseLines.map((line, i) => (
+              <p
+                key={i}
+                className="reveal l-verse-line"
+                style={{ transitionDelay: `${i * 250}ms` }}
+              >
+                {line}
+              </p>
+            ))}
           </div>
         </section>
       )}
