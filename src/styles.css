@@ -1536,6 +1536,21 @@ img { display: block; }
   .l-hero-logo.reveal-in { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
 }
 
+/* titulo animado letra por letra (opt-in via settings.landing.heading_effect: 'letters') */
+.l-title-word { display: inline-block; }
+.l-hero h1 .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: l-letter-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes l-letter-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .l-hero h1 .letter { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
 .landing.theme-epic .l-hero-overlay {
   background: linear-gradient(180deg, rgba(11,11,12,0.45) 0%, rgba(11,11,12,0.65) 55%, rgba(11,11,12,0.92) 100%);
 }

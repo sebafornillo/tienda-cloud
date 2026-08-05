@@ -99,6 +99,27 @@ function ProductImage({ image, images, name, intervalMs = 1800 }) {
   ))
 }
 
+function AnimatedTitle({ text, startDelayMs = 0, stepMs = 35 }) {
+  const words = text.split(' ')
+  let letterIndex = 0
+  return words.flatMap((word, wi) => {
+    const wordSpan = (
+      <span className="l-title-word" key={`w${wi}`}>
+        {Array.from(word).map((ch) => {
+          const delay = startDelayMs + letterIndex * stepMs
+          letterIndex++
+          return (
+            <span key={letterIndex} className="letter" style={{ animationDelay: `${delay}ms` }}>
+              {ch}
+            </span>
+          )
+        })}
+      </span>
+    )
+    return wi < words.length - 1 ? [wordSpan, ' '] : [wordSpan]
+  })
+}
+
 export default function Landing() {
   const { tenant } = useTenant()
   const s = tenant.settings || {}
@@ -148,6 +169,8 @@ export default function Landing() {
   const verseRef = L.verse_ref || ''
   const verseText = L.verse_text || ''
   const verseLines = verseText ? verseText.split('\n').filter(Boolean) : []
+  const animateTitle = L.heading_effect === 'letters'
+  const titleStartDelay = logoEntrance === 'reveal' ? 2500 : logoEntrance === 'bounce' ? 700 : 0
 
   return (
     <div
@@ -161,7 +184,7 @@ export default function Landing() {
           <div className="l-hero-dark-grid">
             <div className="l-hero-content">
               {logo && <img className={logoClass} src={logo} alt={tenant.name} />}
-              <h1>{tagline}</h1>
+              <h1>{animateTitle ? <AnimatedTitle text={tagline} startDelayMs={titleStartDelay} /> : tagline}</h1>
               {sub && <p>{sub}</p>}
               <Link to="/tienda" className="l-cta">
                 Pedir ahora
@@ -183,7 +206,7 @@ export default function Landing() {
           <div className="l-hero-overlay" />
           <div className="l-hero-content">
             {logo && <img className={logoClass} src={logo} alt={tenant.name} />}
-            <h1>{tagline}</h1>
+            <h1>{animateTitle ? <AnimatedTitle text={tagline} startDelayMs={titleStartDelay} /> : tagline}</h1>
             {sub && <p>{sub}</p>}
             <Link to="/tienda" className="l-cta">
               Ver la tienda
