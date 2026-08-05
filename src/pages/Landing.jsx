@@ -297,6 +297,9 @@ export default function Landing() {
           )}
           <div className="l-feature-overlay" />
           <div className="l-feature-content reveal">
+            {L.feature_show_logo && logo && (
+              <img className="l-feature-logo" src={logo} alt={tenant.name} />
+            )}
             <span className="l-kicker light">{featureTitle}</span>
             <p>{featureText}</p>
             <Link to="/tienda" className="l-cta">

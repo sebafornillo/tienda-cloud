@@ -964,6 +964,12 @@ img { display: block; }
   z-index: -1;
 }
 .l-feature-content { max-width: 640px; margin: 0 auto; }
+.l-feature-logo {
+  width: min(140px, 40vw);
+  margin: 0 auto 1.4rem;
+  display: block;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,0.5));
+}
 .l-feature-content p {
   font-family: var(--serif);
   font-size: clamp(1.2rem, 2.8vw, 1.55rem);
