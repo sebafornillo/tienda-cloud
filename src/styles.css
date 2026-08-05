@@ -1485,6 +1485,15 @@ img { display: block; }
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
+.landing.theme-epic .l-hero h1 { color: #cbc6bc; }
+.landing.theme-epic .l-hero h1 .letter { color: #cbc6bc; }
+.landing.theme-epic .l-hero p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(241,237,228,0.75);
+}
 .landing.theme-epic .l-kicker {
   color: var(--accent2, #d98a3d);
 }
