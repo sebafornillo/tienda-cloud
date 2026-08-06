@@ -1623,6 +1623,90 @@ img { display: block; }
 .landing.theme-epic .l-social svg { color: var(--accent3, #2f8f8a); }
 .landing.theme-epic .l-social a:hover { color: var(--accent2, #d98a3d); }
 
+/* ---------- Producto flotante (opt-in: floating_product_image) ---------- */
+.l-floating-section {
+  padding: 5rem 1.5rem;
+  text-align: center;
+  perspective: 1200px;
+}
+.l-floating-stage { perspective: 1200px; }
+.l-floating-float {
+  display: inline-block;
+  animation: l-float-bob 5s ease-in-out infinite;
+}
+.l-floating-img {
+  max-width: min(360px, 80vw);
+  max-height: 60vh;
+  transition: transform 0.2s ease-out;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,0.5));
+}
+@keyframes l-float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+.l-floating-caption {
+  margin-top: 1.5rem;
+  font-family: var(--font-epic-script, inherit);
+  font-size: 1.3rem;
+  color: var(--epic-paper, inherit);
+}
+@media (prefers-reduced-motion: reduce) {
+  .l-floating-float { animation: none; }
+}
+
+/* ---------- Cards de producto "vidrio oscuro" en theme-epic ---------- */
+.landing.theme-epic .l-collection,
+.landing.theme-epic .l-badges {
+  background: var(--epic-ink);
+}
+.landing.theme-epic .l-product-img {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.55);
+}
+.landing.theme-epic .l-product strong { color: var(--epic-paper); }
+.landing.theme-epic .l-product small { color: rgba(241,237,228,0.55); }
+.landing.theme-epic .l-product:hover .l-product-img {
+  border-color: color-mix(in srgb, var(--accent2, #d98a3d) 50%, transparent);
+  box-shadow: 0 24px 44px rgba(0,0,0,0.6), 0 0 0 1px color-mix(in srgb, var(--accent2, #d98a3d) 40%, transparent);
+}
+.landing.theme-epic .l-collection-head p,
+.landing.theme-epic .l-badges strong { color: var(--epic-paper); }
+.landing.theme-epic .l-badges small { color: rgba(241,237,228,0.55); }
+
+/* ---------- Historia revelada en partes (opt-in: story_scroll_reveal) ---------- */
+.landing .l-story-part { margin-bottom: 0.9rem; }
+
+/* ---------- Particulas de brasa (opt-in: scroll_particles, dentro de .l-verse) ---------- */
+.l-verse { position: relative; overflow: hidden; }
+.l-embers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.l-ember {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffb066 0%, rgba(217,138,61,0.9) 45%, rgba(217,138,61,0) 75%);
+  opacity: 0;
+  animation-name: l-ember-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes l-ember-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: 0.85; }
+  85% { opacity: 0.4; }
+  100% { opacity: 0; transform: translate(var(--drift), -360px); }
+}
+.l-verse-inner { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .l-embers { display: none; }
+}
+
 /* ---------- Inventario (admin Productos) ---------- */
 .inv-grid { margin-bottom: 1.25rem; }
 .kpi-value.warn { color: #8a5b00; }

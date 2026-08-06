@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTenant } from '../lib/TenantContext'
 
@@ -30,13 +30,13 @@ function useReveal() {
   return ref
 }
 
-function useTilt() {
+function useTilt(zoneSelector = '.l-hero') {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const zone = el.closest('.l-hero')
+    const zone = el.closest(zoneSelector)
     if (!zone) return
     const move = (e) => {
       const r = zone.getBoundingClientRect()
@@ -53,7 +53,7 @@ function useTilt() {
       zone.removeEventListener('mousemove', move)
       zone.removeEventListener('mouseleave', reset)
     }
-  }, [])
+  }, [zoneSelector])
   return ref
 }
 
@@ -120,12 +120,45 @@ function AnimatedTitle({ text, startDelayMs = 0, stepMs = 35 }) {
   })
 }
 
+function Embers({ count = 22 }) {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: count }, () => ({
+        left: Math.random() * 100,
+        delay: Math.random() * 9,
+        duration: 7 + Math.random() * 7,
+        size: 2 + Math.random() * 4,
+        drift: (Math.random() - 0.5) * 60,
+      })),
+    [count]
+  )
+  return (
+    <div className="l-embers" aria-hidden="true">
+      {particles.map((p, i) => (
+        <span
+          key={i}
+          className="l-ember"
+          style={{
+            left: `${p.left}%`,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+            '--drift': `${p.drift}px`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 export default function Landing() {
   const { tenant } = useTenant()
   const s = tenant.settings || {}
   const L = s.landing || {}
   const rootRef = useReveal()
   const tiltRef = useTilt()
+  const productTiltRef = useTilt('.l-floating-section')
   const isDark = L.theme === 'dark'
 
   // Temas disponibles: 'dark' (food-truck / 3D), 'craft' (papelería / hecho a mano),
@@ -171,6 +204,11 @@ export default function Landing() {
   const verseLines = verseText ? verseText.split('\n').filter(Boolean) : []
   const animateTitle = L.heading_effect === 'letters'
   const titleStartDelay = logoEntrance === 'reveal' ? 2500 : logoEntrance === 'bounce' ? 700 : 0
+  const floatingProductImg = L.floating_product_image
+  const floatingProductCaption = L.floating_product_caption || ''
+  const storyReveal = L.story_scroll_reveal === true
+  const storyParts = storyReveal ? story.split(/(?<=[.!?])\s+/).filter(Boolean) : []
+  const scrollParticles = L.scroll_particles === true
 
   return (
     <div
@@ -218,12 +256,38 @@ export default function Landing() {
         </section>
       )}
 
+      {/* ---------- PRODUCTO FLOTANTE (opt-in: floating_product_image) ---------- */}
+      {floatingProductImg && (
+        <section className="l-floating-section">
+          <div className="l-floating-stage" aria-hidden="true">
+            <div className="l-floating-float">
+              <img ref={productTiltRef} className="l-floating-img" src={floatingProductImg} alt={floatingProductCaption} />
+            </div>
+          </div>
+          {floatingProductCaption && (
+            <p className="l-floating-caption reveal">{floatingProductCaption}</p>
+          )}
+        </section>
+      )}
+
       {/* ---------- HISTORIA ---------- */}
       {story && (
         <section className="l-story">
           <div className="reveal">
             <span className="l-kicker">{storyTitle}</span>
-            <p className="l-story-text">{story}</p>
+            {storyReveal ? (
+              storyParts.map((part, i) => (
+                <p
+                  key={i}
+                  className="reveal l-story-text l-story-part"
+                  style={{ transitionDelay: `${i * 220}ms` }}
+                >
+                  {part}
+                </p>
+              ))
+            ) : (
+              <p className="l-story-text">{story}</p>
+            )}
           </div>
         </section>
       )}
@@ -231,6 +295,7 @@ export default function Landing() {
       {/* ---------- MOMENTO DE VERSICULO (opt-in: verse_ref + verse_text) ---------- */}
       {verseRef && verseLines.length > 0 && (
         <section className="l-verse">
+          {scrollParticles && <Embers />}
           <div className="l-verse-inner">
             <span className="l-verse-ref">{verseRef}</span>
             {verseLines.map((line, i) => (
