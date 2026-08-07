@@ -1527,24 +1527,25 @@ img { display: block; }
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* entrada del logo: revelacion pesada tipo "sale de la niebla", sin rebote (opt-in via logo_entrance: 'reveal') */
 .l-hero-logo.reveal-in {
   opacity: 0;
   animation: l-logo-reveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 @keyframes l-logo-reveal {
   0% {
     opacity: 0;
-    transform: scale(1.18) translateY(-26px);
-    filter: blur(26px) drop-shadow(0 22px 30px rgba(0,0,0,0.6));
+    transform: scale(1.18) translateY(-26px) translateZ(0);
+    filter: drop-shadow(0 22px 30px rgba(0,0,0,0.6));
   }
   55% {
     opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0) drop-shadow(0 16px 22px rgba(0,0,0,0.55));
+    transform: scale(1) translateY(0) translateZ(0);
+    filter: drop-shadow(0 16px 22px rgba(0,0,0,0.55));
   }
 }
 @media (prefers-reduced-motion: reduce) {
