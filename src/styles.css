@@ -1624,6 +1624,13 @@ img { display: block; }
 }
 .landing.theme-epic .l-social svg { color: var(--accent3, #2f8f8a); }
 .landing.theme-epic .l-social a:hover { color: var(--accent2, #d98a3d); }
+.landing.theme-epic .l-footer-logo-inline {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.9;
+}
 /* ---------- Producto flotante (opt-in: floating_product_image) ---------- */
 .l-floating-section {
   padding: 5rem 1.5rem;

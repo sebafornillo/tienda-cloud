@@ -397,7 +397,10 @@ export default function Landing() {
             Comprar ahora
           </Link>
           <div className="l-social">
-            {instagram && (
+  {logo && themeClass === 'theme-epic' && (
+    <img className="l-footer-logo-inline" src={logo} alt="" />
+  )}
+  {instagram && (
               <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noreferrer">
                 <InstagramIcon /> @{instagram}
               </a>
