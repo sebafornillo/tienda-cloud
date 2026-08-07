@@ -391,8 +391,8 @@ export default function Landing() {
       {isDark && <div className="checker-strip" aria-hidden="true" />}
       <section className="l-footer">
         <div className="reveal">
-          {logo && <img className="l-footer-logo" src={logo} alt="" />}
-          <h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
+        {logo && themeClass !== 'theme-epic' && <img className="l-footer-logo" src={logo} alt="" />}
+<h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
           <Link to="/tienda" className="l-cta">
             Comprar ahora
           </Link>
