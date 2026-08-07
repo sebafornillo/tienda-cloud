@@ -1620,7 +1620,15 @@ img { display: block; }
 }
 .landing.theme-epic .l-social svg { color: var(--accent3, #2f8f8a); }
 .landing.theme-epic .l-social a:hover { color: var(--accent2, #d98a3d); }
-
+.landing.theme-epic .l-footer {
+  background: linear-gradient(180deg, #0b0b0c 0%, #050505 100%);
+}
+.landing.theme-epic .l-footer-logo {
+  width: 64px;
+  opacity: 0.85;
+}
+.landing.theme-epic .l-social svg { color: var(--accent3, #2f8f8a); }
+.landing.theme-epic .l-social a:hover { color: var(--accent2, #d98a3d); }
 /* ---------- Producto flotante (opt-in: floating_product_image) ---------- */
 .l-floating-section {
   padding: 5rem 1.5rem;
