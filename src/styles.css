@@ -2550,3 +2550,26 @@ img { display: block; }
   font-size: 0.85rem;
   color: var(--ink-soft);
 }
+
+.l-footprints {
+  position: relative;
+  height: 70px;
+  max-width: 480px;
+  margin: 1.5rem auto 0;
+}
+.landing .l-footprint-logo {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.4) translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.landing .l-footprint-logo.visible {
+  opacity: 0.55;
+  transform: scale(1) translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing .l-footprint-logo { opacity: 0.55; transform: none; transition: none; }
+}

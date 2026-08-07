@@ -152,6 +152,30 @@ function Embers({ count = 22 }) {
   )
 }
 
+function LogoFootsteps({ src, count = 7 }) {
+  const steps = Array.from({ length: count }, (_, i) => ({
+    left: 6 + i * (88 / (count - 1)),
+    top: i % 2 === 0 ? 58 : 82,
+  }))
+  return (
+    <div className="l-footprints" aria-hidden="true">
+      {steps.map((s, i) => (
+        <img
+          key={i}
+          src={src}
+          alt=""
+          className="reveal l-footprint-logo"
+          style={{
+            left: `${s.left}%`,
+            top: `${s.top}%`,
+            transitionDelay: `${1000 + i * 280}ms`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 export default function Landing() {
   const { tenant } = useTenant()
   const s = tenant.settings || {}
@@ -273,6 +297,7 @@ export default function Landing() {
       {/* ---------- HISTORIA ---------- */}
       {story && (
         <section className="l-story">
+
           <div className="reveal">
             <span className="l-kicker">{storyTitle}</span>
             {storyReveal ? (
@@ -411,9 +436,11 @@ export default function Landing() {
               </a>
             )}
           </div>
+          {L.footer_footsteps && logo && <LogoFootsteps src={logo} />}
           <p className="l-credit">
             Tienda creada con <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">Fornistore</a>
           </p>
+          
         </div>
       </section>
     </div>
