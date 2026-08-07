@@ -151,11 +151,10 @@ function Embers({ count = 22 }) {
     </div>
   )
 }
-
 function LogoFootsteps({ src, count = 7 }) {
   const steps = Array.from({ length: count }, (_, i) => ({
     left: 6 + i * (88 / (count - 1)),
-    top: i % 2 === 0 ? 58 : 82,
+    top: i % 2 === 0 ? 0 : 40,
   }))
   return (
     <div className="l-footprints" aria-hidden="true">
@@ -167,7 +166,7 @@ function LogoFootsteps({ src, count = 7 }) {
           className="reveal l-footprint-logo"
           style={{
             left: `${s.left}%`,
-            top: `${s.top}%`,
+            top: `${s.top}px`,
             transitionDelay: `${1000 + i * 280}ms`,
           }}
         />

@@ -2550,13 +2550,13 @@ img { display: block; }
   font-size: 0.85rem;
   color: var(--ink-soft);
 }
-
 .l-footprints {
   position: relative;
-  height: 70px;
+  height: 74px;
   max-width: 480px;
-  margin: 1.5rem auto 0;
+  margin: 1.5rem auto 1.5rem;
 }
+
 .landing .l-footprint-logo {
   position: absolute;
   width: 30px;
