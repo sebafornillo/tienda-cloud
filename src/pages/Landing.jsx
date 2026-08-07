@@ -418,6 +418,7 @@ export default function Landing() {
         <div className="reveal">
         {logo && themeClass !== 'theme-epic' && <img className="l-footer-logo" src={logo} alt="" />}
 <h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
+{L.footer_footsteps && logo && <LogoFootsteps src={logo} count={5} />}
           <Link to="/tienda" className="l-cta">
             Comprar ahora
           </Link>
