@@ -942,6 +942,9 @@ img { display: block; }
 .l-product strong { font-size: 0.98rem; }
 .l-product small { color: var(--ink-soft); }
 
+.l-product:hover .l-product-hover-front { opacity: 0; }
+.l-product:hover .l-product-hover-back { opacity: 1; }
+
 /* ---------- Diferencial ---------- */
 .l-feature {
   position: relative;

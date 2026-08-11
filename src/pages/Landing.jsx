@@ -75,18 +75,28 @@ function WhatsAppIcon() {
   )
 }
 
-function ProductImage({ image, images, name, intervalMs = 1800 }) {
+function ProductImage({ image, images, name, intervalMs = 1800, hoverMode = false }) {
   const list = Array.isArray(images) && images.length > 0 ? images : image ? [image] : []
   const [idx, setIdx] = useState(0)
 
   useEffect(() => {
+    if (hoverMode) return
     if (list.length < 2) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const t = setInterval(() => setIdx((i) => (i + 1) % list.length), intervalMs)
     return () => clearInterval(t)
-  }, [list.length, intervalMs])
+  }, [list.length, intervalMs, hoverMode])
 
   if (list.length === 0) return null
+
+  if (hoverMode && list.length === 2) {
+    return (
+      <>
+        <img src={list[0]} alt={name} loading="lazy" className="l-product-carousel-img is-active l-product-hover-front" />
+        <img src={list[1]} alt={name} loading="lazy" className="l-product-carousel-img l-product-hover-back" />
+      </>
+    )
+  }
 
   return list.map((src, i) => (
     <img
@@ -358,7 +368,7 @@ export default function Landing() {
                     style={{ transitionDelay: `${i * 90}ms` }}
                   >
                     <div className="l-product-img">
-                      <ProductImage image={p.image} images={p.images} name={p.name} />
+                    <ProductImage image={p.image} images={p.images} name={p.name} hoverMode={p.mode === 'hover'} />
                     </div>
                     <strong>{p.name}</strong>
                     {p.note && <small>{p.note}</small>}
