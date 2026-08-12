@@ -331,17 +331,22 @@ export default function Landing() {
         <section className="l-verse">
           {scrollParticles && <Embers />}
           <div className="l-verse-inner">
-            <span className="l-verse-ref">{verseRef}</span>
-            {verseLines.map((line, i) => (
-              <p
-                key={i}
-                className="reveal l-verse-line"
-                style={{ transitionDelay: `${i * 250}ms` }}
-              >
-                {line}
-              </p>
-            ))}
-          </div>
+  {verseLines.map((line, i) => (
+    <p
+      key={i}
+      className="reveal l-verse-line"
+      style={{ transitionDelay: `${i * 250}ms` }}
+    >
+      {line}
+    </p>
+  ))}
+  <span
+    className="reveal l-verse-ref"
+    style={{ transitionDelay: `${verseLines.length * 250 + 200}ms` }}
+  >
+    {verseRef}
+  </span>
+</div>
         </section>
       )}
 
