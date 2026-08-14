@@ -2569,8 +2569,7 @@ img { display: block; }
   transform: scale(0.4) translateY(10px);
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.landing .l-footprint-icon.visible { opacity: 0.7; transform: scale(1) translateY(0); }
 .landing .l-footprint-icon.visible { opacity: 0.6; transform: scale(1) translateY(0); }
 @media (prefers-reduced-motion: reduce) {
-  .landing .l-footprint-logo { opacity: 0.55; transform: none; transition: none; }
+  .landing .l-footprint-icon { opacity: 0.6; transform: none; transition: none; }
 }
