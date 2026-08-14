@@ -171,6 +171,11 @@ export default function Store() {
             {p.compare_at_price && (
               <span className="compare">{money(p.compare_at_price)}</span>
             )}
+            {p.installments > 0 && (
+  <span className="installments">
+    {p.installments}x {money(p.price / p.installments)} sin interés
+  </span>
+)}
             {out && <span className="stock-chip out">Sin stock</span>}
             {low && (
               <span className="stock-chip low">

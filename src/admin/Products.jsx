@@ -8,6 +8,8 @@ const EMPTY = {
   name: '',
   description: '',
   price: '',
+  compare_at_price: '',
+  installments: '',
   category_id: '',
   image_url: '',
   images: [],
@@ -107,6 +109,8 @@ export default function Products() {
       images: editing.images || [],
       stock: editing.stock === '' || editing.stock === null ? null : Number(editing.stock),
       is_active: editing.is_active,
+      compare_at_price: editing.compare_at_price ? Number(editing.compare_at_price) : null,
+      installments: editing.installments ? Number(editing.installments) : null,
     }
     if (editing.id) {
       await supabase.from('products').update(row).eq('id', editing.id)
@@ -193,6 +197,26 @@ export default function Products() {
                   onChange={(e) => setEditing({ ...editing, price: e.target.value })}
                 />
               </label>
+              <label>
+  Precio de lista (opcional)
+  <input
+    type="number"
+    inputMode="decimal"
+    value={editing.compare_at_price}
+    onChange={(e) => setEditing({ ...editing, compare_at_price: e.target.value })}
+    placeholder="Para mostrar tachado arriba del precio real"
+  />
+</label>
+<label>
+  Cuotas sin interés (opcional)
+  <input
+    type="number"
+    inputMode="numeric"
+    value={editing.installments}
+    onChange={(e) => setEditing({ ...editing, installments: e.target.value })}
+    placeholder="Ej: 3 — vacío = no se muestra"
+  />
+</label>
               <label>
                 Categoría
                 <select
@@ -345,7 +369,8 @@ export default function Products() {
               </small>
             </div>
             <div className="row-actions">
-              <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [] })}>
+              <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [],compare_at_price: p.compare_at_price != null ? String(p.compare_at_price) : '',
+installments: p.installments != null ? String(p.installments) : '', })}>
                 Editar
               </button>
               <button className="link" onClick={() => setEditingMods(p)}>
