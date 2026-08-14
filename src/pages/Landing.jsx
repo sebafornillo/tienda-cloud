@@ -161,25 +161,29 @@ function Embers({ count = 22 }) {
     </div>
   )
 }
-function LogoFootsteps({ src, count = 7 }) {
+function FootprintTrail({ count = 7 }) {
   const steps = Array.from({ length: count }, (_, i) => ({
     left: 6 + i * (88 / (count - 1)),
     top: i % 2 === 0 ? 0 : 40,
+    mirrored: i % 2 === 0,
   }))
   return (
     <div className="l-footprints" aria-hidden="true">
       {steps.map((s, i) => (
-        <img
+        <span
           key={i}
-          src={src}
-          alt=""
-          className="reveal l-footprint-logo"
-          style={{
-            left: `${s.left}%`,
-            top: `${s.top}px`,
-            transitionDelay: `${1000 + i * 280}ms`,
-          }}
-        />
+          className="reveal l-footprint-icon"
+          style={{ left: `${s.left}%`, top: `${s.top}px`, transitionDelay: `${1000 + i * 280}ms` }}
+        >
+          <svg viewBox="0 0 60 140" style={s.mirrored ? { transform: 'scaleX(-1)' } : undefined}>
+            <ellipse cx="30" cy="90" rx="20" ry="40" />
+            <circle cx="14" cy="22" r="7.5" />
+            <circle cx="27" cy="12" r="8" />
+            <circle cx="40" cy="14" r="7" />
+            <circle cx="51" cy="22" r="6" />
+            <circle cx="58" cy="34" r="5" />
+          </svg>
+        </span>
       ))}
     </div>
   )
@@ -432,7 +436,7 @@ export default function Landing() {
         <div className="reveal">
         {logo && themeClass !== 'theme-epic' && <img className="l-footer-logo" src={logo} alt="" />}
 <h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
-{L.footer_footsteps && logo && <LogoFootsteps src={logo} count={5} />}
+{L.footer_footsteps && <FootprintTrail count={5} />}
           <Link to="/tienda" className="l-cta">
             Comprar ahora
           </Link>
@@ -451,7 +455,7 @@ export default function Landing() {
               </a>
             )}
           </div>
-          {L.footer_footsteps && logo && <LogoFootsteps src={logo} />}
+          {L.footer_footsteps && <FootprintTrail count={7} />}
           <p className="l-credit">
             Tienda creada con <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">Fornistore</a>
           </p>
