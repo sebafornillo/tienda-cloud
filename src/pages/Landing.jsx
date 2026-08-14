@@ -161,7 +161,7 @@ function Embers({ count = 22 }) {
     </div>
   )
 }
-function FootprintTrail({ count = 7 }) {
+function FootprintTrail({ src, count = 7 }) {
   const steps = Array.from({ length: count }, (_, i) => ({
     left: 6 + i * (88 / (count - 1)),
     top: i % 2 === 0 ? 0 : 40,
@@ -170,27 +170,22 @@ function FootprintTrail({ count = 7 }) {
   return (
     <div className="l-footprints" aria-hidden="true">
       {steps.map((s, i) => (
-        <span
+        <img
           key={i}
+          src={src}
+          alt=""
           className="reveal l-footprint-icon"
-          style={{ left: `${s.left}%`, top: `${s.top}px`, transitionDelay: `${1000 + i * 280}ms` }}
-        >
-         <svg viewBox="0 0 70 200" style={s.mirrored ? { transform: 'scaleX(-1)' } : undefined}>
-  <path d="M30,8 C13,8 6,26 8,48 C10,63 19,68 17,86 C15,104 4,116 4,142
-           C4,172 13,196 34,196 C55,196 64,175 64,148 C64,124 54,114 54,94
-           C54,76 61,62 59,42 C57,22 48,8 30,8 Z" />
-  <ellipse cx="14" cy="9" rx="9.5" ry="12" transform="rotate(-8 14 9)" />
-  <ellipse cx="28" cy="3" rx="7.5" ry="10" transform="rotate(-3 28 3)" />
-  <ellipse cx="41" cy="2" rx="6.5" ry="9" />
-  <ellipse cx="52" cy="5" rx="5.5" ry="8" transform="rotate(6 52 5)" />
-  <ellipse cx="61" cy="12" rx="4.5" ry="6.5" transform="rotate(14 61 12)" />
-</svg>
-        </span>
+          style={{
+            left: `${s.left}%`,
+            top: `${s.top}px`,
+            transitionDelay: `${1000 + i * 280}ms`,
+            transform: s.mirrored ? 'scaleX(-1)' : undefined,
+          }}
+        />
       ))}
     </div>
   )
 }
-
 export default function Landing() {
   const { tenant } = useTenant()
   const s = tenant.settings || {}
@@ -438,7 +433,7 @@ export default function Landing() {
         <div className="reveal">
         {logo && themeClass !== 'theme-epic' && <img className="l-footer-logo" src={logo} alt="" />}
 <h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
-{L.footer_footsteps && <FootprintTrail count={5} />}
+{L.footer_footsteps && <FootprintTrail src="https://mlotgobakmgcftgggvgd.supabase.co/storage/v1/object/public/products/landing-dejandohuellas/d439a329-7af6-4b6a-b87d-5e95dcc7d702.png" count={5} />}
           <Link to="/tienda" className="l-cta">
             Comprar ahora
           </Link>
@@ -457,7 +452,7 @@ export default function Landing() {
               </a>
             )}
           </div>
-          {L.footer_footsteps && <FootprintTrail count={7} />}
+          {L.footer_footsteps && <FootprintTrail src="https://mlotgobakmgcftgggvgd.supabase.co/storage/v1/object/public/products/landing-dejandohuellas/d439a329-7af6-4b6a-b87d-5e95dcc7d702.png" count={7} />}
           <p className="l-credit">
             Tienda creada con <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">Fornistore</a>
           </p>
