@@ -171,17 +171,20 @@ export default function ProductModal({
           {product.description && <p className="desc">{product.description}</p>}
 
           <div className="modal-price-row">
-  <span className="modal-price">{money(product.price)}</span>
   {product.compare_at_price && (
     <span className="modal-compare">{money(product.compare_at_price)}</span>
   )}
+  <span className="modal-price">
+    {money(product.price)}
+    {product.compare_at_price && <small className="transfer-label"> con transferencia bancaria</small>}
+  </span>
 </div>
 {product.installments > 0 && (
   <p className="modal-installments">
-    {product.installments}x {money(product.price / product.installments)} sin interés
+    {product.installments} cuotas sin interés de{' '}
+    {money((product.compare_at_price || product.price) / product.installments)}
   </p>
 )}
-
           {loading && <p className="desc">Cargando opciones…</p>}
 
           {maxQty !== Infinity && maxQty <= 5 && (

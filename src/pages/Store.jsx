@@ -167,22 +167,26 @@ export default function Store() {
           <h3>{highlight(p.name, q)}</h3>
           {p.description && <p>{highlight(p.description, q)}</p>}
           <div className="price-row">
-            <span className="price">{money(p.price)}</span>
-            {p.compare_at_price && (
-              <span className="compare">{money(p.compare_at_price)}</span>
-            )}
-            {p.installments > 0 && (
-  <span className="installments">
-    {p.installments}x {money(p.price / p.installments)} sin interés
+  {p.compare_at_price && (
+    <span className="compare">{money(p.compare_at_price)}</span>
+  )}
+  <span className="price">
+    {money(p.price)}
+    {p.compare_at_price && <small className="transfer-label"> con transferencia bancaria</small>}
   </span>
-)}
-            {out && <span className="stock-chip out">Sin stock</span>}
-            {low && (
-              <span className="stock-chip low">
-                ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
-              </span>
-            )}
-          </div>
+  {p.installments > 0 && (
+    <span className="installments-box">
+      {p.installments} cuotas sin interés de{' '}
+      {money((p.compare_at_price || p.price) / p.installments)}
+    </span>
+  )}
+  {out && <span className="stock-chip out">Sin stock</span>}
+  {low && (
+    <span className="stock-chip low">
+      ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
+    </span>
+  )}
+</div>
         </div>
         {p.image_url && <img src={p.image_url} alt={p.name} />}
       </button>

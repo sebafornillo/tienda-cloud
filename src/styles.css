@@ -175,7 +175,16 @@ img { display: block; }
 .price-row { margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: baseline; }
 .price { font-weight: 700; }
 .compare { color: var(--ink-soft); text-decoration: line-through; font-size: 0.85rem; }
-.installments { display: block; font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.15rem; }
+.transfer-label { font-size: 0.7rem; font-weight: 500; color: var(--ink-soft); }
+.installments-box {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
 .modal-price-row { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.4rem 0; }
 .modal-price { font-size: 1.4rem; font-weight: 700; }
 .modal-compare { text-decoration: line-through; color: var(--ink-soft); }
