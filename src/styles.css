@@ -162,7 +162,10 @@ img { display: block; }
   border-radius: 10px;
   flex-shrink: 0;
 }
-.product-info h3 { font-size: 1rem; font-family: var(--font-body); font-weight: 600; }
+.product-info {
+  min-width: 0;
+  flex: 1;
+}
 .product-info p {
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
@@ -172,7 +175,7 @@ img { display: block; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.price-row { margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: baseline; }
+.price-row { margin-top: 0.4rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
 .price { font-weight: 700; }
 .compare { color: var(--ink-soft); text-decoration: line-through; font-size: 0.85rem; }
 .transfer-label { font-size: 0.7rem; font-weight: 500; color: var(--ink-soft); }
