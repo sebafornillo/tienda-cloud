@@ -2590,3 +2590,10 @@ img { display: block; }
 @media (prefers-reduced-motion: reduce) {
   .landing .l-footprint-icon { opacity: 0.6; transform: none; transition: none; }
 }
+
+.transfer-discount {
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand);
+}

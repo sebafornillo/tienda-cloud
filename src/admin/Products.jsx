@@ -10,6 +10,7 @@ const EMPTY = {
   price: '',
   compare_at_price: '',
   installments: '',
+  transfer_discount_percent: '',
   category_id: '',
   image_url: '',
   images: [],
@@ -111,6 +112,9 @@ export default function Products() {
       is_active: editing.is_active,
       compare_at_price: editing.compare_at_price ? Number(editing.compare_at_price) : null,
       installments: editing.installments ? Number(editing.installments) : null,
+      compare_at_price: editing.compare_at_price ? Number(editing.compare_at_price) : null,
+installments: editing.installments ? Number(editing.installments) : null,
+transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.transfer_discount_percent) : null,
     }
     if (editing.id) {
       await supabase.from('products').update(row).eq('id', editing.id)
@@ -369,10 +373,9 @@ export default function Products() {
               </small>
             </div>
             <div className="row-actions">
-              <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [],compare_at_price: p.compare_at_price != null ? String(p.compare_at_price) : '',
-installments: p.installments != null ? String(p.installments) : '', })}>
-                Editar
-              </button>
+            <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [], compare_at_price: p.compare_at_price != null ? String(p.compare_at_price) : '', installments: p.installments != null ? String(p.installments) : '', transfer_discount_percent: p.transfer_discount_percent != null ? String(p.transfer_discount_percent) : '' })}>
+  Editar
+</button>
               <button className="link" onClick={() => setEditingMods(p)}>
                 Opciones
               </button>
