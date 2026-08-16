@@ -221,6 +221,16 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
     placeholder="Ej: 3 — vacío = no se muestra"
   />
 </label>
+<label>
+  % descuento por transferencia (opcional)
+  <input
+    type="number"
+    inputMode="numeric"
+    value={editing.transfer_discount_percent}
+    onChange={(e) => setEditing({ ...editing, transfer_discount_percent: e.target.value })}
+    placeholder="Ej: 10 — vacío = no se muestra"
+  />
+</label>
               <label>
                 Categoría
                 <select
