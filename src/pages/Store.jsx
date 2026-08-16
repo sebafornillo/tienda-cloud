@@ -168,12 +168,6 @@ export default function Store() {
           {p.description && <p>{highlight(p.description, q)}</p>}
           <div className="price-row">
   <span className="price">{money(p.price)}</span>
-  {p.installments > 0 && (
-    <span className="installments-box">
-      {p.installments} cuotas sin interés de{' '}
-      {money(p.price / p.installments)}
-    </span>
-  )}
   {out && <span className="stock-chip out">Sin stock</span>}
   {low && (
     <span className="stock-chip low">
@@ -184,6 +178,12 @@ export default function Store() {
 {p.transfer_discount_percent > 0 && (
   <p className="transfer-discount">
     {p.transfer_discount_percent}% con transferencia bancaria: {money(p.price * (1 - p.transfer_discount_percent / 100))}
+  </p>
+)}
+{p.installments > 0 && (
+  <p className="installments-box">
+    {p.installments} cuotas sin interés de{' '}
+    {money(p.price / p.installments)}
   </p>
 )}
         </div>

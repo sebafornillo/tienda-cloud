@@ -173,6 +173,11 @@ export default function ProductModal({
           <div className="modal-price-row">
   <span className="modal-price">{money(product.price)}</span>
 </div>
+{product.transfer_discount_percent > 0 && (
+  <p className="transfer-discount">
+    {product.transfer_discount_percent}% con transferencia bancaria: {money(product.price * (1 - product.transfer_discount_percent / 100))}
+  </p>
+)}
 {product.installments > 0 && (
   <p className="modal-installments">
     {product.installments} cuotas sin interés de{' '}
