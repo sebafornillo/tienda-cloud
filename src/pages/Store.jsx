@@ -167,17 +167,11 @@ export default function Store() {
           <h3>{highlight(p.name, q)}</h3>
           {p.description && <p>{highlight(p.description, q)}</p>}
           <div className="price-row">
-  {p.compare_at_price && (
-    <span className="compare">{money(p.compare_at_price)}</span>
-  )}
-  <span className="price">
-    {money(p.price)}
-    {p.compare_at_price && <small className="transfer-label"> con transferencia bancaria</small>}
-  </span>
+  <span className="price">{money(p.price)}</span>
   {p.installments > 0 && (
     <span className="installments-box">
       {p.installments} cuotas sin interés de{' '}
-      {money((p.compare_at_price || p.price) / p.installments)}
+      {money(p.price / p.installments)}
     </span>
   )}
   {out && <span className="stock-chip out">Sin stock</span>}
@@ -187,6 +181,11 @@ export default function Store() {
     </span>
   )}
 </div>
+{p.transfer_discount_percent > 0 && (
+  <p className="transfer-discount">
+    {p.transfer_discount_percent}% con transferencia bancaria: {money(p.price * (1 - p.transfer_discount_percent / 100))}
+  </p>
+)}
         </div>
         {p.image_url && <img src={p.image_url} alt={p.name} />}
       </button>
