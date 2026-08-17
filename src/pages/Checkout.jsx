@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
 import { isStoreOpen, nextOpening } from '../lib/schedule'
+import { useState, useMemo } from 'react'
 
 export default function Checkout() {
   const { tenant } = useTenant()
@@ -33,13 +34,20 @@ export default function Checkout() {
   const [confirmCancel, setConfirmCancel] = useState(false)
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
-    ? tenant.settings.delivery_zones
-    : []
-  const selectedZone =
-    form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
-  const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
-  const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
-  const total = Math.max(0, subtotal + deliveryFee - discount)
+  ? tenant.settings.delivery_zones
+  : []
+const selectedZone =
+  form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
+const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
+const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
+const transferDiscount = useMemo(() => {
+  if (form.payment_method !== 'transfer') return 0
+  return items.reduce((s, i) => {
+    const pct = Number(i.product.transfer_discount_percent) || 0
+    return pct > 0 ? s + i.unitPrice * i.quantity * (pct / 100) : s
+  }, 0)
+}, [items, form.payment_method])
+const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
 
   async function copyAlias() {
     try {
