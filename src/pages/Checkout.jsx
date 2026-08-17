@@ -162,10 +162,21 @@ export default function Checkout() {
 
   return (
     <div className="checkout">
-      <header className="page-header">
-        <Link to="/" className="back">← {tenant.name}</Link>
-        <h1>Tu pedido</h1>
-      </header>
+    <header className="page-header">
+  <Link to="/" className="back">← {tenant.name}</Link>
+  <h1>Tu pedido</h1>
+  <button
+    className="link danger"
+    onClick={() => {
+      if (window.confirm('¿Cancelar el pedido y vaciar el carrito?')) {
+        clear()
+        navigate('/')
+      }
+    }}
+  >
+    Cancelar pedido
+  </button>
+</header>
 
       <ul className="cart-items">
         {items.map((i) => (
