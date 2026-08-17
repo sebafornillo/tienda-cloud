@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
 import { isStoreOpen, nextOpening } from '../lib/schedule'
-import { useState, useMemo } from 'react'
+
 
 export default function Checkout() {
   const { tenant } = useTenant()
