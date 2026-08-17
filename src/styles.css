@@ -2637,3 +2637,9 @@ img { display: block; }
 .confirm-modal { max-width: 340px; }
 .confirm-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; align-items: center; }
 .btn-primary.danger { background: #c0392b; }
+
+.coupon-disabled-note {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  padding: 0.6rem 0;
+}

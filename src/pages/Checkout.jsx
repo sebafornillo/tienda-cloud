@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useTenant } from '../lib/TenantContext'
@@ -48,6 +48,13 @@ const transferDiscount = useMemo(() => {
   }, 0)
 }, [items, form.payment_method])
 const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
+
+useEffect(() => {
+  if (form.payment_method === 'transfer' && transferDiscount > 0 && coupon) {
+    setCoupon(null)
+    setCouponError(null)
+  }
+}, [form.payment_method, transferDiscount])
 
   async function copyAlias() {
     try {
@@ -320,37 +327,43 @@ const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
         )}
       </div>
 
-      <div className="coupon-box">
-        {coupon ? (
-          <div className="coupon-applied">
-            <span className="coupon-tag">🎟 {coupon.code}</span>
-            <span>{coupon.label} · −{money(discount)}</span>
-            <button
-              className="link danger"
-              onClick={() => { setCoupon(null); setCouponError(null) }}
-            >
-              Quitar
-            </button>
-          </div>
-        ) : (
-          <div className="coupon-input-row">
-            <input
-              placeholder="¿Tenés un cupón?"
-              value={couponInput}
-              onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-            />
-            <button
-              className="btn-small"
-              disabled={!couponInput.trim() || checkingCoupon}
-              onClick={applyCoupon}
-            >
-              {checkingCoupon ? '…' : 'Aplicar'}
-            </button>
-          </div>
-        )}
-        {couponError && <p className="error">{couponError}</p>}
+      {form.payment_method === 'transfer' && transferDiscount > 0 ? (
+  <p className="coupon-disabled-note">
+    Los cupones no se pueden combinar con el descuento por transferencia.
+  </p>
+) : (
+  <div className="coupon-box">
+    {coupon ? (
+      <div className="coupon-applied">
+        <span className="coupon-tag">🎟 {coupon.code}</span>
+        <span>{coupon.label} · −{money(discount)}</span>
+        <button
+          className="link danger"
+          onClick={() => { setCoupon(null); setCouponError(null) }}
+        >
+          Quitar
+        </button>
       </div>
+    ) : (
+      <div className="coupon-input-row">
+        <input
+          placeholder="¿Tenés un cupón?"
+          value={couponInput}
+          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+          onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+        />
+        <button
+          className="btn-small"
+          disabled={!couponInput.trim() || checkingCoupon}
+          onClick={applyCoupon}
+        >
+          {checkingCoupon ? '…' : 'Aplicar'}
+        </button>
+      </div>
+    )}
+    {couponError && <p className="error">{couponError}</p>}
+  </div>
+)}
 
 
       <div className="totals">
