@@ -201,16 +201,7 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
                   onChange={(e) => setEditing({ ...editing, price: e.target.value })}
                 />
               </label>
-              <label>
-  Precio de lista (opcional)
-  <input
-    type="number"
-    inputMode="decimal"
-    value={editing.compare_at_price}
-    onChange={(e) => setEditing({ ...editing, compare_at_price: e.target.value })}
-    placeholder="Para mostrar tachado arriba del precio real"
-  />
-</label>
+  
 <label>
   Cuotas sin interés (opcional)
   <input
