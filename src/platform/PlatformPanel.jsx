@@ -103,18 +103,22 @@ function Dashboard() {
   const [editDomain, setEditDomain] = useState(null) // tenant | null
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState(null)
+  const [changeRequests, setChangeRequests] = useState([])
+  const [changesFor, setChangesFor] = useState(null) // tenant | null
 
   async function load() {
-    const [t, o] = await Promise.all([
+    const [t, o, cr] = await Promise.all([
       supabase.from('tenants').select('*').order('created_at', { ascending: false }),
       supabase
         .from('orders')
         .select('tenant_id, total, status, created_at')
         .gte('created_at', new Date(Date.now() - 30 * 86400000).toISOString())
         .limit(5000),
+      supabase.from('landing_requests').select('*').order('created_at', { ascending: false }),
     ])
     setTenants(t.data || [])
     setOrders(o.data || [])
+    setChangeRequests(cr.data || [])
   }
 
   useEffect(() => {
@@ -133,6 +137,15 @@ function Dashboard() {
     }
     return map
   }, [orders])
+
+  const pendingByTenant = useMemo(() => {
+    const map = new Map()
+    for (const r of changeRequests) {
+      if (r.status !== 'pending') continue
+      map.set(r.tenant_id, (map.get(r.tenant_id) || 0) + 1)
+    }
+    return map
+  }, [changeRequests])
 
   const totals = useMemo(() => {
     let orders30 = 0
@@ -293,6 +306,11 @@ function Dashboard() {
                   <small>últimos 30 días</small>
                 </div>
                 <div className="tenant-actions">
+                {pendingByTenant.get(t.id) > 0 && (
+  <button className="link changes-badge" onClick={() => setChangesFor(t)}>
+    🔔 {pendingByTenant.get(t.id)} cambio{pendingByTenant.get(t.id) > 1 ? 's' : ''}
+  </button>
+)}
                   <a
                     className="link"
                     href={`https://${t.subdomain}.${BASE_DOMAIN}/admin/login`}
@@ -448,6 +466,42 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+{changesFor && (
+  <div className="modal-backdrop" onClick={() => setChangesFor(null)}>
+    <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-body">
+        <h2>Cambios pedidos por {changesFor.name}</h2>
+        <ul className="change-request-list">
+          {changeRequests
+            .filter((r) => r.tenant_id === changesFor.id)
+            .map((r) => (
+              <li key={r.id}>
+                <strong>{r.section_label}</strong>
+                <p>{r.message}</p>
+                <small>{new Date(r.created_at).toLocaleDateString('es-AR')}</small>
+                <select
+                  value={r.status}
+                  onChange={async (e) => {
+                    await supabase
+                      .from('landing_requests')
+                      .update({ status: e.target.value })
+                      .eq('id', r.id)
+                    load()
+                  }}
+                >
+                  <option value="pending">Pendiente</option>
+                  <option value="in_progress">En proceso</option>
+                  <option value="done">Hecho</option>
+                </select>
+              </li>
+            ))}
+        </ul>
+      </div>
+      <button className="modal-close" onClick={() => setChangesFor(null)} aria-label="Cerrar">✕</button>
+    </div>
+  </div>
+)}
     </div>
   )
 }
