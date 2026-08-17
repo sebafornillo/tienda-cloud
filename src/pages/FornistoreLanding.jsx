@@ -1658,22 +1658,23 @@ export default function FornistoreLanding() {
               </div>
               <p className="fs-plan-setup">+ $90.000 por única vez</p>
               <ul>
-                <li>Todo lo del plan Tienda Online</li>
-                <li>Landing de marca diseñada a medida</li>
-                <li>Animaciones y fotografía optimizada</li>
-                <li>Tu historia, tu colección, tus productos</li>
-                <li>
-                  Mirá{' '}
-                  <a
-                    href="https://rinconmatero.fornistore.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="fs-plan-proof"
-                  >
-                    la página web y la tienda de Rincón Matero →
-                  </a>
-                </li>
-              </ul>
+  <li>Todo lo del plan Tienda Online</li>
+  <li>Landing de marca diseñada a medida</li>
+  <li>Animaciones y fotografía optimizada</li>
+  <li>Tu historia, tu colección, tus productos</li>
+  <li>Pedí cambios en tu página cuando quieras, sin escribirnos por WhatsApp</li>
+  <li>
+    Mirá{' '}
+    <a
+      href="https://dejandohuellas.fornistore.com"
+      target="_blank"
+      rel="noreferrer"
+      className="fs-plan-proof"
+    >
+      la página web y la tienda de Dejando Huellas →
+    </a>
+  </li>
+</ul>
               <a
                 className="fs-plan-cta"
                 href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Me interesa la Tienda + Landing Premium de Fornistore ✨')}`}
