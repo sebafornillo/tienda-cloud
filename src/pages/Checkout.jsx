@@ -354,9 +354,13 @@ const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
 
       <div className="totals">
         <div><span>Subtotal</span><span>{money(subtotal)}</span></div>
+        {transferDiscount > 0 && (
+  <div className="discount-row"><span>Descuento por transferencia</span><span>−{money(transferDiscount)}</span></div>
+)}
         {deliveryFee > 0 && <div><span>Envío</span><span>{money(deliveryFee)}</span></div>}
         {discount > 0 && (
           <div className="discount-row"><span>Cupón {coupon.code}</span><span>−{money(discount)}</span></div>
+          
         )}
         <div className="grand"><span>Total</span><span>{money(total)}</span></div>
       </div>
