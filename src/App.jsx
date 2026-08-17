@@ -17,6 +17,7 @@ import StockPanel from './admin/StockPanel'
 import FornistoreLanding from './pages/FornistoreLanding'
 import LoadingScreen from './components/LoadingScreen'
 import Customers from './admin/Customers'
+import Cambios from './admin/Cambios'
 
 export default function App() {
   const { tenant, loading, error } = useTenant()
@@ -70,6 +71,7 @@ export default function App() {
         <Route path="config" element={<Settings />} />
         <Route path="stock" element={<StockPanel />} />
         <Route path="clientes" element={<Customers />} />
+        <Route path="cambios" element={<Cambios />} />
       </Route>
     </Routes>
   )
