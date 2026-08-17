@@ -184,11 +184,7 @@ export default function ProductModal({
     {money(product.price / product.installments)}
   </p>
 )}
-{product.transfer_discount_percent > 0 && (
-  <p className="transfer-discount">
-    {product.transfer_discount_percent}% con transferencia bancaria: {money(product.price * (1 - product.transfer_discount_percent / 100))}
-  </p>
-)}
+
           {loading && <p className="desc">Cargando opciones…</p>}
 
           {maxQty !== Infinity && maxQty <= 5 && (
