@@ -2611,3 +2611,25 @@ img { display: block; }
   cursor: pointer;
 }
 .cart-item-remove:hover { color: #c0392b; }
+
+.page-header .danger {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.cart-item-remove {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  padding: 0.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cart-item-remove:hover { color: #c0392b; }
