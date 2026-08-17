@@ -352,6 +352,7 @@ const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
         {couponError && <p className="error">{couponError}</p>}
       </div>
 
+
       <div className="totals">
         <div><span>Subtotal</span><span>{money(subtotal)}</span></div>
         {transferDiscount > 0 && (
