@@ -180,20 +180,27 @@ export default function Checkout() {
 
       <ul className="cart-items">
         {items.map((i) => (
-          <li key={i.key}>
-            <div className="cart-item-info">
-              <strong>{i.product.name}</strong>
-              {i.modifiers.length > 0 && (
-                <small>{i.modifiers.map((m) => m.name).join(', ')}</small>
-              )}
-              <span>{money(i.unitPrice * i.quantity)}</span>
-            </div>
-            <div className="qty">
-              <button onClick={() => updateQty(i.key, i.quantity - 1)} aria-label="Restar">−</button>
-              <span>{i.quantity}</span>
-              <button onClick={() => updateQty(i.key, i.quantity + 1)} aria-label="Sumar">+</button>
-            </div>
-          </li>
+       <li key={i.key}>
+       <div className="cart-item-info">
+         <strong>{i.product.name}</strong>
+         {i.modifiers.length > 0 && (
+           <small>{i.modifiers.map((m) => m.name).join(', ')}</small>
+         )}
+         <span>{money(i.unitPrice * i.quantity)}</span>
+       </div>
+       <div className="qty">
+         <button onClick={() => updateQty(i.key, i.quantity - 1)} aria-label="Restar">−</button>
+         <span>{i.quantity}</span>
+         <button onClick={() => updateQty(i.key, i.quantity + 1)} aria-label="Sumar">+</button>
+       </div>
+       <button
+         className="cart-item-remove"
+         onClick={() => updateQty(i.key, 0)}
+         aria-label="Quitar producto"
+       >
+         ✕
+       </button>
+     </li>
         ))}
       </ul>
 
