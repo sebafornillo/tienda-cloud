@@ -894,8 +894,8 @@ export default function FornistoreLanding() {
         .fs-chat.right {
           align-self: flex-end;
           border-radius: 14px 14px 4px 14px;
-          background: #e7f6e2;
-          border-color: #cfe8c6;
+          background: #fff;
+          border-color: #e8e2d2;
         }
         .fs-pain-punch {
           font-size: 1.1rem;
@@ -1558,7 +1558,7 @@ export default function FornistoreLanding() {
       <section className="fs-pain">
         <div className="fs-pain-inner">
           <span className="fs-kicker fs-reveal">¿Te suena?</span>
-          <h2 className="fs-reveal">Vender por WhatsApp era gratis.<br />Hasta que empezaste a vender.</h2>
+          <h2 className="fs-reveal">Tu negocio creció.<br />Tu WhatsApp, no.</h2>
           <div className="fs-pain-chats" aria-hidden="true">
             <div className="fs-chat fs-reveal">Hola! ¿Tenés stock del grande?</div>
             <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.15s' }}>¿Me pasás el CBU de nuevo?</div>
@@ -1566,11 +1566,10 @@ export default function FornistoreLanding() {
             <div className="fs-chat right fs-reveal" style={{ transitionDelay: '0.5s' }}>Perdón!! Se me traspapeló 🙏</div>
           </div>
           <p className="fs-pain-punch fs-reveal">
-            Pedidos perdidos entre 40 chats, transferencias que hay que verificar a mano,
-            el "¿tenés stock?" repetido veinte veces por día. <strong>Tu negocio creció;
-            tu herramienta no.</strong> Fornistore ordena todo eso: catálogo, pago y
-            pedidos en un solo lugar, con tu marca.
-          </p>
+  Pedidos perdidos entre 40 chats, transferencias que hay que verificar a mano,
+  el "¿tenés stock?" repetido veinte veces por día. Fornistore ordena todo eso:
+  catálogo, pago y pedidos en un solo lugar, con tu marca.
+</p>
         </div>
       </section>
 
