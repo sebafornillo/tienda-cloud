@@ -306,12 +306,14 @@ function Dashboard() {
                   <small>últimos 30 días</small>
                 </div>
                 <div className="tenant-actions">
-                {pendingByTenant.get(t.id) > 0 && (
-  <button className="link changes-badge" onClick={() => setChangesFor(t)}>
-    🔔 {pendingByTenant.get(t.id)} cambio{pendingByTenant.get(t.id) > 1 ? 's' : ''}
-  </button>
-)}
-                  <a
+                <button
+  className={pendingByTenant.get(t.id) > 0 ? 'link changes-badge' : 'link'}
+  onClick={() => setChangesFor(t)}
+>
+  {pendingByTenant.get(t.id) > 0
+    ? `🔔 ${pendingByTenant.get(t.id)} cambio${pendingByTenant.get(t.id) > 1 ? 's' : ''}`
+    : 'Cambios'}
+</button>             <a
                     className="link"
                     href={`https://${t.subdomain}.${BASE_DOMAIN}/admin/login`}
                     target="_blank"
