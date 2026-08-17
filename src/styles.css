@@ -2633,3 +2633,7 @@ img { display: block; }
   flex-shrink: 0;
 }
 .cart-item-remove:hover { color: #c0392b; }
+
+.confirm-modal { max-width: 340px; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; align-items: center; }
+.btn-primary.danger { background: #c0392b; }

@@ -30,6 +30,7 @@ export default function Checkout() {
   const transferHolder = tenant.settings?.transfer_holder
   const storeOpen = isStoreOpen(tenant.settings?.schedule)
   const opensAt = storeOpen ? null : nextOpening(tenant.settings?.schedule)
+  const [confirmCancel, setConfirmCancel] = useState(false)
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
     ? tenant.settings.delivery_zones
@@ -166,16 +167,11 @@ export default function Checkout() {
   <Link to="/" className="back">← {tenant.name}</Link>
   <h1>Tu pedido</h1>
   <button
-    className="link danger"
-    onClick={() => {
-      if (window.confirm('¿Cancelar el pedido y vaciar el carrito?')) {
-        clear()
-        navigate('/')
-      }
-    }}
-  >
-    Cancelar pedido
-  </button>
+  className="link danger"
+  onClick={() => setConfirmCancel(true)}
+>
+  Cancelar pedido
+</button>
 </header>
 
       <ul className="cart-items">
@@ -373,6 +369,28 @@ export default function Checkout() {
           ? `Pagar con Mercado Pago · ${money(total)}`
           : `Confirmar pedido · ${money(total)}`}
       </button>
+
+      {confirmCancel && (
+  <div className="modal-backdrop" onClick={() => setConfirmCancel(false)}>
+    <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-body">
+        <h2>¿Cancelar tu pedido?</h2>
+        <p className="desc">Se va a vaciar el carrito y vas a volver a la tienda.</p>
+        <div className="confirm-actions">
+          <button className="link" onClick={() => setConfirmCancel(false)}>
+            Seguir con mi pedido
+          </button>
+          <button
+            className="btn-primary danger"
+            onClick={() => { clear(); navigate('/') }}
+          >
+            Sí, cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   )
 }
