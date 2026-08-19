@@ -236,6 +236,9 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
               </label>
               <div className="photo-field">
                 <span className="field-label">Foto de portada</span>
+                <small className="hint">
+  Recomendado: foto cuadrada, fondo claro, producto centrado, menos de 500 KB — así se ve prolija en la tienda.
+</small>
                 <div className="photo-row">
                   {editing.image_url ? (
                     <img className="photo-preview" src={editing.image_url} alt="" />
@@ -267,6 +270,9 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
 
               <div className="photo-field">
                 <span className="field-label">Más fotos (galería)</span>
+                <small className="hint">
+  Recomendado: foto cuadrada, fondo claro, producto centrado, menos de 500 KB — así se ve prolija en la tienda.
+</small>
                 <div className="gallery-grid">
                   {(editing.images || []).map((url) => (
                     <div className="gallery-thumb" key={url}>
