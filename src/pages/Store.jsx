@@ -73,6 +73,15 @@ export default function Store() {
     load()
   }, [tenant.id])
 
+  // Si la URL trae ?p=ID, abre ese producto directo (para links compartidos en Instagram/WhatsApp)
+useEffect(() => {
+  const id = new URLSearchParams(window.location.search).get('p')
+  if (id && products.length > 0) {
+    const found = products.find((p) => p.id === id)
+    if (found) setSelected(found)
+  }
+}, [products])
+
   // Cupones públicos: los muestra el menú lateral
   useEffect(() => {
     supabase
