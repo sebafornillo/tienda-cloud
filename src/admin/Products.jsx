@@ -31,6 +31,28 @@ export default function Products() {
   const [editingMods, setEditingMods] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
 
+  async function processImage(file, { maxDim = 1200, quality = 0.82 } = {}) {
+    try {
+      const bitmap = await createImageBitmap(file)
+      let { width, height } = bitmap
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height)
+        width = Math.round(width * scale)
+        height = Math.round(height * scale)
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height)
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality))
+      if (!blob) return file // el navegador no soporta WebP: sube el original, no rompe nada
+      const newName = file.name.replace(/\.[^.]+$/, '') + '.webp'
+      return new File([blob], newName, { type: 'image/webp' })
+    } catch {
+      return file // cualquier error: sube el original tal cual, nunca bloquea la carga
+    }
+  }
+
   async function uploadToStorage(file) {
     const ext = file.name.split('.').pop().toLowerCase()
     const path = `${tenant.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
@@ -47,7 +69,8 @@ export default function Products() {
     if (!file) return
     setUploading(true)
     setUploadError(null)
-    const url = await uploadToStorage(file)
+    const processed = await processImage(file)
+    const url = await uploadToStorage(processed)
     if (!url) {
       setUploadError('No se pudo subir la imagen. Probá de nuevo.')
     } else {
@@ -62,7 +85,8 @@ export default function Products() {
     setUploadError(null)
     const urls = []
     for (const file of Array.from(files)) {
-      const url = await uploadToStorage(file)
+      const processed = await processImage(file)
+      const url = await uploadToStorage(processed)
       if (url) urls.push(url)
     }
     if (urls.length < files.length) {
