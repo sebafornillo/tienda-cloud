@@ -36,6 +36,18 @@ export default function App() {
         })
       )
     } catch {}
+  
+    // Favicon dinámico: usa el logo de la tienda si tiene, si no deja el de Fornistore
+    if (tenant.settings?.logo_url) {
+      let link = document.querySelector("link[rel='icon']")
+      if (!link) {
+        link = document.createElement('link')
+        link.rel = 'icon'
+        document.head.appendChild(link)
+      }
+      link.href = tenant.settings.logo_url
+    }
+    document.title = tenant.name
   }, [tenant])
 
   if (loading) return <LoadingScreen />
