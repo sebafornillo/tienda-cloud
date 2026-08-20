@@ -29,6 +29,7 @@ export default function Products() {
   const [uploadingGallery, setUploadingGallery] = useState(false)
   const [uploadError, setUploadError] = useState(null)
   const [editingMods, setEditingMods] = useState(null)
+  const [copiedId, setCopiedId] = useState(null)
 
   async function uploadToStorage(file) {
     const ext = file.name.split('.').pop().toLowerCase()
@@ -136,6 +137,17 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
     await supabase.from('products').delete().eq('id', p.id)
     load()
   }
+
+  
+
+async function copyProductLink(p) {
+  const url = `${window.location.origin}/tienda?p=${p.id}`
+  try {
+    await navigator.clipboard.writeText(url)
+    setCopiedId(p.id)
+    setTimeout(() => setCopiedId(null), 2000)
+  } catch {}
+}
 
   async function addCategory() {
     if (!newCat.trim()) return
@@ -380,6 +392,9 @@ transfer_discount_percent: editing.transfer_discount_percent ? Number(editing.tr
               </small>
             </div>
             <div className="row-actions">
+            <button className="link" onClick={() => copyProductLink(p)}>
+  {copiedId === p.id ? '✓ Copiado' : 'Copiar link'}
+</button>
             <button className="link" onClick={() => setEditing({ ...EMPTY, ...p, price: String(p.price), description: p.description || '', image_url: p.image_url || '', category_id: p.category_id || '', images: Array.isArray(p.images) ? p.images : [], compare_at_price: p.compare_at_price != null ? String(p.compare_at_price) : '', installments: p.installments != null ? String(p.installments) : '', transfer_discount_percent: p.transfer_discount_percent != null ? String(p.transfer_discount_percent) : '' })}>
   Editar
 </button>
