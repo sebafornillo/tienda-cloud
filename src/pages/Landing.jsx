@@ -215,6 +215,7 @@ export default function Landing() {
     'l-hero-logo',
     logoEntrance === 'bounce' ? 'bounce-in' : '',
     logoEntrance === 'reveal' ? 'reveal-in' : '',
+    L.logo_circular ? 'circular' : '',
   ].filter(Boolean).join(' ')
 
   const hero = L.hero_image || s.banner_url

@@ -860,6 +860,12 @@ img { display: block; }
   margin: 0 auto 1.5rem;
   filter: drop-shadow(0 8px 30px rgba(0,0,0,0.45));
 }
+
+.l-hero-logo.circular {
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+}
 /* Entrada opcional (opt-in por tenant vía settings.landing.logo_bounce) */
 .l-hero-logo.bounce-in {
   opacity: 0;
