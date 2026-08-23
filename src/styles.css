@@ -845,7 +845,7 @@ img { display: block; }
   background-size: cover;
   background-position: center;
   z-index: -2;
-  animation: heroZoom 4s ease-out forwards;
+  animation: heroZoom 8s ease-out forwards;
 }
 @keyframes heroZoom { from { transform: scale(1.12); } to { transform: scale(1); } }
 .l-hero-overlay {
