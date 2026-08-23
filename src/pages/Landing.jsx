@@ -282,6 +282,7 @@ export default function Landing() {
       backgroundImage: `url(${hero})`,
       backgroundPosition: L.hero_position || 'center',
       backgroundSize: L.hero_size || 'cover',
+      animationDuration: L.hero_zoom_seconds ? `${L.hero_zoom_seconds}s` : undefined,
     }}
   />
 )}
