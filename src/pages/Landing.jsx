@@ -275,10 +275,14 @@ export default function Landing() {
         </section>
       ) : (
         <section className="l-hero">
-       {hero && (
+{hero && (
   <div
     className="l-hero-bg"
-    style={{ backgroundImage: `url(${hero})`, backgroundPosition: L.hero_position || 'center' }}
+    style={{
+      backgroundImage: `url(${hero})`,
+      backgroundPosition: L.hero_position || 'center',
+      backgroundSize: L.hero_size || 'cover',
+    }}
   />
 )}
           <div className="l-hero-overlay" />
