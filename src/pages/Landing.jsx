@@ -431,8 +431,9 @@ export default function Landing() {
       {/* ---------- CIERRE ---------- */}
       {isDark && <div className="checker-strip" aria-hidden="true" />}
       <section className="l-footer">
-        <div className="reveal">
-        {logo && themeClass !== 'theme-epic' && <img className="l-footer-logo" src={logo} alt="" />}
+        <div className="reveal">{logo && themeClass !== 'theme-epic' && (
+  <img className={L.logo_circular ? 'l-footer-logo circular' : 'l-footer-logo'} src={logo} alt="" />
+)}
 <h2>{L.closing || `Sumate a ${tenant.name}`}</h2>
 {L.footer_footsteps && <FootprintTrail src="https://mlotgobakmgcftgggvgd.supabase.co/storage/v1/object/public/products/landing-dejandohuellas/d439a329-7af6-4b6a-b87d-5e95dcc7d702.png" count={5} />}
           <Link to="/tienda" className="l-cta">
