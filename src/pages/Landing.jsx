@@ -275,7 +275,12 @@ export default function Landing() {
         </section>
       ) : (
         <section className="l-hero">
-          {hero && <div className="l-hero-bg" style={{ backgroundImage: `url(${hero})` }} />}
+       {hero && (
+  <div
+    className="l-hero-bg"
+    style={{ backgroundImage: `url(${hero})`, backgroundPosition: L.hero_position || 'center' }}
+  />
+)}
           <div className="l-hero-overlay" />
           <div className="l-hero-content">
             {logo && <img className={logoClass} src={logo} alt={tenant.name} />}
