@@ -480,6 +480,9 @@ function Dashboard() {
             .map((r) => (
               <li key={r.id}>
                 <strong>{r.section_label}</strong>
+                {r.image_url && (
+    <img className="change-request-thumb" src={r.image_url} alt="" />
+  )}
                 <p>{r.message}</p>
                 <small>{new Date(r.created_at).toLocaleDateString('es-AR')}</small>
                 <select
