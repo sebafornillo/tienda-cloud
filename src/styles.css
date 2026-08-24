@@ -2674,6 +2674,26 @@ img { display: block; }
   box-sizing: border-box;
   margin-bottom: 0.6rem;
 }
+.change-photo-row { margin: 0.5rem 0 0.75rem; }
+.btn-upload.small { font-size: 0.82rem; padding: 0.4rem 0.8rem; }
+.change-photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.change-photo-preview img {
+  width: 56px; height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.change-request-thumb {
+  width: 100%;
+  max-width: 220px;
+  border-radius: 8px;
+  margin: 0.4rem 0;
+  display: block;
+}
 
 .change-request-list {
   list-style: none;

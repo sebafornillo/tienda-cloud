@@ -12,6 +12,8 @@ export default function Cambios() {
     : []
   const [requests, setRequests] = useState([])
   const [drafts, setDrafts] = useState({}) // section_key -> texto
+  const [images, setImages] = useState({}) // section_key -> url ya subida
+  const [uploadingImg, setUploadingImg] = useState(null) // section_key en subida
   const [sending, setSending] = useState(null)
 
   async function load() {
@@ -27,6 +29,22 @@ export default function Cambios() {
     load()
   }, [tenant.id])
 
+  async function uploadChangeImage(sectionKey, file) {
+    if (!file) return
+    setUploadingImg(sectionKey)
+    const ext = file.name.split('.').pop().toLowerCase()
+    const path = `${tenant.id}/changes/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const { error } = await supabase.storage.from('products').upload(path, file, {
+      cacheControl: '31536000',
+      upsert: false,
+    })
+    if (!error) {
+      const { data } = supabase.storage.from('products').getPublicUrl(path)
+      setImages((imgs) => ({ ...imgs, [sectionKey]: data.publicUrl }))
+    }
+    setUploadingImg(null)
+  }
+
   async function send(section) {
     const text = (drafts[section.key] || '').trim()
     if (!text) return
@@ -36,10 +54,12 @@ export default function Cambios() {
       section_key: section.key,
       section_label: section.label,
       message: text,
+      image_url: images[section.key] || null,
     })
     setSending(null)
     if (!error) {
       setDrafts((d) => ({ ...d, [section.key]: '' }))
+      setImages((imgs) => ({ ...imgs, [section.key]: null }))
       load()
     }
   }
@@ -64,8 +84,8 @@ export default function Cambios() {
     <div className="admin-page">
       <h1>Cambios en tu página</h1>
       <p className="desc">
-        Elegí la sección donde querés un cambio, contanos qué te gustaría y te avisamos
-        cuando esté listo.
+        Elegí la sección donde querés un cambio, contanos qué te gustaría (podés
+        adjuntar una foto de referencia si aplica) y te avisamos cuando esté listo.
       </p>
 
       {sections.map((s) => (
@@ -79,6 +99,33 @@ export default function Cambios() {
             value={drafts[s.key] || ''}
             onChange={(e) => setDrafts((d) => ({ ...d, [s.key]: e.target.value }))}
           />
+
+          <div className="change-photo-row">
+            {images[s.key] ? (
+              <div className="change-photo-preview">
+                <img src={images[s.key]} alt="" />
+                <button
+                  type="button"
+                  className="link danger"
+                  onClick={() => setImages((imgs) => ({ ...imgs, [s.key]: null }))}
+                >
+                  Quitar foto
+                </button>
+              </div>
+            ) : (
+              <label className="btn-upload small">
+                {uploadingImg === s.key ? 'Subiendo…' : '📎 Adjuntar foto (opcional)'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
+                  disabled={uploadingImg === s.key}
+                  onChange={(e) => uploadChangeImage(s.key, e.target.files?.[0])}
+                />
+              </label>
+            )}
+          </div>
+
           <button
             className="btn-primary"
             disabled={!drafts[s.key]?.trim() || sending === s.key}
@@ -94,6 +141,9 @@ export default function Cambios() {
                   <span className={`status-chip ${STATUS_CLASS[r.status]}`}>
                     {STATUS_LABEL[r.status]}
                   </span>
+                  {r.image_url && (
+                    <img className="change-request-thumb" src={r.image_url} alt="" />
+                  )}
                   <p>{r.message}</p>
                   <small>{new Date(r.created_at).toLocaleDateString('es-AR')}</small>
                 </li>
