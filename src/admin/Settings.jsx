@@ -129,8 +129,7 @@ export default function Settings() {
   async function save() {
     setSaving(true)
     setError(null)
-
-    // Si cargó un token nuevo de MP, se guarda en la tabla segura
+  
     if (mpToken.trim()) {
       const { error: secErr } = await supabase
         .from('tenant_secrets')
@@ -143,9 +142,23 @@ export default function Settings() {
       setMpConfigured(true)
       setMpToken('')
     }
-
+  
+    // Traemos el settings actual de la base (no el que quedó en memoria al
+    // cargar la página) para no pisar cambios hechos por SQL directo u otra
+    // pestaña mientras esta pantalla estaba abierta.
+    const { data: fresh, error: fetchErr } = await supabase
+      .from('tenants')
+      .select('settings')
+      .eq('id', tenant.id)
+      .single()
+    if (fetchErr) {
+      setError('No se pudo guardar. Probá de nuevo.')
+      setSaving(false)
+      return
+    }
+  
     const newSettings = {
-      ...tenant.settings,
+      ...fresh.settings,
       logo_url: form.logo_url || null,
       banner_url: form.banner_url || null,
       banners,
@@ -166,7 +179,7 @@ export default function Settings() {
     if (dbErr) {
       setError('No se pudo guardar. Probá de nuevo.')
     } else {
-      tenant.settings = newSettings // refleja el cambio en la sesión actual
+      tenant.settings = newSettings
       document.documentElement.style.setProperty('--brand', form.primary_color)
       setSaved(true)
     }
