@@ -1463,6 +1463,18 @@ export default function FornistoreLanding() {
           font-size: 0.8rem;
           color: #6b665a !important;
         }
+        .fs-final-ig {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 24px;
+          color: #b8b2a2;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 0.95rem;
+          transition: color 0.15s;
+        }
+        .fs-final-ig:hover { color: #f5efdf; }
       `}</style>
 
       <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
@@ -1701,26 +1713,35 @@ export default function FornistoreLanding() {
         </div>
       </section>
 
-      {/* ---------- CTA FINAL ---------- */}
-      <section className="fs-final">
-        <span className="fs-reveal" style={{ display: 'inline-block' }}>
-          <LogoF size={54} />
-        </span>
-        <h2 className="fs-reveal">Tu tienda puede estar vendiendo esta semana.</h2>
-        <p className="fs-reveal">Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
-        <a
-          className="fs-cta fs-reveal"
-          style={{ transitionDelay: '0.15s' }}
-          href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero arrancar con Fornistore 🚀')}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Hablemos por WhatsApp →
-        </a>
-        <p className="fs-final-foot">
-          Fornistore · Tiendas online para emprendedores · Santa Fe, Argentina
-        </p>
-      </section>
+ {/* ---------- CTA FINAL ---------- */}
+<section className="fs-final">
+  <span className="fs-reveal" style={{ display: 'inline-block' }}>
+    <LogoF size={54} />
+  </span>
+  <h2 className="fs-reveal">Tu tienda puede estar vendiendo esta semana.</h2>
+  <p className="fs-reveal">Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
+  <a
+    className="fs-cta fs-reveal"
+    style={{ transitionDelay: '0.15s' }}
+    href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero arrancar con Fornistore 🚀')}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    Hablemos por WhatsApp →
+  </a>
+  <a
+    className="fs-final-ig fs-reveal"
+    style={{ transitionDelay: '0.25s' }}
+    href="https://instagram.com/fornistore"
+    target="_blank"
+    rel="noreferrer"
+  >
+    <InstagramIcon /> @fornistore
+  </a>
+  <p className="fs-final-foot">
+    Fornistore · Tiendas online para emprendedores · Santa Fe, Argentina
+  </p>
+</section>
     </div>
   )
 }
