@@ -1396,12 +1396,11 @@ export default function FornistoreLanding() {
           padding-left: 22px;
           position: relative;
         }
-        .fs-plan li::before {
-          content: '✓';
-          position: absolute;
-          left: 0;
-          color: #1d9e75;
-          font-weight: 800;
+        .fs-plan li {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          padding-left: 0;
         }
         .fs-plan-proof {
           color: #23211b;
@@ -1646,66 +1645,68 @@ export default function FornistoreLanding() {
           <span className="fs-kicker fs-reveal">Simple y sin sorpresas</span>
           <h2 className="fs-reveal">Un precio que se paga solo</h2>
           <div className="fs-plans">
-            <div className="fs-plan fs-reveal from-left">
-              <h3>Tienda Online</h3>
-              <div className="fs-plan-price">
-                <strong>$35.000</strong>
-                <span>/mes</span>
-              </div>
-              <ul>
-                <li>Catálogo con fotos y categorías</li>
-                <li>Pedidos en tiempo real + WhatsApp</li>
-                <li>Cobros con Mercado Pago</li>
-                <li>Control de stock automático</li>
-                <li>Cupones de descuento</li>
-                <li>Panel de gestión completo</li>
-                <li>Tu subdominio: tunegocio.fornistore.com</li>
-              </ul>
-              <a
-                className="fs-plan-cta outline"
-                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero mi Tienda Online de Fornistore 🚀')}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Quiero mi tienda
-              </a>
-            </div>
-            <div className="fs-plan featured fs-reveal from-right" style={{ transitionDelay: '0.12s' }}>
-              <span className="fs-plan-tag">Para marcas que quieren impactar</span>
-              <h3>Tienda + Landing Premium</h3>
-              <div className="fs-plan-price">
-                <strong>$35.000</strong>
-                <span>/mes</span>
-              </div>
-              <p className="fs-plan-setup">+ $90.000 por única vez</p>
-              <ul>
-  <li>Todo lo del plan Tienda Online</li>
-  <li>Landing de marca diseñada a medida</li>
-  <li>Animaciones y fotografía optimizada</li>
-  <li>Tu historia, tu colección, tus productos</li>
-  <li>Pedí cambios en tu página cuando quieras, sin escribirnos por WhatsApp</li>
-  <li>
-    Mirá{' '}
+  <div className="fs-plan fs-reveal from-left">
+    <h3>Tienda Online</h3>
+    <div className="fs-plan-price">
+      <strong>$40.000</strong>
+      <span>/mes</span>
+    </div>
+    <ul>
+      <li>📦 Catálogo con fotos y categorías</li>
+      <li>💬 Pedidos en tiempo real + WhatsApp</li>
+      <li>💳 Cobros con Mercado Pago</li>
+      <li>📊 Control de stock automático</li>
+      <li>🎟️ Cupones de descuento</li>
+      <li>🛠️ Panel de gestión completo</li>
+      <li>🌐 Tu subdominio: tunegocio.fornistore.com</li>
+      <li>🔄 Actualizaciones y mejoras incluidas</li>
+      <li>🤝 Soporte directo, sin tickets ni esperas</li>
+    </ul>
     <a
-      href="https://dejandohuellas.fornistore.com"
+      className="fs-plan-cta outline"
+      href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero mi Tienda Online de Fornistore 🚀')}`}
       target="_blank"
       rel="noreferrer"
-      className="fs-plan-proof"
     >
-      la página web y la tienda de Dejando Huellas →
+      Quiero mi tienda
     </a>
-  </li>
-</ul>
-              <a
-                className="fs-plan-cta"
-                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Me interesa la Tienda + Landing Premium de Fornistore ✨')}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Quiero el combo
-              </a>
-            </div>
-          </div>
+  </div>
+  <div className="fs-plan featured fs-reveal from-right" style={{ transitionDelay: '0.12s' }}>
+    <span className="fs-plan-tag">Para marcas que quieren impactar</span>
+    <h3>Tienda + Landing Premium</h3>
+    <div className="fs-plan-price">
+      <strong>$40.000</strong>
+      <span>/mes</span>
+    </div>
+    <p className="fs-plan-setup">+ $90.000 por única vez</p>
+    <ul>
+      <li>✅ Todo lo del plan Tienda Online</li>
+      <li>🎨 Landing de marca diseñada a medida</li>
+      <li>🎬 Animaciones y fotografía optimizada</li>
+      <li>📖 Tu historia, tu colección, tus productos</li>
+      <li>✍️ Pedí cambios en tu página cuando quieras, sin escribirnos por WhatsApp</li>
+      <li>
+        👉 Mirá{' '}
+        <a
+          href="https://dejandohuellas.fornistore.com"
+          target="_blank"
+          rel="noreferrer"
+          className="fs-plan-proof"
+        >
+          la página web y la tienda de Dejando Huellas →
+        </a>
+      </li>
+    </ul>
+    <a
+      className="fs-plan-cta"
+      href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Me interesa la Tienda + Landing Premium de Fornistore ✨')}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      Quiero el combo
+    </a>
+  </div>
+</div>
           <p className="fs-pricing-fine">
             Precios en pesos argentinos, con actualización trimestral. Sin permanencia:
             te vas cuando quieras.
