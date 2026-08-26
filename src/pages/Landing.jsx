@@ -370,11 +370,22 @@ export default function Landing() {
             {collectionText && <p>{collectionText}</p>}
           </div>
           <div className="l-collection-body">
-            {collectionImg && (
-              <div className="l-collection-img reveal">
-                <img src={collectionImg} alt="" loading="lazy" />
-              </div>
-            )}
+          {(collectionImg || L.collection_video) && (
+  <div className="l-collection-img reveal">
+    {L.collection_video ? (
+      <video
+        src={L.collection_video}
+        poster={collectionImg || undefined}
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+    ) : (
+      <img src={collectionImg} alt="" loading="lazy" />
+    )}
+  </div>
+)}
             {products.length > 0 && (
               <div className="l-products">
                 {products.map((p, i) => (
