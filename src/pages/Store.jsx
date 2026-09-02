@@ -130,6 +130,8 @@ useEffect(() => {
 
   const announcement = tenant.settings?.announcement?.trim()
   const whatsapp = tenant.settings?.whatsapp
+  const mpEnabled = tenant.settings?.mp_enabled === true
+const transferAlias = tenant.settings?.transfer_alias
 
   // Portada: si hay imágenes extra, la portada es un carrusel
   const slides = useMemo(() => {
