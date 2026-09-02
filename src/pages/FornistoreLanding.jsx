@@ -1333,6 +1333,13 @@ export default function FornistoreLanding() {
           margin: 0 0 32px;
           color: #23211b;
         }
+        .fs-pricing-lead {
+          max-width: 560px;
+          margin: 0 auto 40px;
+          color: #6b6555;
+          font-size: 1.05rem;
+          line-height: 1.5;
+        }
         .fs-plans {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -1644,6 +1651,10 @@ export default function FornistoreLanding() {
         <div className="fs-pricing-inner">
           <span className="fs-kicker fs-reveal">Simple y sin sorpresas</span>
           <h2 className="fs-reveal">Un precio que se paga solo</h2>
+          <p className="fs-pricing-lead fs-reveal">
+    No es una plantilla que armás vos solo. Es tu tienda, programada y sostenida
+    por alguien real — con soporte directo, no un ticket que nadie responde.
+  </p>
           <div className="fs-plans">
   <div className="fs-plan fs-reveal from-left">
     <h3>Tienda Online</h3>
@@ -1707,10 +1718,11 @@ export default function FornistoreLanding() {
     </a>
   </div>
 </div>
-          <p className="fs-pricing-fine">
-            Precios en pesos argentinos, con actualización trimestral. Sin permanencia:
-            te vas cuando quieras.
-          </p>
+<p className="fs-pricing-fine">
+  Precios en pesos argentinos, con actualización trimestral. Sin permanencia:
+  te vas cuando quieras. Cada mejora que ves en esta página —el sistema de
+  pedidos, los cupones, Mercado Pago— ya está incluida, sin pagar de más.
+</p>
         </div>
       </section>
 
