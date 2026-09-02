@@ -429,32 +429,33 @@ const transferAlias = tenant.settings?.transfer_alias
       </main>
 
       <footer className="store-footer">
-  <span className="store-footer-label">Medios de pago</span>
   <div className="payment-badges">
     {mpEnabled && (
       <span className="payment-badge">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <rect x="2" y="5" width="20" height="14" rx="2" />
-          <line x1="2" y1="10" x2="22" y2="10" />
-        </svg>
+        <span className="payment-badge-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Zm2 2v2h16V8H4Zm0 5v3h6v-3H4Z" />
+          </svg>
+        </span>
         Mercado Pago
       </span>
     )}
     {transferAlias && (
       <span className="payment-badge">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M3 10l9-6 9 6" />
-          <path d="M5 10v9M19 10v9M9 10v9M15 10v9" />
-          <path d="M3 19h18" />
-        </svg>
+        <span className="payment-badge-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2 2 8v2h20V8L12 2ZM4 12v7H2v2h20v-2h-2v-7h-2v7h-3v-7h-2v7h-3v-7H8v7H6v-7H4Z" />
+          </svg>
+        </span>
         Transferencia
       </span>
     )}
     <span className="payment-badge">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <rect x="2" y="6" width="20" height="12" rx="2" />
-        <circle cx="12" cy="12" r="2.5" />
-      </svg>
+      <span className="payment-badge-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M20 6H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Zm-8 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+        </svg>
+      </span>
       Efectivo
     </span>
   </div>
