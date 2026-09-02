@@ -1343,15 +1343,16 @@ export default function FornistoreLanding() {
         .fs-plans {
           display: grid;
           grid-template-columns: 0.85fr 1.15fr;
-          gap: 0;
+          gap: 24px;
           align-items: stretch;
           text-align: left;
           margin-top: 8px;
         }
         .fs-plan {
-          background: transparent;
-          border: none;
-          padding: 40px 32px 40px 0;
+          background: #fdfbf5;
+          border-radius: 18px;
+          box-shadow: 0 10px 30px rgba(35,33,27,0.06);
+          padding: 40px 36px;
           display: flex;
           flex-direction: column;
         }
