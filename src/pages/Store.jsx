@@ -426,6 +426,42 @@ useEffect(() => {
         )}
       </main>
 
+      <footer className="store-footer">
+  <span className="store-footer-label">Medios de pago</span>
+  <div className="payment-badges">
+    {mpEnabled && (
+      <span className="payment-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+        Mercado Pago
+      </span>
+    )}
+    {transferAlias && (
+      <span className="payment-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M3 10l9-6 9 6" />
+          <path d="M5 10v9M19 10v9M9 10v9M15 10v9" />
+          <path d="M3 19h18" />
+        </svg>
+        Transferencia
+      </span>
+    )}
+    <span className="payment-badge">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="2" y="6" width="20" height="12" rx="2" />
+        <circle cx="12" cy="12" r="2.5" />
+      </svg>
+      Efectivo
+    </span>
+  </div>
+  <p className="store-footer-credit">
+    Tienda creada con{' '}
+    <a href="https://www.fornistore.com" target="_blank" rel="noreferrer">Fornistore</a>
+  </p>
+</footer>
+
       {selected && (
         <ProductModal
           key={selected.id}
