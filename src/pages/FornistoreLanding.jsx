@@ -1346,7 +1346,7 @@ export default function FornistoreLanding() {
           gap: 24px;
           align-items: stretch;
           text-align: left;
-          margin-top: 8px;
+          margin-top: 32px;
         }
         .fs-plan {
           background: #fdfbf5;
@@ -1481,7 +1481,7 @@ export default function FornistoreLanding() {
         }
         @media (max-width: 800px) {
           .fs-plans { grid-template-columns: 1fr; }
-          .fs-plan { padding: 24px 0; }
+          .fs-plan { padding: 28px 24px; }
           .fs-plan-premium { margin: 24px 0; padding: 36px 28px; }
         }
         /* ---- CTA final ---- */
