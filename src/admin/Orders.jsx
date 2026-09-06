@@ -275,13 +275,15 @@ const [extError, setExtError] = useState(null)
       setExtError('Elegí un producto y completá cantidad y precio.')
       return
     }
+    const customerName =
+    extForm.customer_name.trim() || `Venta por ${CHANNEL_LABELS[extForm.channel]}`
     setExtSending(true)
     setExtError(null)
     const subtotal = price * qty
     const { error } = await supabase.rpc('place_order', {
       order_data: {
         tenant_id: tenant.id,
-        customer_name: `Venta por ${CHANNEL_LABELS[extForm.channel]}`,
+        customer_name: customerName,
         customer_phone: extForm.phone.trim(),
         delivery_type: 'pickup',
         subtotal,
@@ -461,7 +463,14 @@ const [extError, setExtError] = useState(null)
               </button>
             ))}
           </div>
-
+          <label>
+  Nombre del cliente (opcional)
+  <input
+    value={extForm.customer_name}
+    onChange={(e) => setExtForm((f) => ({ ...f, customer_name: e.target.value }))}
+    placeholder="Ej: Lazaro Benitez"
+  />
+</label>
           <label>
             Teléfono del cliente (opcional)
             <input
