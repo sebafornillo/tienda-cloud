@@ -39,6 +39,7 @@ export default function Checkout() {
   const storeOpen = isStoreOpen(tenant.settings?.schedule)
   const opensAt = storeOpen ? null : nextOpening(tenant.settings?.schedule)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const [showProvincePicker, setShowProvincePicker] = useState(false)
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
     ? tenant.settings.delivery_zones
@@ -327,15 +328,17 @@ export default function Checkout() {
 
         {form.delivery_type === 'envio' && (
           <>
-            <label>
-              Provincia
-              <select value={province} onChange={(e) => setProvince(e.target.value)}>
-                <option value="">Elegí tu provincia…</option>
-                {ARGENTINA_PROVINCES.map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-            </label>
+           <label>
+  Provincia
+  <button
+    type="button"
+    className="fake-select"
+    onClick={() => setShowProvincePicker(true)}
+  >
+    {province || 'Elegí tu provincia…'}
+    <span className="fake-select-arrow">▾</span>
+  </button>
+</label>
             <label>
               Dirección completa
               <input
@@ -492,6 +495,30 @@ export default function Checkout() {
           </div>
         </div>
       )}
+      {showProvincePicker && (
+  <div className="modal-backdrop" onClick={() => setShowProvincePicker(false)}>
+    <div className="modal province-picker" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-body">
+        <h2>Elegí tu provincia</h2>
+        <ul className="province-list">
+          {ARGENTINA_PROVINCES.map((p) => (
+            <li key={p}>
+              <button
+                className={p === province ? 'active' : ''}
+                onClick={() => {
+                  setProvince(p)
+                  setShowProvincePicker(false)
+                }}
+              >
+                {p}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   )
 }

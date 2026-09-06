@@ -2774,3 +2774,49 @@ img { display: block; }
   color: var(--ink-soft);
 }
 .store-footer-credit a { color: inherit; font-weight: 600; }
+
+.fake-select {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  color: #333;
+  text-align: left;
+}
+.fake-select-arrow {
+  color: #888;
+  font-size: 12px;
+}
+
+.province-picker {
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.province-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+.province-list button {
+  width: 100%;
+  text-align: left;
+  padding: 14px 12px;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 15px;
+  color: #333;
+}
+.province-list button.active {
+  color: var(--brand-color, #ea8025);
+  font-weight: 600;
+}
