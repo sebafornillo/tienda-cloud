@@ -4,6 +4,7 @@ import { useTenant } from '../lib/TenantContext'
 import { money } from '../lib/CartContext'
 
 const FLOW = ['pending', 'confirmed', 'preparing', 'ready', 'delivered']
+const CHANNEL_LABELS = { whatsapp: 'WhatsApp', instagram: 'Instagram', otro: 'Otro canal' }
 const LABELS = {
   pending: 'Nuevo',
   confirmed: 'Confirmado',
@@ -130,6 +131,17 @@ export default function Orders() {
   const [items, setItems] = useState({})
   const [open, setOpen] = useState(null)
   const pendingAlerts = useRef(0)
+  const [products, setProducts] = useState([])
+const [showExternal, setShowExternal] = useState(false)
+const [extForm, setExtForm] = useState({
+  product_id: '',
+  quantity: 1,
+  unit_price: '',
+  channel: 'whatsapp',
+  phone: '',
+})
+const [extSending, setExtSending] = useState(false)
+const [extError, setExtError] = useState(null)
 
   // El navegador bloquea el audio hasta la primera interacción:
   // con el primer click/tecla en el panel dejamos el audio listo
@@ -146,6 +158,16 @@ export default function Orders() {
       window.removeEventListener('keydown', unlock)
     }
   }, [])
+
+  useEffect(() => {
+    if (!showExternal || products.length > 0) return
+    supabase
+      .from('products')
+      .select('id, name, price, stock')
+      .eq('tenant_id', tenant.id)
+      .order('name')
+      .then(({ data }) => setProducts(data || []))
+  }, [showExternal, tenant.id])
 
   // Al volver a la pestaña, se limpia el aviso del título
   useEffect(() => {
@@ -229,7 +251,68 @@ export default function Orders() {
       setItems((prev) => ({ ...prev, [order.id]: data || [] }))
     }
   }
-
+  function openExternalSale() {
+    setExtForm({ product_id: '', quantity: 1, unit_price: '', channel: 'whatsapp', phone: '' })
+    setExtError(null)
+    setShowExternal(true)
+  }
+  
+  function selectExtProduct(productId) {
+    const p = products.find((x) => x.id === productId)
+    setExtForm((f) => ({
+      ...f,
+      product_id: productId,
+      unit_price: p ? String(p.price) : '',
+    }))
+  }
+  
+  async function submitExternalSale() {
+    const product = products.find((p) => p.id === extForm.product_id)
+    const qty = Number(extForm.quantity)
+    const price = Number(extForm.unit_price)
+    if (!product || !qty || qty < 1 || !price || price <= 0) {
+      setExtError('Elegí un producto y completá cantidad y precio.')
+      return
+    }
+    setExtSending(true)
+    setExtError(null)
+    const subtotal = price * qty
+    const { error } = await supabase.rpc('place_order', {
+      order_data: {
+        tenant_id: tenant.id,
+        customer_name: `Venta por ${CHANNEL_LABELS[extForm.channel]}`,
+        customer_phone: extForm.phone.trim(),
+        delivery_type: 'pickup',
+        subtotal,
+        delivery_fee: 0,
+        total: subtotal,
+        payment_method: 'efectivo',
+        sale_channel: extForm.channel,
+        status: 'delivered',
+        payment_status: 'paid',
+      },
+      items_data: [
+        {
+          product_id: product.id,
+          product_name: product.name,
+          unit_price: price,
+          quantity: qty,
+          modifiers: [],
+          line_total: subtotal,
+        },
+      ],
+    })
+    setExtSending(false)
+    if (error) {
+      setExtError(
+        error.message.includes('SIN_STOCK')
+          ? `"${product.name}" no tiene stock suficiente.`
+          : 'No se pudo registrar la venta. Probá de nuevo.'
+      )
+      return
+    }
+    setShowExternal(false)
+  }
   async function setStatus(order, status) {
     if (status === 'cancelled') {
       // Cancela y devuelve el stock de los productos, todo junto
@@ -246,7 +329,12 @@ export default function Orders() {
 
   return (
     <div className="admin-page">
-      <h1>Pedidos activos</h1>
+     <div className="admin-page-header">
+  <h1>Pedidos activos</h1>
+  <button className="btn-primary" onClick={openExternalSale}>
+    + Venta externa
+  </button>
+</div>
       {orders.length === 0 && <p className="empty">Sin pedidos activos por ahora.</p>}
       <ul className="order-list">
         {orders.map((o) => {
@@ -318,6 +406,86 @@ export default function Orders() {
           )
         })}
       </ul>
+      {showExternal && (
+  <div className="modal-backdrop" onClick={() => setShowExternal(false)}>
+    <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-body">
+        <h2>Registrar venta externa</h2>
+        <p className="desc">Para ventas cerradas por WhatsApp, Instagram u otro canal fuera de la tienda.</p>
+
+        <div className="form">
+          <label>
+            Producto
+            <select
+              value={extForm.product_id}
+              onChange={(e) => selectExtProduct(e.target.value)}
+            >
+              <option value="">Elegí un producto…</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} {p.stock != null ? `(stock: ${p.stock})` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Cantidad
+            <input
+              type="number"
+              min="1"
+              value={extForm.quantity}
+              onChange={(e) => setExtForm((f) => ({ ...f, quantity: e.target.value }))}
+            />
+          </label>
+
+          <label>
+            Precio unitario
+            <input
+              type="number"
+              min="0"
+              value={extForm.unit_price}
+              onChange={(e) => setExtForm((f) => ({ ...f, unit_price: e.target.value }))}
+            />
+          </label>
+
+          <div className="segmented">
+            {Object.entries(CHANNEL_LABELS).map(([key, label]) => (
+              <button
+                key={key}
+                className={extForm.channel === key ? 'active' : ''}
+                onClick={() => setExtForm((f) => ({ ...f, channel: key }))}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <label>
+            Teléfono del cliente (opcional)
+            <input
+              value={extForm.phone}
+              onChange={(e) => setExtForm((f) => ({ ...f, phone: e.target.value }))}
+              placeholder="Ej: 3874..."
+              inputMode="tel"
+            />
+          </label>
+        </div>
+
+        {extError && <p className="error">{extError}</p>}
+
+        <div className="confirm-actions">
+          <button className="link" onClick={() => setShowExternal(false)}>
+            Cancelar
+          </button>
+          <button className="btn-primary" disabled={extSending} onClick={submitExternalSale}>
+            {extSending ? 'Guardando…' : 'Registrar venta'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   )
 }
