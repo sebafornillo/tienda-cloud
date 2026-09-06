@@ -5,6 +5,12 @@ import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
 import { isStoreOpen, nextOpening } from '../lib/schedule'
 
+const ARGENTINA_PROVINCES = [
+  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
+  'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones',
+  'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
+  'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
+]
 
 export default function Checkout() {
   const { tenant } = useTenant()
@@ -21,6 +27,7 @@ export default function Checkout() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
   const [zoneIndex, setZoneIndex] = useState('')
+  const [province, setProvince] = useState('')
   const [couponInput, setCouponInput] = useState('')
   const [coupon, setCoupon] = useState(null) // {code, discount, label}
   const [couponError, setCouponError] = useState(null)
@@ -34,27 +41,54 @@ export default function Checkout() {
   const [confirmCancel, setConfirmCancel] = useState(false)
 
   const zones = Array.isArray(tenant.settings?.delivery_zones)
-  ? tenant.settings.delivery_zones
-  : []
-const selectedZone =
-  form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
-const deliveryFee = selectedZone ? Number(selectedZone.fee) || 0 : 0
-const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
-const transferDiscount = useMemo(() => {
-  if (form.payment_method !== 'transfer') return 0
-  return items.reduce((s, i) => {
-    const pct = Number(i.product.transfer_discount_percent) || 0
-    return pct > 0 ? s + i.unitPrice * i.quantity * (pct / 100) : s
-  }, 0)
-}, [items, form.payment_method])
-const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
+    ? tenant.settings.delivery_zones
+    : []
+  const selectedZone =
+    form.delivery_type === 'delivery' && zoneIndex !== '' ? zones[Number(zoneIndex)] : null
 
-useEffect(() => {
-  if (form.payment_method === 'transfer' && transferDiscount > 0 && coupon) {
-    setCoupon(null)
-    setCouponError(null)
-  }
-}, [form.payment_method, transferDiscount])
+  // Envío nacional por provincia (opt-in: si la tienda no tiene shipping_zones
+  // cargado en settings, la opción "Envío" ni se muestra).
+  const shippingZones = Array.isArray(tenant.settings?.shipping_zones)
+    ? tenant.settings.shipping_zones
+    : []
+
+  const matchedShippingZone = useMemo(() => {
+    if (form.delivery_type !== 'envio' || !province) return null
+    const exact = shippingZones.find(
+      (z) => Array.isArray(z.provincias) && z.provincias.includes(province)
+    )
+    if (exact) return exact
+    return (
+      shippingZones.find((z) => Array.isArray(z.provincias) && z.provincias.includes('*')) ||
+      null
+    )
+  }, [form.delivery_type, province, shippingZones])
+
+  const deliveryFee =
+    form.delivery_type === 'envio'
+      ? matchedShippingZone
+        ? Number(matchedShippingZone.fee) || 0
+        : 0
+      : selectedZone
+      ? Number(selectedZone.fee) || 0
+      : 0
+
+  const discount = coupon ? Math.min(Number(coupon.discount), subtotal) : 0
+  const transferDiscount = useMemo(() => {
+    if (form.payment_method !== 'transfer') return 0
+    return items.reduce((s, i) => {
+      const pct = Number(i.product.transfer_discount_percent) || 0
+      return pct > 0 ? s + i.unitPrice * i.quantity * (pct / 100) : s
+    }, 0)
+  }, [items, form.payment_method])
+  const total = Math.max(0, subtotal + deliveryFee - discount - transferDiscount)
+
+  useEffect(() => {
+    if (form.payment_method === 'transfer' && transferDiscount > 0 && coupon) {
+      setCoupon(null)
+      setCouponError(null)
+    }
+  }, [form.payment_method, transferDiscount])
 
   async function copyAlias() {
     try {
@@ -94,7 +128,9 @@ useEffect(() => {
     form.customer_name.trim() &&
     form.customer_phone.trim() &&
     (form.delivery_type !== 'delivery' ||
-      (form.address.trim() && (zones.length === 0 || selectedZone)))
+      (form.address.trim() && (zones.length === 0 || selectedZone))) &&
+    (form.delivery_type !== 'envio' ||
+      (province && form.address.trim() && matchedShippingZone))
 
   async function submit() {
     setSending(true)
@@ -108,8 +144,17 @@ useEffect(() => {
         customer_name: form.customer_name.trim(),
         customer_phone: form.customer_phone.trim(),
         delivery_type: form.delivery_type,
-        address: form.delivery_type === 'delivery' ? form.address.trim() : '',
-        delivery_zone: selectedZone ? selectedZone.name : '',
+        address: form.delivery_type !== 'pickup' ? form.address.trim() : '',
+        delivery_zone:
+          form.delivery_type === 'delivery'
+            ? selectedZone
+              ? selectedZone.name
+              : ''
+            : form.delivery_type === 'envio'
+            ? matchedShippingZone
+              ? matchedShippingZone.name
+              : ''
+            : '',
         coupon_code: coupon ? coupon.code : '',
         notes: form.notes.trim(),
         subtotal,
@@ -178,40 +223,37 @@ useEffect(() => {
 
   return (
     <div className="checkout">
-    <header className="page-header">
-  <Link to="/" className="back">← {tenant.name}</Link>
-  <h1>Tu pedido</h1>
-  <button
-  className="link danger"
-  onClick={() => setConfirmCancel(true)}
->
-  Cancelar pedido
-</button>
-</header>
+      <header className="page-header">
+        <Link to="/" className="back">← {tenant.name}</Link>
+        <h1>Tu pedido</h1>
+        <button className="link danger" onClick={() => setConfirmCancel(true)}>
+          Cancelar pedido
+        </button>
+      </header>
 
       <ul className="cart-items">
         {items.map((i) => (
-       <li key={i.key}>
-       <div className="cart-item-info">
-         <strong>{i.product.name}</strong>
-         {i.modifiers.length > 0 && (
-           <small>{i.modifiers.map((m) => m.name).join(', ')}</small>
-         )}
-         <span>{money(i.unitPrice * i.quantity)}</span>
-       </div>
-       <div className="qty">
-         <button onClick={() => updateQty(i.key, i.quantity - 1)} aria-label="Restar">−</button>
-         <span>{i.quantity}</span>
-         <button onClick={() => updateQty(i.key, i.quantity + 1)} aria-label="Sumar">+</button>
-       </div>
-       <button
-         className="cart-item-remove"
-         onClick={() => updateQty(i.key, 0)}
-         aria-label="Quitar producto"
-       >
-         ✕
-       </button>
-     </li>
+          <li key={i.key}>
+            <div className="cart-item-info">
+              <strong>{i.product.name}</strong>
+              {i.modifiers.length > 0 && (
+                <small>{i.modifiers.map((m) => m.name).join(', ')}</small>
+              )}
+              <span>{money(i.unitPrice * i.quantity)}</span>
+            </div>
+            <div className="qty">
+              <button onClick={() => updateQty(i.key, i.quantity - 1)} aria-label="Restar">−</button>
+              <span>{i.quantity}</span>
+              <button onClick={() => updateQty(i.key, i.quantity + 1)} aria-label="Sumar">+</button>
+            </div>
+            <button
+              className="cart-item-remove"
+              onClick={() => updateQty(i.key, 0)}
+              aria-label="Quitar producto"
+            >
+              ✕
+            </button>
+          </li>
         ))}
       </ul>
 
@@ -247,6 +289,14 @@ useEffect(() => {
           >
             Delivery
           </button>
+          {shippingZones.length > 0 && (
+            <button
+              className={form.delivery_type === 'envio' ? 'active' : ''}
+              onClick={() => set('delivery_type', 'envio')}
+            >
+              Envío
+            </button>
+          )}
         </div>
 
         {form.delivery_type === 'delivery' && (
@@ -272,6 +322,33 @@ useEffect(() => {
                 placeholder="Calle, número, referencia"
               />
             </label>
+          </>
+        )}
+
+        {form.delivery_type === 'envio' && (
+          <>
+            <label>
+              Provincia
+              <select value={province} onChange={(e) => setProvince(e.target.value)}>
+                <option value="">Elegí tu provincia…</option>
+                {ARGENTINA_PROVINCES.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Dirección completa
+              <input
+                value={form.address}
+                onChange={(e) => set('address', e.target.value)}
+                placeholder="Calle, número, código postal, localidad"
+              />
+            </label>
+            {matchedShippingZone && (
+              <p className="shipping-zone-note">
+                📦 Envío a {matchedShippingZone.name}: {money(Number(matchedShippingZone.fee) || 0)}
+              </p>
+            )}
           </>
         )}
 
@@ -328,53 +405,51 @@ useEffect(() => {
       </div>
 
       {form.payment_method === 'transfer' && transferDiscount > 0 ? (
-  <p className="coupon-disabled-note">
-    Los cupones no se pueden combinar con el descuento por transferencia.
-  </p>
-) : (
-  <div className="coupon-box">
-    {coupon ? (
-      <div className="coupon-applied">
-        <span className="coupon-tag">🎟 {coupon.code}</span>
-        <span>{coupon.label} · −{money(discount)}</span>
-        <button
-          className="link danger"
-          onClick={() => { setCoupon(null); setCouponError(null) }}
-        >
-          Quitar
-        </button>
-      </div>
-    ) : (
-      <div className="coupon-input-row">
-        <input
-          placeholder="¿Tenés un cupón?"
-          value={couponInput}
-          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-          onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-        />
-        <button
-          className="btn-small"
-          disabled={!couponInput.trim() || checkingCoupon}
-          onClick={applyCoupon}
-        >
-          {checkingCoupon ? '…' : 'Aplicar'}
-        </button>
-      </div>
-    )}
-    {couponError && <p className="error">{couponError}</p>}
-  </div>
-)}
-
+        <p className="coupon-disabled-note">
+          Los cupones no se pueden combinar con el descuento por transferencia.
+        </p>
+      ) : (
+        <div className="coupon-box">
+          {coupon ? (
+            <div className="coupon-applied">
+              <span className="coupon-tag">🎟 {coupon.code}</span>
+              <span>{coupon.label} · −{money(discount)}</span>
+              <button
+                className="link danger"
+                onClick={() => { setCoupon(null); setCouponError(null) }}
+              >
+                Quitar
+              </button>
+            </div>
+          ) : (
+            <div className="coupon-input-row">
+              <input
+                placeholder="¿Tenés un cupón?"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+              />
+              <button
+                className="btn-small"
+                disabled={!couponInput.trim() || checkingCoupon}
+                onClick={applyCoupon}
+              >
+                {checkingCoupon ? '…' : 'Aplicar'}
+              </button>
+            </div>
+          )}
+          {couponError && <p className="error">{couponError}</p>}
+        </div>
+      )}
 
       <div className="totals">
         <div><span>Subtotal</span><span>{money(subtotal)}</span></div>
         {transferDiscount > 0 && (
-  <div className="discount-row"><span>Descuento por transferencia</span><span>−{money(transferDiscount)}</span></div>
-)}
+          <div className="discount-row"><span>Descuento por transferencia</span><span>−{money(transferDiscount)}</span></div>
+        )}
         {deliveryFee > 0 && <div><span>Envío</span><span>{money(deliveryFee)}</span></div>}
         {discount > 0 && (
           <div className="discount-row"><span>Cupón {coupon.code}</span><span>−{money(discount)}</span></div>
-          
         )}
         <div className="grand"><span>Total</span><span>{money(total)}</span></div>
       </div>
@@ -397,26 +472,26 @@ useEffect(() => {
       </button>
 
       {confirmCancel && (
-  <div className="modal-backdrop" onClick={() => setConfirmCancel(false)}>
-    <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
-      <div className="modal-body">
-        <h2>¿Cancelar tu pedido?</h2>
-        <p className="desc">Se va a vaciar el carrito y vas a volver a la tienda.</p>
-        <div className="confirm-actions">
-          <button className="link" onClick={() => setConfirmCancel(false)}>
-            Seguir con mi pedido
-          </button>
-          <button
-            className="btn-primary danger"
-            onClick={() => { clear(); navigate('/') }}
-          >
-            Sí, cancelar
-          </button>
+        <div className="modal-backdrop" onClick={() => setConfirmCancel(false)}>
+          <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-body">
+              <h2>¿Cancelar tu pedido?</h2>
+              <p className="desc">Se va a vaciar el carrito y vas a volver a la tienda.</p>
+              <div className="confirm-actions">
+                <button className="link" onClick={() => setConfirmCancel(false)}>
+                  Seguir con mi pedido
+                </button>
+                <button
+                  className="btn-primary danger"
+                  onClick={() => { clear(); navigate('/') }}
+                >
+                  Sí, cancelar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   )
 }
