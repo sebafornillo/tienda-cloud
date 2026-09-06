@@ -138,6 +138,7 @@ const [extForm, setExtForm] = useState({
   quantity: 1,
   unit_price: '',
   channel: 'whatsapp',
+  customer_name: '',
   phone: '',
 })
 const [extSending, setExtSending] = useState(false)
