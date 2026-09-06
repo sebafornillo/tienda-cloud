@@ -253,7 +253,7 @@ const [extError, setExtError] = useState(null)
     }
   }
   function openExternalSale() {
-    setExtForm({ product_id: '', quantity: 1, unit_price: '', channel: 'whatsapp', phone: '' })
+    setExtForm({ product_id: '', quantity: 1, unit_price: '', channel: 'whatsapp',customer_name: '', phone: '' })
     setExtError(null)
     setShowExternal(true)
   }
