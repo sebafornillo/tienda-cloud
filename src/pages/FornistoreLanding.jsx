@@ -1828,7 +1828,7 @@ export default function FornistoreLanding() {
     <div className="fs-plan fs-reveal from-left">
         <h3>Tienda Online</h3>
         <div className="fs-plan-price">
-          <strong>$20.000</strong>
+          <strong>$25.000</strong>
           <span>/mes</span>
         </div>
         <ul>
@@ -1856,8 +1856,8 @@ export default function FornistoreLanding() {
         <span className="fs-premium-eyebrow">Para marcas que quieren impactar</span>
         <h3>Tienda + Landing Premium</h3>
         <div className="fs-premium-price">
-          <strong>$25.000</strong>
-          <span>/mes + $50.000 única vez</span>
+          <strong>$35.000</strong>
+          <span>/mes</span>
         </div>
         <ul>
           <li>Todo lo del plan Tienda Online</li>
