@@ -1648,7 +1648,7 @@ export default function FornistoreLanding() {
       {stores.length > 0 && (
       <section className="fs-stores">
         <div className="fs-stores-inner">
-          <span className="fs-kicker fs-reveal">Sin humo</span>
+          <span className="fs-kicker fs-reveal">Plataform personalizada para emprendedores</span>
           <h2 className="fs-reveal">Tiendas reales, vendiendo ahora</h2>
           <p className="fs-reveal">No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
           <div className="fs-stores-grid">
@@ -1692,7 +1692,7 @@ export default function FornistoreLanding() {
    {/* ---------- PRECIOS ---------- */}
 <section className="fs-pricing">
   <div className="fs-pricing-inner">
-    <h2 className="fs-reveal">Un precio que se paga solo</h2>
+    <h2 className="fs-reveal">Escala tu negocio, suma valor.</h2>
     <p className="fs-pricing-lead fs-reveal">
       No es una plantilla que armás vos solo. Es tu tienda, programada y
       sostenida por alguien real — con soporte directo, no un ticket que nadie
@@ -1759,7 +1759,7 @@ export default function FornistoreLanding() {
       </div>
     </div>
     <p className="fs-pricing-fine">
-      Precios en pesos argentinos, con actualización trimestral. Sin
+      
       permanencia: te vas cuando quieras.
     </p>
   </div>
