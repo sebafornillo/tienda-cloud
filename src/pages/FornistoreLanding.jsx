@@ -1699,10 +1699,10 @@ export default function FornistoreLanding() {
       responde.
     </p>
     <div className="fs-plans">
-      <div className="fs-plan fs-reveal from-left">
+    <div className="fs-plan fs-reveal from-left">
         <h3>Tienda Online</h3>
         <div className="fs-plan-price">
-          <strong>$40.000</strong>
+          <strong>$20.000</strong>
           <span>/mes</span>
         </div>
         <ul>
@@ -1730,8 +1730,8 @@ export default function FornistoreLanding() {
         <span className="fs-premium-eyebrow">Para marcas que quieren impactar</span>
         <h3>Tienda + Landing Premium</h3>
         <div className="fs-premium-price">
-          <strong>$40.000</strong>
-          <span>/mes + $90.000 única vez</span>
+          <strong>$25.000</strong>
+          <span>/mes + $50.000 única vez</span>
         </div>
         <ul>
           <li>Todo lo del plan Tienda Online</li>
@@ -1754,7 +1754,7 @@ export default function FornistoreLanding() {
           target="_blank"
           rel="noreferrer"
         >
-          Quiero el combo
+          Quiero consultar con fornistore
         </a>
       </div>
     </div>
