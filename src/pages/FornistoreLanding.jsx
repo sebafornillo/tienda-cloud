@@ -1317,6 +1317,81 @@ export default function FornistoreLanding() {
           }
         }
 
+        /* ---- Beneficios ---- */
+        .fs-benefits {
+          background: #f7f3e8;
+          color: #23211b;
+          padding: 8px 24px 92px;
+        }
+        .fs-benefits-inner {
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+        .fs-benefit-intro {
+          text-align: center;
+          margin-bottom: 38px;
+        }
+        .fs-benefit-intro h2, .fs-process h2 {
+          font-size: clamp(1.8rem, 3.8vw, 2.5rem);
+          line-height: 1.1;
+          letter-spacing: -0.025em;
+          margin: 0;
+        }
+        .fs-benefits-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+        .fs-benefit-card {
+          background: #fff;
+          border: 1px solid #e8e2d2;
+          border-radius: 18px;
+          padding: 28px 24px;
+          min-height: 190px;
+        }
+        .fs-benefit-number {
+          display: inline-block;
+          font-size: 0.75rem;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          color: #1d9e75;
+          margin-bottom: 28px;
+        }
+        .fs-benefit-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+        .fs-benefit-card p { margin: 0; color: #777062; line-height: 1.55; font-size: 0.92rem; }
+
+        /* ---- Proceso ---- */
+        .fs-process {
+          background: #f7f3e8;
+          color: #23211b;
+          padding: 0 24px 92px;
+        }
+        .fs-process-inner { max-width: 1080px; margin: 0 auto; text-align: center; }
+        .fs-process-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          margin-top: 38px;
+          text-align: left;
+        }
+        .fs-process-step {
+          border-top: 2px solid #23211b;
+          padding: 18px 6px 0;
+        }
+        .fs-process-step > span {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #1d9e75;
+        }
+        .fs-process-step h3 { margin: 16px 0 7px; font-size: 1.05rem; }
+        .fs-process-step p { margin: 0; color: #777062; line-height: 1.55; font-size: 0.92rem; max-width: 32ch; }
+
+        @media (max-width: 760px) {
+          .fs-benefits-grid, .fs-process-grid { grid-template-columns: 1fr; }
+          .fs-benefit-card { min-height: auto; }
+          .fs-process-step p { max-width: none; }
+        }
+
         /* ---- Precios ---- */
         .fs-pricing {
           background: #f7f3e8;
@@ -1535,15 +1610,15 @@ export default function FornistoreLanding() {
         <div className="fs-hero-grid">
           <div>
             <h1>
-              Tu tienda online,
+              Tu negocio merece
               <br />
-              con tu marca,
+              una tienda que
               <br />
-              vendiendo en 48 horas.
+              venda por vos.
             </h1>
             <p className="fs-sub">
-              Catálogo, pedidos en tiempo real y cobros con Mercado Pago. Escribí el
-              nombre de tu negocio y mirala nacer. →
+              Una tienda propia, con tu marca, catálogo, pagos y pedidos.
+              Nosotros la armamos; vos te ocupás de vender.
             </p>
 
             <div className="fs-field">
@@ -1586,10 +1661,10 @@ export default function FornistoreLanding() {
             </div>
 
             <a className="fs-cta" href={waLink} target="_blank" rel="noreferrer">
-              Quiero mi tienda así →
+              Quiero mi tienda →
             </a>
             <p className="fs-cta-hint">
-              Te abre WhatsApp con tu pedido armado. Sin compromiso.
+              Contanos qué vendés y te mostramos cómo quedaría. Sin compromiso.
             </p>
           </div>
 
@@ -1625,11 +1700,38 @@ export default function FornistoreLanding() {
       {/* ---------- TRANSICIÓN ---------- */}
       <div className="fs-fade" aria-hidden="true" />
 
+      {/* ---------- BENEFICIOS ---------- */}
+      <section className="fs-benefits">
+        <div className="fs-benefits-inner">
+          <div className="fs-benefit-intro fs-reveal">
+            <span className="fs-kicker">LO IMPORTANTE</span>
+            <h2>Menos mensajes sueltos.<br />Más ventas ordenadas.</h2>
+          </div>
+          <div className="fs-benefits-grid">
+            <article className="fs-benefit-card fs-reveal from-left">
+              <span className="fs-benefit-number">01</span>
+              <h3>Tu catálogo, siempre listo</h3>
+              <p>Mostrá productos, precios, variantes y stock sin responder la misma pregunta todo el día.</p>
+            </article>
+            <article className="fs-benefit-card fs-reveal">
+              <span className="fs-benefit-number">02</span>
+              <h3>Pedidos sin perseguir chats</h3>
+              <p>Cada compra entra a tu panel con su estado. Sabés qué llegó, qué confirmaste y qué falta entregar.</p>
+            </article>
+            <article className="fs-benefit-card fs-reveal from-right">
+              <span className="fs-benefit-number">03</span>
+              <h3>Tu marca, no una plantilla</h3>
+              <p>Colores, nombre, productos y una experiencia pensada alrededor de tu negocio.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- DOLOR ---------- */}
       <section className="fs-pain">
         <div className="fs-pain-inner">
-          <span className="fs-kicker fs-reveal">¿Te suena?</span>
-          <h2 className="fs-reveal">Tu negocio creció.<br />Tu WhatsApp, no.</h2>
+          <span className="fs-kicker fs-reveal">EL PROBLEMA NO ES VENDER</span>
+          <h2 className="fs-reveal">Tu negocio creció.<br />Tu forma de vender también tiene que crecer.</h2>
           <div className="fs-pain-chats" aria-hidden="true">
             <div className="fs-chat fs-reveal">Hola! ¿Tenés stock del grande?</div>
             <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.15s' }}>¿Me pasás el CBU de nuevo?</div>
@@ -1637,9 +1739,9 @@ export default function FornistoreLanding() {
             <div className="fs-chat right fs-reveal" style={{ transitionDelay: '0.5s' }}>Perdón!! Se me traspapeló 🙏</div>
           </div>
           <p className="fs-pain-punch fs-reveal">
-  Pedidos perdidos entre 40 chats, transferencias que hay que verificar a mano,
-  el "¿tenés stock?" repetido veinte veces por día. Fornistore ordena todo eso:
-  catálogo, pago y pedidos en un solo lugar, con tu marca.
+  Cada pedido no debería depender de encontrar un mensaje entre 40 chats.
+  Fornistore junta catálogo, pagos, stock y pedidos en un solo lugar,
+  con la identidad de tu negocio.
 </p>
         </div>
       </section>
@@ -1648,9 +1750,9 @@ export default function FornistoreLanding() {
       {stores.length > 0 && (
       <section className="fs-stores">
         <div className="fs-stores-inner">
-          <span className="fs-kicker fs-reveal">Plataform personalizada para emprendedores</span>
-          <h2 className="fs-reveal">Tiendas reales, vendiendo ahora</h2>
-          <p className="fs-reveal">No te mostramos plantillas: tocá y recorré tiendas de clientes reales.</p>
+          <span className="fs-kicker fs-reveal">PRUEBA REAL, NO UNA MAQUETA</span>
+          <h2 className="fs-reveal">Así se ven las tiendas que armamos</h2>
+          <p className="fs-reveal">Entrá, recorré y fijate cómo funciona una tienda real de Fornistore.</p>
           <div className="fs-stores-grid">
             {stores.map((t, i) => (
               <a
@@ -1677,11 +1779,11 @@ export default function FornistoreLanding() {
       {/* ---------- TU PANEL EN VIVO ---------- */}
       <section className="fs-admin-demo">
         <div className="fs-admin-demo-inner">
-          <span className="fs-kicker fs-reveal">Del otro lado del mostrador</span>
-          <h2 className="fs-reveal">Vos manejás todo desde acá</h2>
+          <span className="fs-kicker fs-reveal">TODO EN UN SOLO PANEL</span>
+          <h2 className="fs-reveal">Tu tienda vende. Vos controlás el negocio.</h2>
           <p className="fs-admin-sub fs-reveal">
-            Pedidos que entran solos, stock que se descuenta con cada venta y estados en
-            un click. Simulá un pedido y confirmalo vos, como si fueras el dueño:
+            Los pedidos aparecen en tiempo real, el stock se actualiza y cada estado
+            queda ordenado. Probá el demo y fijate cómo se siente manejarlo:
           </p>
           <div className="fs-reveal from-right" style={{ transitionDelay: '0.15s' }}>
             <PanelDemo />
@@ -1689,20 +1791,44 @@ export default function FornistoreLanding() {
         </div>
       </section>
 
+      {/* ---------- PROCESO ---------- */}
+      <section className="fs-process">
+        <div className="fs-process-inner">
+          <span className="fs-kicker fs-reveal">CÓMO ARRANCAMOS</span>
+          <h2 className="fs-reveal">De idea a tienda online, sin vueltas.</h2>
+          <div className="fs-process-grid">
+            <article className="fs-process-step fs-reveal from-left">
+              <span>01</span>
+              <h3>Nos contás tu negocio</h3>
+              <p>Nombre, productos, colores y cómo querés vender. Partimos de lo que ya tenés.</p>
+            </article>
+            <article className="fs-process-step fs-reveal">
+              <span>02</span>
+              <h3>Armamos tu tienda</h3>
+              <p>Configuramos catálogo, pedidos, pagos, stock y la identidad visual de tu marca.</p>
+            </article>
+            <article className="fs-process-step fs-reveal from-right">
+              <span>03</span>
+              <h3>La ponés a vender</h3>
+              <p>Recibís tu tienda lista y empezás a compartirla por WhatsApp, Instagram y donde quieras.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
    {/* ---------- PRECIOS ---------- */}
 <section className="fs-pricing">
   <div className="fs-pricing-inner">
-    <h2 className="fs-reveal">Escala tu negocio, suma valor.</h2>
+    <h2 className="fs-reveal">Elegí cómo querés arrancar</h2>
     <p className="fs-pricing-lead fs-reveal">
-      No es una plantilla que armás vos solo. Es tu tienda, programada y
-      sostenida por alguien real — con soporte directo, no un ticket que nadie
-      responde.
+      Empezá con una tienda lista para vender. Si después querés una presencia
+      de marca más completa, podés sumar una landing diseñada a medida.
     </p>
     <div className="fs-plans">
     <div className="fs-plan fs-reveal from-left">
         <h3>Tienda Online</h3>
         <div className="fs-plan-price">
-          <strong>$25.000</strong>
+          <strong>$20.000</strong>
           <span>/mes</span>
         </div>
         <ul>
@@ -1730,8 +1856,8 @@ export default function FornistoreLanding() {
         <span className="fs-premium-eyebrow">Para marcas que quieren impactar</span>
         <h3>Tienda + Landing Premium</h3>
         <div className="fs-premium-price">
-          <strong>$35.000</strong>
-          <span>/mes</span>
+          <strong>$25.000</strong>
+          <span>/mes + $50.000 única vez</span>
         </div>
         <ul>
           <li>Todo lo del plan Tienda Online</li>
@@ -1754,13 +1880,12 @@ export default function FornistoreLanding() {
           target="_blank"
           rel="noreferrer"
         >
-          Quiero consultar con fornistore
+          Quiero consultar
         </a>
       </div>
     </div>
     <p className="fs-pricing-fine">
-      
-      permanencia: te vas cuando quieras.
+      Sin permanencia: te vas cuando quieras. La tienda es tuya mientras el servicio esté activo.
     </p>
   </div>
 </section>
@@ -1770,8 +1895,8 @@ export default function FornistoreLanding() {
   <span className="fs-reveal" style={{ display: 'inline-block' }}>
     <LogoF size={54} />
   </span>
-  <h2 className="fs-reveal">Tu tienda puede estar vendiendo esta semana.</h2>
-  <p className="fs-reveal">Escribinos y en 48 horas está en línea, con tu marca y tus productos.</p>
+  <h2 className="fs-reveal">Tu próxima venta puede empezar con una tienda propia.</h2>
+  <p className="fs-reveal">Contanos qué vendés. Armamos tu tienda, cargamos tu identidad y la dejamos lista para salir.</p>
   <a
     className="fs-cta fs-reveal"
     style={{ transitionDelay: '0.15s' }}
