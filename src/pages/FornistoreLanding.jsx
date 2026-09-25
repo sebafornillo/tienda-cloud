@@ -13,6 +13,22 @@ const TYPE_LABEL = {
 const DEMO_NAMES = ['sofi', 'marcos', 'caro', 'leo', 'vale', 'nico']
 const DEMO_STAGES = ['Nuevo', 'Confirmado', 'En preparación', 'Listo', 'Entregado']
 
+// Rubros del constructor del hero: cambian los productos del celular y el mensaje de WhatsApp
+const RUBROS = [
+  { key: 'comida', label: 'Comida', items: [['Pizza muzza', '$ 8.500'], ['Empanadas x12', '$ 14.000']], btn: 'Hacer mi pedido' },
+  { key: 'ropa', label: 'Ropa', items: [['Remera oversize', '$ 18.000'], ['Jean mom', '$ 42.000']], btn: 'Comprar' },
+  { key: 'deco', label: 'Deco y regalos', items: [['Vela de soja', '$ 9.800'], ['Mate imperial', '$ 35.000']], btn: 'Comprar' },
+  { key: 'otro', label: 'Otra cosa', items: [['Más vendido', '$ 8.500'], ['Nuevo', '$ 5.000']], btn: 'Hacer mi pedido' },
+]
+
+function WhatsAppIcon({ size = 20 }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size} aria-hidden="true">
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+    </svg>
+  )
+}
+
 // ---------- Scroll reveal: los elementos aparecen al entrar en pantalla ----------
 function useReveal(deps = []) {
   const ref = useRef(null)
@@ -362,6 +378,21 @@ export default function FornistoreLanding() {
   const [color, setColor] = useState(COLORS[1])
   const [autoColor, setAutoColor] = useState(true)
   const [stores, setStores] = useState([])
+  const [rubro, setRubro] = useState(RUBROS[0])
+  const heroRef = useRef(null)
+  const finalRef = useRef(null)
+  const [heroOut, setHeroOut] = useState(false)
+  const [finalIn, setFinalIn] = useState(false)
+
+  // Barra fija de WhatsApp en mobile: aparece al salir del hero, se oculta en el CTA final
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return
+    const o1 = new IntersectionObserver(([e]) => setHeroOut(!e.isIntersecting))
+    const o2 = new IntersectionObserver(([e]) => setFinalIn(e.isIntersecting))
+    if (heroRef.current) o1.observe(heroRef.current)
+    if (finalRef.current) o2.observe(finalRef.current)
+    return () => { o1.disconnect(); o2.disconnect() }
+  }, [])
   const [intro, setIntro] = useState(() => {
     try {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
@@ -403,10 +434,20 @@ export default function FornistoreLanding() {
 
   const displayName = bizName.trim() || 'Tu Negocio'
 
-  const waLink = useMemo(() => {
-    const msg = `Hola! Quiero mi tienda "${displayName}" en ${color.name} 🚀`
-    return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
-  }, [displayName, color])
+  const waMsg =
+    'Hola! Quiero mi tienda "' + displayName + '"' +
+    (rubro.key !== 'otro' ? ' de ' + rubro.label.toLowerCase() : '') +
+    ' en ' + color.name + ' 🚀'
+  const waLink = useMemo(() => 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(waMsg), [waMsg])
+  const ctaLabel = bizName.trim() ? 'Quiero "' + displayName + '" online' : 'Quiero mi tienda online'
+
+  function focusBuilder(e) {
+    e.preventDefault()
+    const el = document.getElementById('fs-bizname')
+    if (!el) return
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 160, behavior: 'smooth' })
+    setTimeout(() => el.focus({ preventScroll: true }), 550)
+  }
 
   const rootRef = useReveal([stores, intro])
 
@@ -1599,45 +1640,328 @@ export default function FornistoreLanding() {
           transition: color 0.15s;
         }
         .fs-final-ig:hover { color: #f5efdf; }
+
+        /* ---- v2: hero orientado a resultado ---- */
+        .fs-nav-cta {
+          margin-left: auto;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 16px;
+          border-radius: 99px;
+          border: 1.5px solid #25d366;
+          color: #25d366;
+          font-weight: 700;
+          font-size: 0.9rem;
+          text-decoration: none;
+          transition: background 0.15s, color 0.15s;
+        }
+        .fs-nav-cta:hover { background: #25d366; color: #0b2b16; }
+        .fs-h1-soft { color: #b8b2a2; }
+        .fs-h1-accent { color: #1d9e75; }
+        .fs-proof-row {
+          list-style: none;
+          padding: 0;
+          margin: -14px 0 28px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px 18px;
+        }
+        .fs-proof-row li {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 0.92rem;
+          color: #f5efdf;
+        }
+        .fs-proof-row li::before { content: '✓'; color: #1d9e75; font-weight: 800; }
+
+        /* ---- v2: constructor "probala con tu negocio" ---- */
+        .fs-builder {
+          max-width: 420px;
+          background: #1b1813;
+          border: 1px solid #2e2a22;
+          border-radius: 18px;
+          padding: 20px 20px 22px;
+        }
+        .fs-builder-head {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 4px 12px;
+          margin-bottom: 18px;
+        }
+        .fs-builder-head strong { font-size: 1.05rem; }
+        .fs-builder-head span { font-size: 0.8rem; color: #8f8a7c; }
+        .fs-builder .fs-field { margin-bottom: 18px; }
+        .fs-builder .fs-field:last-child { margin-bottom: 0; }
+        .fs-builder .fs-field label { display: flex; align-items: center; gap: 8px; }
+        .fs-builder .fs-field label b {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #2e2a22;
+          color: #f5efdf;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.72rem;
+        }
+        .fs-builder .fs-field input { max-width: none; }
+        .fs-rubros { display: flex; flex-wrap: wrap; gap: 8px; }
+        .fs-rubros button {
+          border: 1.5px solid #3a362c;
+          background: transparent;
+          color: #b8b2a2;
+          border-radius: 99px;
+          padding: 8px 14px;
+          font-family: inherit;
+          font-size: 0.9rem;
+          font-weight: 600;
+          white-space: nowrap;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .fs-rubros button:hover { border-color: #6b665a; color: #f5efdf; }
+        .fs-rubros button.on { background: #f5efdf; border-color: #f5efdf; color: #14120e; }
+        .fs-cta.fs-cta-big {
+          width: 100%;
+          max-width: 420px;
+          box-sizing: border-box;
+          margin-top: 20px;
+          padding: 19px 24px;
+          border-radius: 16px;
+          font-size: 1.15rem;
+          box-shadow: 0 10px 30px rgba(37, 211, 102, 0.28);
+        }
+        .fs-cta-big .fs-cta-label {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          text-align: left;
+        }
+        .fs-cta-arrow { transition: transform 0.15s; }
+        .fs-cta:hover .fs-cta-arrow { transform: translateX(4px); }
+        .fs-wa-preview { max-width: 420px; margin-top: 12px; }
+        .fs-wa-preview small { display: block; font-size: 0.78rem; color: #8f8a7c; margin-bottom: 6px; }
+        .fs-wa-preview p {
+          display: inline-block;
+          margin: 0;
+          background: #1f3a2c;
+          color: #dcf2e3;
+          border-radius: 12px 12px 4px 12px;
+          padding: 9px 13px;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+
+        /* ---- v2: barra fija de WhatsApp (mobile) ---- */
+        .fs-sticky-wa { display: none; }
+        @media (max-width: 800px) {
+          .fs-sticky-wa {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 100;
+            padding: 15px 18px;
+            border-radius: 16px;
+            background: #25d366;
+            color: #0b2b16;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            transform: translateY(140%);
+            transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+          }
+          .fs-sticky-wa.on { transform: none; }
+          .fs-sticky-wa i {
+            flex: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--fs-accent);
+            border: 2px solid #0b2b16;
+          }
+          .fs-sticky-wa span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        }
+
+        /* ---- v2: tiendas reales como vitrina ---- */
+        .fs-stores { padding: 24px 24px 88px; }
+        .fs-stores-grid.single { grid-template-columns: 1fr; max-width: 640px; margin: 0 auto; }
+        .fs-store-card.has-shot { padding: 0; }
+        .fs-store-card::before { z-index: 3; }
+        .fs-store-shot {
+          position: relative;
+          aspect-ratio: 16 / 10;
+          overflow: hidden;
+          background: var(--card-accent);
+          border-bottom: 1px solid #e8e2d2;
+        }
+        .fs-store-shot-bar {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 30px;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 0 12px;
+          background: #f3eee2;
+          border-bottom: 1px solid #e8e2d2;
+        }
+        .fs-store-shot-bar i { width: 8px; height: 8px; border-radius: 50%; background: #d8d1bf; }
+        .fs-store-shot-bar em {
+          margin-left: 8px;
+          font-style: normal;
+          font-size: 0.72rem;
+          color: #8f8a7c;
+          background: #fff;
+          border-radius: 99px;
+          padding: 3px 10px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .fs-store-shot-fallback {
+          position: absolute;
+          inset: 30px 0 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 3rem;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+        }
+        .fs-store-shot iframe,
+        .fs-store-shot img {
+          position: absolute;
+          top: 30px;
+          left: 0;
+          border: 0;
+          pointer-events: none;
+          background: #fff;
+        }
+        .fs-store-shot iframe {
+          width: 300%;
+          height: calc(300% - 90px);
+          transform: scale(0.3333);
+          transform-origin: 0 0;
+        }
+        .fs-store-shot img { width: 100%; height: calc(100% - 30px); object-fit: cover; object-position: top; }
+        .fs-store-info { padding: 22px 24px 24px; }
+        .fs-stores-next {
+          display: inline-block;
+          margin-top: 32px;
+          font-weight: 700;
+          color: #23211b;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        }
+
+        /* ---- v2: solución dentro de la sección de dolor ---- */
+        .fs-solution { max-width: 1080px; margin: 64px auto 0; }
+        .fs-solution .fs-benefit-intro { margin-bottom: 28px; }
+
+        /* ---- v2: pasos en el CTA final ---- */
+        .fs-final-steps {
+          list-style: none;
+          padding: 0;
+          margin: 0 auto 32px;
+          max-width: 720px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          text-align: left;
+        }
+        .fs-final-steps li {
+          border-top: 2px solid #3a362c;
+          padding-top: 14px;
+          color: #b8b2a2;
+          font-size: 0.95rem;
+          line-height: 1.45;
+        }
+        .fs-final-steps span { display: block; font-size: 0.75rem; font-weight: 800; color: #1d9e75; margin-bottom: 6px; }
+        .fs-final .fs-cta-big { max-width: 440px; }
+        @media (max-width: 640px) {
+          .fs-final-steps { grid-template-columns: 1fr; }
+        }
       `}</style>
 
-      <div className="fs-hero" style={{ '--fs-accent': color.hex }}>
+      <div className="fs-hero" ref={heroRef} style={{ '--fs-accent': color.hex }}>
         <nav className="fs-nav">
           <LogoF size={36} />
           <strong>Fornistore</strong>
+          <a className="fs-nav-cta" href={waLink} target="_blank" rel="noreferrer">
+            <WhatsAppIcon size={16} /> Hablemos
+          </a>
         </nav>
 
         <div className="fs-hero-grid">
           <div>
             <h1>
-              Tu negocio merece
+              Tu negocio vendiendo online.
               <br />
-              una tienda que
-              <br />
-              venda por vos.
+              <span className="fs-h1-soft">Pedidos, pagos y stock,</span>{' '}
+              <span className="fs-h1-accent">resueltos.</span>
             </h1>
             <p className="fs-sub">
-              Una tienda propia, con tu marca, catálogo, pagos y pedidos.
-              Nosotros la armamos; vos te ocupás de vender.
+              Dejá de anotar pedidos entre chats. Tu tienda, con tu marca, recibe pedidos,
+              cobra con Mercado Pago y descuenta stock sola. Nosotros la armamos.
             </p>
+            <ul className="fs-proof-row">
+              <li>Pedidos en un solo panel</li>
+              <li>Cobros con Mercado Pago</li>
+              <li>Stock que se descuenta solo</li>
+            </ul>
 
-            <div className="fs-field">
-              <label htmlFor="fs-bizname">Nombre de tu negocio</label>
-              <input
-                id="fs-bizname"
-                type="text"
-                maxLength={26}
-                placeholder="Pizzería Don Beto"
-                value={bizName}
-                onChange={(e) => {
-                  setBizName(e.target.value)
-                  setAutoColor(false)
-                }}
-              />
-            </div>
-
-            <div className="fs-field">
-              <label>Tu color</label>
+            <div className="fs-builder">
+              <div className="fs-builder-head">
+                <strong>Probala con tu negocio</strong>
+                <span>Se arma en vivo en el celular</span>
+              </div>
+              <div className="fs-field">
+                <label htmlFor="fs-bizname"><b>1</b> ¿Cómo se llama?</label>
+                <input
+                  id="fs-bizname"
+                  type="text"
+                  maxLength={26}
+                  placeholder="Pizzería Don Beto"
+                  value={bizName}
+                  onChange={(e) => {
+                    setBizName(e.target.value)
+                    setAutoColor(false)
+                  }}
+                />
+              </div>
+              <div className="fs-field">
+                <label><b>2</b> ¿Qué vendés?</label>
+                <div className="fs-rubros">
+                  {RUBROS.map((r) => (
+                    <button
+                      key={r.key}
+                      type="button"
+                      className={rubro.key === r.key ? 'on' : ''}
+                      onClick={() => {
+                        setRubro(r)
+                        setAutoColor(false)
+                      }}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="fs-field">
+                <label><b>3</b> Elegí tu color</label>
               <div className="fs-swatches">
                 <span
                   className="fs-swatch-ring"
@@ -1658,14 +1982,18 @@ export default function FornistoreLanding() {
                   />
                 ))}
               </div>
+              </div>
             </div>
 
-            <a className="fs-cta" href={waLink} target="_blank" rel="noreferrer">
-              Quiero mi tienda →
+            <a className="fs-cta fs-cta-big" href={waLink} target="_blank" rel="noreferrer">
+              <WhatsAppIcon size={22} />
+              <span className="fs-cta-label">{ctaLabel}</span>
+              <span className="fs-cta-arrow" aria-hidden="true">→</span>
             </a>
-            <p className="fs-cta-hint">
-              Contanos qué vendés y te mostramos cómo quedaría. Sin compromiso.
-            </p>
+            <div className="fs-wa-preview">
+              <small>Te abre WhatsApp con este mensaje · sin compromiso</small>
+              <p>{waMsg}</p>
+            </div>
           </div>
 
           <div className="fs-phone-wrap fs-reveal">
@@ -1679,18 +2007,15 @@ export default function FornistoreLanding() {
                   .replace(/[^a-z0-9]+/g, '')
                   .slice(0, 14) || 'tunegocio'}.fornistore.com</p>
                 <div className="fs-phone-products">
-                  <div className="fs-phone-card">
-                    <div className="ph-img" />
-                    <small>Más vendido</small>
-                    <p>$ 8.500</p>
-                  </div>
-                  <div className="fs-phone-card">
-                    <div className="ph-img" />
-                    <small>Nuevo</small>
-                    <p>$ 5.000</p>
-                  </div>
+                  {rubro.items.map(([name, price]) => (
+                    <div className="fs-phone-card" key={name}>
+                      <div className="ph-img" />
+                      <small>{name}</small>
+                      <p>{price}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="fs-phone-btn">Hacer mi pedido</div>
+                <div className="fs-phone-btn">{rubro.btn}</div>
               </div>
             </div>
           </div>
@@ -1700,11 +2025,75 @@ export default function FornistoreLanding() {
       {/* ---------- TRANSICIÓN ---------- */}
       <div className="fs-fade" aria-hidden="true" />
 
-      {/* ---------- BENEFICIOS ---------- */}
-      <section className="fs-benefits">
-        <div className="fs-benefits-inner">
+      {/* ---------- TIENDAS REALES (prueba social) ---------- */}
+      {stores.length > 0 && (
+      <section className="fs-stores">
+        <div className="fs-stores-inner">
+          <span className="fs-kicker fs-reveal">YA ESTÁN VENDIENDO</span>
+          <h2 className="fs-reveal">Mirá lo que ya armamos.</h2>
+          <p className="fs-reveal">Tiendas reales de emprendedores como vos, funcionando hoy. Entrá y probá hacer un pedido.</p>
+          <div className={stores.length === 1 ? 'fs-stores-grid single' : 'fs-stores-grid'}>
+            {stores.map((t, i) => {
+              const accent = t.settings?.primary_color || '#5a6b3a'
+              // settings.fornistore_screenshot (URL de imagen) es la opción por defecto y la más liviana;
+              // el iframe en vivo es opt-in por tienda: solo se activa con fornistore_live_preview: true
+              const shot = t.settings?.fornistore_screenshot
+              const live = !shot && t.settings?.fornistore_live_preview === true
+              const url = t.subdomain + '.fornistore.com'
+              return (
+                <a
+                  key={t.subdomain}
+                  className={'fs-store-card has-shot fs-reveal ' + (i % 2 === 0 ? 'from-left' : 'from-right')}
+                  onMouseMove={tiltMove}
+                  onMouseLeave={tiltLeave}
+                  style={{ '--card-accent': accent, transitionDelay: i * 0.12 + 's' }}
+                  href={'https://' + url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div className="fs-store-shot" aria-hidden="true">
+                    <div className="fs-store-shot-bar"><i /><i /><i /><em>{url}</em></div>
+                    <div className="fs-store-shot-fallback">{initials(t.name)}</div>
+                    {shot && <img src={shot} alt="" loading="lazy" />}
+                    {live && <iframe src={'https://' + url} title={t.name} loading="lazy" tabIndex={-1} />}
+                  </div>
+                  <div className="fs-store-info">
+                    <span className="tag">{TYPE_LABEL[t.business_type] || 'Tienda'}</span>
+                    <h3>{t.name}</h3>
+                    {t.settings?.fornistore_blurb && <p>{t.settings.fornistore_blurb}</p>}
+                    <span className="visit">Recorrer la tienda →</span>
+                  </div>
+                </a>
+              )
+            })}
+          </div>
+          <a className="fs-stores-next fs-reveal" href="#fs-bizname" onClick={focusBuilder}>
+            ¿La tuya es la próxima? Armala arriba ↑
+          </a>
+        </div>
+      </section>
+      )}
+
+      {/* ---------- DOLOR / SOLUCIÓN ---------- */}
+      <section className="fs-pain">
+        <div className="fs-pain-inner">
+          <span className="fs-kicker fs-reveal">EL PROBLEMA NO ES VENDER</span>
+          <h2 className="fs-reveal">Tu negocio creció.<br />Tu forma de vender también tiene que crecer.</h2>
+          <div className="fs-pain-chats" aria-hidden="true">
+            <div className="fs-chat fs-reveal">Hola! ¿Tenés stock del grande?</div>
+            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.15s' }}>¿Me pasás el CBU de nuevo?</div>
+            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.3s' }}>¿Viste mi pedido de ayer? Nadie me contestó 😕</div>
+            <div className="fs-chat right fs-reveal" style={{ transitionDelay: '0.5s' }}>Perdón!! Se me traspapeló 🙏</div>
+          </div>
+          <p className="fs-pain-punch fs-reveal">
+  Cada pedido no debería depender de encontrar un mensaje entre 40 chats.
+  Fornistore junta catálogo, pagos, stock y pedidos en un solo lugar,
+  con la identidad de tu negocio.
+</p>
+        </div>
+        <div className="fs-solution">
           <div className="fs-benefit-intro fs-reveal">
-            <span className="fs-kicker">LO IMPORTANTE</span>
+            <span className="fs-kicker">CON FORNISTORE</span>
             <h2>Menos mensajes sueltos.<br />Más ventas ordenadas.</h2>
           </div>
           <div className="fs-benefits-grid">
@@ -1727,55 +2116,6 @@ export default function FornistoreLanding() {
         </div>
       </section>
 
-      {/* ---------- DOLOR ---------- */}
-      <section className="fs-pain">
-        <div className="fs-pain-inner">
-          <span className="fs-kicker fs-reveal">EL PROBLEMA NO ES VENDER</span>
-          <h2 className="fs-reveal">Tu negocio creció.<br />Tu forma de vender también tiene que crecer.</h2>
-          <div className="fs-pain-chats" aria-hidden="true">
-            <div className="fs-chat fs-reveal">Hola! ¿Tenés stock del grande?</div>
-            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.15s' }}>¿Me pasás el CBU de nuevo?</div>
-            <div className="fs-chat fs-reveal" style={{ transitionDelay: '0.3s' }}>¿Viste mi pedido de ayer? Nadie me contestó 😕</div>
-            <div className="fs-chat right fs-reveal" style={{ transitionDelay: '0.5s' }}>Perdón!! Se me traspapeló 🙏</div>
-          </div>
-          <p className="fs-pain-punch fs-reveal">
-  Cada pedido no debería depender de encontrar un mensaje entre 40 chats.
-  Fornistore junta catálogo, pagos, stock y pedidos en un solo lugar,
-  con la identidad de tu negocio.
-</p>
-        </div>
-      </section>
-
-      {/* ---------- TIENDAS REALES ---------- */}
-      {stores.length > 0 && (
-      <section className="fs-stores">
-        <div className="fs-stores-inner">
-          <span className="fs-kicker fs-reveal">PRUEBA REAL, NO UNA MAQUETA</span>
-          <h2 className="fs-reveal">Así se ven las tiendas que armamos</h2>
-          <p className="fs-reveal">Entrá, recorré y fijate cómo funciona una tienda real de Fornistore.</p>
-          <div className="fs-stores-grid">
-            {stores.map((t, i) => (
-              <a
-                key={t.subdomain}
-                className={`fs-store-card fs-reveal ${i % 2 === 0 ? 'from-left' : 'from-right'}`}
-                onMouseMove={tiltMove}
-                onMouseLeave={tiltLeave}
-                style={{ '--card-accent': t.settings?.primary_color || '#5a6b3a', transitionDelay: `${i * 0.12}s` }}
-                href={`https://${t.subdomain}.fornistore.com`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="tag">{TYPE_LABEL[t.business_type] || 'Tienda'}</span>
-                <h3>{t.name}</h3>
-                {t.settings?.fornistore_blurb && <p>{t.settings.fornistore_blurb}</p>}
-                <span className="visit">Recorrer la tienda →</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
-
       {/* ---------- TU PANEL EN VIVO ---------- */}
       <section className="fs-admin-demo">
         <div className="fs-admin-demo-inner">
@@ -1787,31 +2127,6 @@ export default function FornistoreLanding() {
           </p>
           <div className="fs-reveal from-right" style={{ transitionDelay: '0.15s' }}>
             <PanelDemo />
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- PROCESO ---------- */}
-      <section className="fs-process">
-        <div className="fs-process-inner">
-          <span className="fs-kicker fs-reveal">CÓMO ARRANCAMOS</span>
-          <h2 className="fs-reveal">De idea a tienda online, sin vueltas.</h2>
-          <div className="fs-process-grid">
-            <article className="fs-process-step fs-reveal from-left">
-              <span>01</span>
-              <h3>Nos contás tu negocio</h3>
-              <p>Nombre, productos, colores y cómo querés vender. Partimos de lo que ya tenés.</p>
-            </article>
-            <article className="fs-process-step fs-reveal">
-              <span>02</span>
-              <h3>Armamos tu tienda</h3>
-              <p>Configuramos catálogo, pedidos, pagos, stock y la identidad visual de tu marca.</p>
-            </article>
-            <article className="fs-process-step fs-reveal from-right">
-              <span>03</span>
-              <h3>La ponés a vender</h3>
-              <p>Recibís tu tienda lista y empezás a compartirla por WhatsApp, Instagram y donde quieras.</p>
-            </article>
           </div>
         </div>
       </section>
@@ -1857,7 +2172,7 @@ export default function FornistoreLanding() {
         <h3>Tienda + Landing Premium</h3>
         <div className="fs-premium-price">
           <strong>$35.000</strong>
-          <span>/mes</span>
+          <span>/mes + $90.000 única vez</span>
         </div>
         <ul>
           <li>Todo lo del plan Tienda Online</li>
@@ -1891,21 +2206,29 @@ export default function FornistoreLanding() {
 </section>
 
  {/* ---------- CTA FINAL ---------- */}
-<section className="fs-final">
+<section className="fs-final" ref={finalRef}>
   <span className="fs-reveal" style={{ display: 'inline-block' }}>
     <LogoF size={54} />
   </span>
   <h2 className="fs-reveal">Tu próxima venta puede empezar con una tienda propia.</h2>
   <p className="fs-reveal">Contanos qué vendés. Armamos tu tienda, cargamos tu identidad y la dejamos lista para salir.</p>
+  <ol className="fs-final-steps fs-reveal">
+    <li><span>01</span>Nos escribís por WhatsApp</li>
+    <li><span>02</span>Armamos tu tienda con tu marca</li>
+    <li><span>03</span>La compartís y empezás a vender</li>
+  </ol>
   <a
-    className="fs-cta fs-reveal"
+    className="fs-cta fs-cta-big fs-reveal"
     style={{ transitionDelay: '0.15s' }}
-    href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola! Quiero arrancar con Fornistore 🚀')}`}
+    href={waLink}
     target="_blank"
     rel="noreferrer"
   >
-    Hablemos por WhatsApp →
+    <WhatsAppIcon size={22} />
+    <span className="fs-cta-label">{bizName.trim() ? ctaLabel : 'Hablemos por WhatsApp'}</span>
+    <span className="fs-cta-arrow" aria-hidden="true">→</span>
   </a>
+  <br />
   <a
     className="fs-final-ig fs-reveal"
     style={{ transitionDelay: '0.25s' }}
@@ -1919,6 +2242,20 @@ export default function FornistoreLanding() {
     Fornistore · Tiendas online para emprendedores · Santa Fe, Argentina
   </p>
 </section>
+
+      <a
+        className={heroOut && !finalIn && !intro ? 'fs-sticky-wa on' : 'fs-sticky-wa'}
+        style={{ '--fs-accent': color.hex }}
+        href={waLink}
+        target="_blank"
+        rel="noreferrer"
+        aria-hidden={!(heroOut && !finalIn)}
+        tabIndex={heroOut && !finalIn ? 0 : -1}
+      >
+        <i />
+        <span>{ctaLabel}</span>
+        <WhatsAppIcon size={20} />
+      </a>
     </div>
   )
 }
