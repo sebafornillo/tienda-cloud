@@ -2037,7 +2037,7 @@ export default function FornistoreLanding() {
               const accent = t.settings?.primary_color || '#5a6b3a'
               // settings.fornistore_screenshot (URL de imagen) es la opción por defecto y la más liviana;
               // el iframe en vivo es opt-in por tienda: solo se activa con fornistore_live_preview: true
-              const shot = t.settings?.fornistore_screenshot
+              const shot = t.settings?.fornistore_screenshot || t.settings?.banner_url
               const live = !shot && t.settings?.fornistore_live_preview === true
               const url = t.subdomain + '.fornistore.com'
               return (
