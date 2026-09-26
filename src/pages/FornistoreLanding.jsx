@@ -2172,7 +2172,7 @@ export default function FornistoreLanding() {
         <h3>Tienda + Landing Premium</h3>
         <div className="fs-premium-price">
           <strong>$35.000</strong>
-          <span>/mes + $90.000 única vez</span>
+          <span>/mes</span>
         </div>
         <ul>
           <li>Todo lo del plan Tienda Online</li>
