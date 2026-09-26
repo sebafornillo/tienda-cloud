@@ -5,6 +5,7 @@ import { useTenant } from '../lib/TenantContext'
 import { useCart, money } from '../lib/CartContext'
 import ProductModal from '../components/ProductModal'
 import { isStoreOpen, nextOpening } from '../lib/schedule'
+import '../store-upgrades.css'
 
 // Normaliza texto para buscar sin acentos ni mayúsculas
 const norm = (t) =>
@@ -29,7 +30,7 @@ function highlight(text, q) {
 
 export default function Store() {
   const { tenant } = useTenant()
-  const { count, subtotal } = useCart()
+  const { items, addItem, count, subtotal } = useCart()
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
   const [selected, setSelected] = useState(null)
@@ -43,6 +44,41 @@ export default function Store() {
   const [slide, setSlide] = useState(0)
   const [autoSlide, setAutoSlide] = useState(true)
   const slideTouchX = useRef(null)
+  const [withMods, setWithMods] = useState(null) // Set de product_id con opciones (null = cargando)
+  const [toast, setToast] = useState(null)
+  const [pulseKey, setPulseKey] = useState(0)
+  const toastTimer = useRef(null)
+  const topbarRef = useRef(null)
+  const [topbarH, setTopbarH] = useState(58)
+
+  // Altura real de la barra superior: la usa la barra de categorías para quedar fija debajo
+  useEffect(() => {
+    const el = topbarRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(() => setTopbarH(el.offsetHeight))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => () => clearTimeout(toastTimer.current), [])
+
+  // Confirmación al agregar: aviso breve + pulso en la barra del carrito
+  function notifyAdded(name) {
+    clearTimeout(toastTimer.current)
+    setToast(name)
+    setPulseKey((k) => k + 1)
+    toastTimer.current = setTimeout(() => setToast(null), 2400)
+  }
+
+  function qtyInCart(id) {
+    return items.filter((i) => i.product.id === id).reduce((s, i) => s + i.quantity, 0)
+  }
+
+  // Agregar rápido: solo productos sin opciones
+  function quickAdd(p) {
+    addItem(p, [], 1)
+    notifyAdded(p.name)
+  }
 
   // Botón "volver arriba": aparece pasados los 400px de scroll
   useEffect(() => {
@@ -69,6 +105,15 @@ export default function Store() {
       ])
       setCategories(cats.data || [])
       setProducts(prods.data || [])
+
+      // Qué productos tienen opciones (esos siguen abriendo el detalle)
+      const ids = (prods.data || []).map((p) => p.id)
+      if (ids.length === 0) return setWithMods(new Set())
+      const { data: mods } = await supabase
+        .from('modifier_groups')
+        .select('product_id')
+        .in('product_id', ids)
+      setWithMods(new Set((mods || []).map((m) => m.product_id)))
     }
     load()
   }, [tenant.id])
@@ -167,44 +212,81 @@ const transferAlias = tenant.settings?.transfer_alias
   function renderCard(p, q) {
     const out = p.stock !== null && p.stock <= 0
     const low = !out && p.stock !== null && p.stock <= 3
+    const canQuick =
+      !out &&
+      withMods !== null &&
+      !withMods.has(p.id) &&
+      (p.stock === null || qtyInCart(p.id) < p.stock)
     return (
-      <button
-        key={p.id}
-        className={out ? 'product-card out-of-stock' : 'product-card'}
-        disabled={out}
-        onClick={() => setSelected(p)}
-      >
-        <div className="product-info">
-          <h3>{highlight(p.name, q)}</h3>
-          {p.description && <p>{highlight(p.description, q)}</p>}
-          <div className="price-row">
-  <span className="price">{money(p.price)}</span>
-  {out && <span className="stock-chip out">Sin stock</span>}
-  {low && (
-    <span className="stock-chip low">
-      ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
-    </span>
-  )}
-</div>
-{p.transfer_discount_percent > 0 && (
-  <p className="transfer-discount">
-    {p.transfer_discount_percent}% con transferencia bancaria: {money(p.price * (1 - p.transfer_discount_percent / 100))}
-  </p>
-)}
-{p.installments > 0 && (
-  <p className="installments-box">
-    {p.installments} cuotas sin interés de{' '}
-    {money(p.price / p.installments)}
-  </p>
-)}
-        </div>
-        {p.image_url && <img src={p.image_url} alt={p.name} />}
-      </button>
+      <div key={p.id} className={out ? 'product-card-wrap is-out' : 'product-card-wrap'}>
+        <button
+          className={out ? 'product-card out-of-stock' : 'product-card'}
+          disabled={out}
+          onClick={() => setSelected(p)}
+        >
+          <div className="product-info">
+            <h3>{highlight(p.name, q)}</h3>
+            {p.description && <p>{highlight(p.description, q)}</p>}
+            <div className="price-row">
+              <span className="price">{money(p.price)}</span>
+              {out && <span className="stock-chip out">Sin stock</span>}
+              {low && (
+                <span className="stock-chip low">
+                  ¡{p.stock === 1 ? 'Última unidad' : `Últimas ${p.stock}`}!
+                </span>
+              )}
+            </div>
+            {p.transfer_discount_percent > 0 && (
+              <p className="transfer-discount">
+                {p.transfer_discount_percent}% con transferencia bancaria: {money(p.price * (1 - p.transfer_discount_percent / 100))}
+              </p>
+            )}
+            {p.installments > 0 && (
+              <p className="installments-box">
+                {p.installments} cuotas sin interés de{' '}
+                {money(p.price / p.installments)}
+              </p>
+            )}
+          </div>
+          {p.image_url ? (
+            <img src={p.image_url} alt={p.name} loading="lazy" />
+          ) : (
+            <div className="product-ph" aria-hidden="true">
+              {(p.name || '?').trim().charAt(0).toUpperCase()}
+            </div>
+          )}
+        </button>
+        {canQuick && (
+          <button
+            className="quick-add"
+            onClick={() => quickAdd(p)}
+            aria-label={`Agregar ${p.name} al pedido`}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        )}
+        {out && whatsapp && (
+          <a
+            className="notify-back"
+            href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola ${tenant.name}! Me avisás cuando vuelva "${p.name}"?`)}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Avisame cuando vuelva →
+          </a>
+        )}
+      </div>
     )
   }
 
   return (
-    <div className="store">
+    <div
+      className={count > 0 ? 'store has-cart' : 'store'}
+      style={{ '--topbar-h': topbarH + 'px' }}
+    >
       {announcement && <div className="announce-bar">{announcement}</div>}
       {!open && (
         <div className="closed-banner">
@@ -214,7 +296,7 @@ const transferAlias = tenant.settings?.transfer_alias
       )}
 
       {/* ---------- Barra superior: menú + búsqueda ---------- */}
-      <div className="store-topbar">
+      <div className="store-topbar" ref={topbarRef}>
         <button
           className="topbar-btn"
           onClick={() => setMenuOpen(true)}
@@ -398,6 +480,25 @@ const transferAlias = tenant.settings?.transfer_alias
         </nav>
       )}
 
+      {coupons.length > 0 && !searching && (
+        <div className="coupon-strip">
+          <div>
+            <small>Cupón activo</small>
+            <strong>
+              {coupons[0].discount_type === 'percent'
+                ? `${Number(coupons[0].value)}% OFF`
+                : `${money(Number(coupons[0].value))} OFF`}
+              {Number(coupons[0].min_subtotal) > 0
+                ? ` · desde ${money(Number(coupons[0].min_subtotal))}`
+                : ''}
+            </strong>
+          </div>
+          <button onClick={() => copyCoupon(coupons[0].code)}>
+            {copiedCode === coupons[0].code ? '✓ Copiado' : coupons[0].code}
+          </button>
+        </div>
+      )}
+
       <main className="catalog">
         {searching ? (
           <section>
@@ -472,6 +573,7 @@ const transferAlias = tenant.settings?.transfer_alias
           allProducts={products}
           onSelectProduct={setSelected}
           onClose={() => setSelected(null)}
+          onAdded={notifyAdded}
         />
       )}
 
@@ -501,8 +603,17 @@ const transferAlias = tenant.settings?.transfer_alias
         </a>
       )}
 
+      {toast && (
+        <div className="add-toast" role="status">
+          <span>
+            <b>✓</b> Agregado: {toast}
+          </span>
+          <Link to="/checkout">Ver pedido</Link>
+        </div>
+      )}
+
       {count > 0 && (
-        <Link to="/checkout" className="cart-bar">
+        <Link key={pulseKey} to="/checkout" className={pulseKey > 0 ? 'cart-bar pulse' : 'cart-bar'}>
           <span className="cart-count">{count}</span>
           <span>Ver pedido</span>
           <span>{money(subtotal)}</span>

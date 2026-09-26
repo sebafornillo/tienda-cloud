@@ -7,6 +7,7 @@ export default function ProductModal({
   onClose,
   allProducts = [],
   onSelectProduct,
+  onAdded,
 }) {
   const { addItem } = useCart()
   const [groups, setGroups] = useState([])
@@ -112,6 +113,7 @@ export default function ProductModal({
 
   function confirm() {
     addItem(product, chosenOptions, qty)
+    onAdded?.(qty > 1 ? `${qty} × ${product.name}` : product.name)
     onClose()
   }
 

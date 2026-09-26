@@ -1,0 +1,181 @@
+/* ============================================================
+   Mejoras de la tienda — se carga después de styles.css
+   ============================================================ */
+
+/* 1. Barra superior: fondo sólido con el color de la tienda */
+.store-topbar {
+    background: var(--paper);
+    backdrop-filter: none;
+    box-shadow: 0 6px 14px -12px rgba(0, 0, 0, 0.35);
+  }
+  
+  /* 2. Categorías fijas justo debajo de la barra superior */
+  .cat-nav {
+    top: var(--topbar-h, 58px);
+    z-index: 35;
+  }
+  
+  /* 3. Espacio para que "Ver pedido" no tape el último producto */
+  .store { margin-left: auto; margin-right: auto; overflow-x: clip; }
+  .store.has-cart {
+    padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+  }
+  
+  /* 4. Botones flotantes siempre dentro de la pantalla */
+  .wa-float,
+  .scroll-top {
+    right: max(16px, env(safe-area-inset-right));
+  }
+  
+  /* 5. Tarjeta: contenedor para el botón "+" y el aviso de agotado */
+  .product-card-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .product-card-wrap .product-card { flex: 1; }
+  
+  /* Productos sin foto: recuadro con el color de la tienda */
+  .product-ph {
+    width: 84px;
+    height: 84px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--brand) 14%, var(--card));
+    color: var(--brand);
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  .product-card.out-of-stock .product-ph { filter: grayscale(1); opacity: 0.6; }
+  
+  /* Agregar rápido */
+  .quick-add {
+    position: absolute;
+    top: calc(0.9rem + 84px - 26px);
+    right: calc(0.9rem - 8px);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--card);
+    background: var(--brand);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.12s;
+    z-index: 2;
+  }
+  .quick-add:hover { transform: scale(1.08); }
+  .quick-add:active { transform: scale(0.94); }
+  .quick-add:focus-visible,
+  .product-card:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  
+  /* Agotado: "Avisame cuando vuelva" */
+  .product-card-wrap.is-out .product-card {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .notify-back {
+    display: block;
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--card);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--brand);
+    text-decoration: none;
+  }
+  .notify-back:hover { background: color-mix(in srgb, var(--brand) 6%, var(--card)); }
+  
+  /* 6. Cupón visible arriba del catálogo */
+  .coupon-strip {
+    margin: 0.75rem 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.7rem 0.8rem 0.7rem 1rem;
+    border: 1.5px dashed var(--brand);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--brand) 6%, var(--card));
+  }
+  .coupon-strip small {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .coupon-strip strong { font-size: 0.95rem; }
+  .coupon-strip button {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    padding: 0.55rem 0.9rem;
+  }
+  
+  /* 7. Confirmación al agregar */
+  .add-toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 70px);
+    width: min(600px, calc(100% - 2rem));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+    z-index: 60;
+    animation: toast-in 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  .add-toast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .add-toast b { color: #7ee2a8; margin-right: 4px; }
+  .add-toast a { flex-shrink: 0; color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .cart-bar.pulse { animation: cart-pulse 0.45s ease; }
+  @keyframes cart-pulse {
+    0% { transform: translateX(-50%) scale(1); }
+    40% { transform: translateX(-50%) scale(1.04); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  /* Con carrito, WhatsApp y "volver arriba" suben un poco más para no chocar con el aviso */
+  .store.has-cart .wa-float.up { bottom: 88px; }
+  
+  /* 8. Escritorio: catálogo más ancho y en 2 columnas */
+  @media (min-width: 960px) {
+    .store { max-width: 1000px; }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .add-toast, .cart-bar.pulse { animation: none; }
+  }
+  
